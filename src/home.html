@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HOTELIFE — Inicio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Manrope:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy: #1a222d;
+    --bg-outer: #f9f6f0;
+    --gold: #d4b285;
+    --border-light: #eae5dc;
+    --text-muted: rgba(26,34,45,0.6);
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{
+    font-family: "Manrope", -apple-system, sans-serif;
+    background: #e5e2db;
+    min-height: 100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 24px;
+    color: var(--navy);
+  }
+  .phone{
+    background: var(--bg-outer);
+    border: 0.8px solid var(--gold);
+    border-radius: 44px;
+    box-shadow: 0 25px 50px -12px rgba(26,34,45,0.25);
+    width: 100%;
+    max-width: 390px;
+    overflow: hidden;
+    display:flex;
+    flex-direction:column;
+    height: 780px;
+    position: relative;
+  }
+  .status-bar{
+    flex-shrink:0;
+    display:flex; align-items:center; justify-content:space-between;
+    height:44px; padding: 0 24px;
+    font-weight:600; font-size:14px;
+  }
+  .status-icons{ display:flex; gap:6px; align-items:center; font-size:12px; }
+  .header-bar{
+    flex-shrink:0;
+    display:flex; align-items:center; justify-content:space-between;
+    height:64px; padding: 0 24px;
+  }
+  .scroll-content{
+    flex:1;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  .scroll-content::-webkit-scrollbar{ display:none; }
+  .icon-btn{
+    width:40px; height:40px; border-radius:20px;
+    background:#fff; border:1px solid var(--border-light);
+    display:flex; align-items:center; justify-content:center;
+    font-size:16px; cursor:pointer;
+  }
+  .logo-mini{
+    font-family:"Cormorant Garamond", serif;
+    font-weight:700; font-size:22px; text-transform:uppercase;
+  }
+  .profile-btn{
+    display:flex; align-items:center; gap:8px;
+    background:#fff; border:1px solid var(--border-light);
+    border-radius:20px; padding:8px 12px;
+    font-size:12px; font-weight:600; cursor:pointer;
+  }
+  .greeting{ padding: 12px 24px 8px; }
+  .greeting h1{
+    font-family:"Cormorant Garamond", serif;
+    font-weight:600; font-size:32px;
+  }
+  .room-info{
+    display:flex; align-items:center; gap:8px;
+    margin-top:6px; font-size:14px; color: var(--text-muted);
+  }
+  .dot{ width:6px; height:6px; border-radius:50%; background: var(--gold); }
+  .stay-dates{
+    font-size:12px; color: var(--text-muted);
+    margin-top:6px;
+  }
+
+  .cards-scroll{
+    display:flex; gap:12px;
+    overflow-x:auto;
+    overscroll-behavior-x: contain;
+    padding: 12px 24px 8px;
+    scrollbar-width:none;
+  }
+  .cards-scroll::-webkit-scrollbar{ display:none; }
+  .feature-card{
+    flex: 0 0 342px;
+    width:342px;
+    height:174px;
+    background: var(--navy);
+    border-radius:24px;
+    padding:24px;
+    color:#fff;
+    display:flex; flex-direction:column; justify-content:space-between; gap:14px;
+    box-shadow: 0 12px 12px rgba(26,34,45,0.04);
+  }
+  .feature-card-header{ display:flex; align-items:center; justify-content:space-between; }
+  .feature-label{ color: var(--gold); font-weight:700; font-size:11px; text-transform:uppercase; margin-bottom:4px; }
+  .feature-sub{ font-family:"Cormorant Garamond", serif; font-size:16px; font-weight:400; }
+  .feature-badge{
+    width:44px; height:44px; border-radius:22px;
+    background: rgba(212,178,133,0.12); border:1px solid var(--gold);
+    display:flex; align-items:center; justify-content:center; font-size:18px;
+  }
+  .feature-btn{
+    background: var(--gold);
+    border:none; border-radius:16px; height:54px;
+    display:flex; align-items:center; justify-content:center; gap:12px;
+    font-weight:700; font-size:13px; text-transform:uppercase;
+    color: var(--navy); cursor:pointer; width:100%; flex-shrink:0;
+  }
+  .feature-btn:active{ filter:brightness(0.95); }
+  .feature-btn-outline{ background:transparent; border:1px solid var(--gold); color: var(--gold); }
+  .feature-btn-row{ display:flex; gap:8px; }
+  .feature-btn-row .feature-btn,
+  .feature-btn-row .feature-btn-outline{
+    height:36px; font-size:10px; border-radius:12px; flex:1;
+  }
+  .requests-list{
+    flex:1; min-height:0; overflow-y:auto;
+    display:flex; flex-direction:column; gap:7px;
+  }
+  .request-item{ display:flex; align-items:center; justify-content:space-between; font-size:12px; flex-shrink:0; }
+  .request-name{ font-weight:500; }
+  .request-status{
+    font-size:9px; font-weight:700; text-transform:uppercase;
+    padding:3px 7px; border-radius:8px; white-space:nowrap;
+  }
+  .status-progress{ background: rgba(212,178,133,0.2); color: var(--gold); }
+  .status-confirmed{ background: rgba(160,190,120,0.2); color: #a8d16a; }
+  .status-done{ background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.5); }
+
+  .services-section{ padding: 12px 24px 24px; }
+  .services-title{
+    font-weight:700; font-size:12px; text-transform:uppercase;
+    color: var(--text-muted); margin-bottom:16px;
+  }
+  .services-scroll{
+    display:flex; gap:12px;
+    overflow-x:auto;
+    overscroll-behavior-x: contain;
+    padding-bottom:4px;
+    margin: 0 -24px;
+    padding-left:24px; padding-right:24px;
+    scrollbar-width:none;
+  }
+  .services-scroll::-webkit-scrollbar{ display:none; }
+  .service-card{
+    flex: 0 0 116px;
+    background:#fff; border:1px solid var(--border-light);
+    border-radius:18px; padding:16px 14px;
+    display:flex; flex-direction:column; gap:14px;
+    box-shadow: 0 4px 6px rgba(26,34,45,0.04);
+    text-decoration:none; color:inherit; cursor:pointer;
+  }
+  .service-card-more{
+    background: var(--bg-outer);
+    border: 1px dashed var(--gold);
+    justify-content:center;
+    align-items:flex-start;
+  }
+  .service-card-more .card-cta{ color: var(--navy); }
+  .card-header{ display:flex; align-items:center; justify-content:flex-start; }
+  .card-emoji{ font-size:24px; }
+  .card-name{ font-weight:600; font-size:13px; line-height:1.25; }
+  .card-cta{ font-weight:700; font-size:11px; color: var(--gold); margin-top:4px; }
+
+  .discover-section{ padding: 12px 24px 32px; }
+  .discover-scroll{
+    display:flex; gap:12px;
+    overflow-x:auto;
+    overscroll-behavior-x: contain;
+    margin: 0 -24px;
+    padding: 0 24px 4px;
+    scrollbar-width:none;
+  }
+  .discover-scroll::-webkit-scrollbar{ display:none; }
+  .discover-card{ flex:0 0 130px; cursor:pointer; }
+  .discover-img{
+    width:130px; height:90px; border-radius:14px; margin-bottom:8px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:28px;
+  }
+  .discover-name{ font-size:12px; font-weight:600; }
+
+  .about-card{
+    margin-top:16px; background:#fff; border:1px solid var(--border-light);
+    border-radius:18px; padding:20px;
+  }
+  .about-title{ font-family:"Cormorant Garamond", serif; font-size:20px; font-weight:600; margin-bottom:8px; }
+  .about-text{ font-size:13px; line-height:1.6; color: var(--text-muted); margin-bottom:14px; }
+  .about-btn{ background:none; border:none; color: var(--gold); font-weight:700; font-size:13px; cursor:pointer; padding:0; }
+
+  .bottom-nav{
+    margin-top:auto;
+    background: var(--navy);
+    border-top: 1px solid var(--gold);
+    height:70px;
+    display:flex; align-items:center; justify-content:space-around;
+  }
+  .nav-item{
+    display:flex; flex-direction:column; align-items:center; gap:4px;
+    color:#fff; opacity:0.6; font-size:9px; text-decoration:none; cursor:pointer;
+    background:none; border:none;
+  }
+  .nav-item.active{ color: var(--gold); opacity:1; }
+  .nav-icon{ font-size:16px; }
+
+  .chat-fab{
+    position:absolute;
+    right:20px;
+    bottom:86px;
+    width:52px; height:52px;
+    border-radius:26px;
+    background: var(--gold);
+    border:none;
+    display:flex; align-items:center; justify-content:center;
+    font-size:22px;
+    box-shadow: 0 8px 16px rgba(26,34,45,0.2);
+    cursor:pointer;
+    z-index:10;
+  }
+  .chat-badge{
+    position:absolute;
+    top:-2px; right:-2px;
+    min-width:18px; height:18px;
+    border-radius:9px;
+    background: #b5573a;
+    color:#fff;
+    font-size:10px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+    padding:0 4px;
+    border: 2px solid var(--bg-outer);
+  }
+  .chat-badge.hidden{ display:none; }
+
+  .chat-overlay{
+    position:absolute;
+    inset:0;
+    background: rgba(26,34,45,0.45);
+    display:none;
+    align-items:flex-end;
+    z-index:20;
+  }
+  .chat-overlay.open{ display:flex; }
+  .chat-panel{
+    width:100%;
+    max-height:75%;
+    background:#fff;
+    border-radius:24px 24px 0 0;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+  .chat-panel-header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 20px;
+    border-bottom:1px solid var(--border-light);
+  }
+  .chat-panel-title{ font-weight:700; font-size:14px; }
+  .chat-header-actions{ display:flex; align-items:center; gap:12px; }
+  .chat-call-btn{
+    font-size:16px; text-decoration:none; color: var(--navy);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .chat-close{
+    background:none; border:none; font-size:16px;
+    color: var(--text-muted); cursor:pointer;
+  }
+  .chat-messages{
+    flex:1;
+    overflow-y:auto;
+    padding:16px 20px;
+    display:flex; flex-direction:column; gap:12px;
+    max-height:320px;
+  }
+  .chat-msg{
+    background: var(--bg-outer);
+    border-radius:14px;
+    padding:10px 14px;
+    max-width:80%;
+    font-size:13px;
+    line-height:1.4;
+  }
+  .chat-msg.received{ align-self:flex-start; }
+  .chat-msg.sent{
+    align-self:flex-end;
+    background: var(--gold);
+    color: var(--navy);
+  }
+  .chat-time{
+    display:block;
+    font-size:10px;
+    color: var(--text-muted);
+    margin-top:4px;
+  }
+  .chat-input-row{
+    display:flex; gap:8px;
+    padding:12px 20px;
+    border-top:1px solid var(--border-light);
+  }
+  .chat-input{
+    flex:1;
+    border:1px solid var(--border-light);
+    border-radius:20px;
+    padding:10px 16px;
+    font-size:13px;
+    font-family:inherit;
+    outline:none;
+  }
+  .chat-input:focus{ border-color: var(--gold); }
+  .chat-send{
+    width:38px; height:38px;
+    border-radius:19px;
+    background: var(--gold);
+    border:none;
+    color: var(--navy);
+    font-size:14px;
+    cursor:pointer;
+  }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="status-bar">
+    <span>12:40</span>
+    <span class="status-icons">📶 📡 🔋</span>
+  </div>
+
+  <div class="header-bar">
+    <button class="icon-btn" aria-label="Notificaciones">🔔</button>
+    <p class="logo-mini">HOTELIFE</p>
+    <button class="profile-btn">Perfil 👤</button>
+  </div>
+
+  <div class="scroll-content">
+    <div class="greeting">
+      <h1 id="guestName">Hola, Sr Snick</h1>
+      <div class="room-info">
+        <span class="dot"></span>
+        <span id="roomInfo">Habitación 405 • Suite Deluxe</span>
+      </div>
+      <div class="stay-dates" id="stayDates">Check-out: 18 sep · 2 noches restantes</div>
+    </div>
+
+    <div class="cards-scroll">
+      <div class="feature-card">
+        <div class="feature-card-header">
+          <div>
+            <p class="feature-label">Mis solicitudes</p>
+            <p class="feature-sub">2 activas · 1 completada</p>
+          </div>
+          <div class="feature-badge">📋</div>
+        </div>
+        <div class="requests-list">
+          <div class="request-item">
+            <span class="request-name">Room Service</span>
+            <span class="request-status status-progress">En camino</span>
+          </div>
+          <div class="request-item">
+            <span class="request-name">Spa 5:00 PM</span>
+            <span class="request-status status-confirmed">Confirmado</span>
+          </div>
+          <div class="request-item">
+            <span class="request-name">Limpieza matutina</span>
+            <span class="request-status status-done">Completada</span>
+          </div>
+        </div>
+        <div class="feature-btn-row">
+          <button class="feature-btn" id="agregarSolicitudBtn">➕ Agregar</button>
+          <button class="feature-btn feature-btn-outline" id="verSolicitudesBtn">Ver todas</button>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-card-header">
+          <div>
+            <p class="feature-label">Tu llave digital</p>
+            <p class="feature-sub" id="keyStatus">Conectada vía Bluetooth</p>
+          </div>
+          <div class="feature-badge">🔒</div>
+        </div>
+        <button class="feature-btn" id="unlockBtn">🔑 Presionar para desbloquear</button>
+      </div>
+    </div>
+
+  <div class="services-section">
+    <p class="services-title">Servicios rápidos</p>
+    <div class="services-scroll">
+      <a class="service-card" href="#" data-service="room-service">
+        <div class="card-header">
+          <span class="card-emoji">🍽️</span>
+        </div>
+        <div>
+          <p class="card-name">Room Service</p>
+          <p class="card-cta">Ver menú →</p>
+        </div>
+      </a>
+      <a class="service-card" href="#" data-service="housekeeping">
+        <div class="card-header">
+          <span class="card-emoji">🧺</span>
+        </div>
+        <div>
+          <p class="card-name">Housekeeping</p>
+          <p class="card-cta">Solicitar →</p>
+        </div>
+      </a>
+      <a class="service-card" href="#" data-service="spa">
+        <div class="card-header">
+          <span class="card-emoji">🧖‍♀️</span>
+        </div>
+        <div>
+          <p class="card-name">Spa & Wellness</p>
+          <p class="card-cta">Reservar →</p>
+        </div>
+      </a>
+      <a class="service-card" href="#" data-service="traslados">
+        <div class="card-header">
+          <span class="card-emoji">🚗</span>
+        </div>
+        <div>
+          <p class="card-name">Traslados</p>
+          <p class="card-cta">Solicitar →</p>
+        </div>
+      </a>
+      <a class="service-card" href="#" data-service="restaurante">
+        <div class="card-header">
+          <span class="card-emoji">🍷</span>
+        </div>
+        <div>
+          <p class="card-name">Restaurante</p>
+          <p class="card-cta">Reservar →</p>
+        </div>
+      </a>
+      <a class="service-card" href="#" data-service="lavanderia">
+        <div class="card-header">
+          <span class="card-emoji">👔</span>
+        </div>
+        <div>
+          <p class="card-name">Lavandería</p>
+          <p class="card-cta">Solicitar →</p>
+        </div>
+      </a>
+      <a class="service-card service-card-more" href="#" data-service="mas-servicios" id="masServiciosCard">
+        <div class="card-header">
+          <span class="card-emoji">➕</span>
+        </div>
+        <div>
+          <p class="card-name">Más servicios</p>
+          <p class="card-cta">Ver todos →</p>
+        </div>
+      </a>
+      </div>
+    </div>
+
+    <div class="discover-section">
+      <p class="services-title">Descubrir más</p>
+      <div class="discover-scroll">
+        <div class="discover-card" data-space="lobby">
+          <div class="discover-img" style="background: linear-gradient(135deg, #e8dcc4, #d9c9ae);">🛋️</div>
+          <p class="discover-name">Lobby</p>
+        </div>
+        <div class="discover-card" data-space="piscina">
+          <div class="discover-img" style="background: linear-gradient(135deg, #c9d6d3, #b7c4c2);">🏊</div>
+          <p class="discover-name">Piscina</p>
+        </div>
+        <div class="discover-card" data-space="restaurante">
+          <div class="discover-img" style="background: linear-gradient(135deg, #dcc7a8, #c9b49a);">🍽️</div>
+          <p class="discover-name">Restaurante</p>
+        </div>
+        <div class="discover-card" data-space="suites">
+          <div class="discover-img" style="background: linear-gradient(135deg, #e0d4bf, #cfc2ae);">🛏️</div>
+          <p class="discover-name">Suites</p>
+        </div>
+      </div>
+
+      <div class="about-card">
+        <p class="about-title">Sobre nosotros</p>
+        <p class="about-text">HOTELIFE nace de la idea de que la hospitalidad de lujo también puede ser inmediata. Cada espacio fue pensado para que tu estadía se sienta a la medida — sin filas, sin llamadas, solo experiencias.</p>
+        <button class="about-btn" id="aboutBtn">Conocer más →</button>
+      </div>
+    </div>
+  </div>
+
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-tab="inicio">
+      <span class="nav-icon">🏠</span>
+      <span>Inicio</span>
+    </button>
+    <button class="nav-item" data-tab="servicios">
+      <span class="nav-icon">🗂️</span>
+      <span>Servicios</span>
+    </button>
+    <button class="nav-item" data-tab="solicitudes">
+      <span class="nav-icon">📋</span>
+      <span>Mis solicitudes</span>
+    </button>
+    <button class="nav-item" data-tab="cuenta">
+      <span class="nav-icon">🧾</span>
+      <span>Mi cuenta</span>
+    </button>
+  </nav>
+
+  <button class="chat-fab" id="chatFab" aria-label="Abrir chat con recepción">
+    💬
+    <span class="chat-badge" id="chatBadge">2</span>
+  </button>
+
+  <div class="chat-overlay" id="chatOverlay">
+    <div class="chat-panel">
+      <div class="chat-panel-header">
+        <p class="chat-panel-title">Chat con Recepción</p>
+        <div class="chat-header-actions">
+          <a class="chat-call-btn" href="tel:+10000000000" aria-label="Llamar a recepción">📞</a>
+          <button class="chat-close" id="chatClose" aria-label="Cerrar chat">✕</button>
+        </div>
+      </div>
+      <div class="chat-messages">
+        <div class="chat-msg received">
+          <p>¡Bienvenido, Sr Snick! Soy Concierge HOTELIFE, ¿en qué puedo ayudarte hoy?</p>
+          <span class="chat-time">10:14 AM</span>
+        </div>
+        <div class="chat-msg received">
+          <p>Tu reserva de spa quedó confirmada para las 5:00 PM.</p>
+          <span class="chat-time">10:17 AM</span>
+        </div>
+      </div>
+      <div class="chat-input-row">
+        <input type="text" placeholder="Escribe un mensaje..." class="chat-input" id="chatInput">
+        <button class="chat-send" id="chatSend" aria-label="Enviar mensaje">➤</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  // Simulación de desbloqueo (a integrar con SDK real de cerradura BLE)
+  const unlockBtn = document.getElementById('unlockBtn');
+  unlockBtn.addEventListener('click', () => {
+    unlockBtn.textContent = '✓ Puerta desbloqueada';
+    unlockBtn.style.background = '#eae5dc';
+    setTimeout(() => {
+      unlockBtn.innerHTML = '🔑 Presionar para desbloquear';
+      unlockBtn.style.background = '';
+    }, 2500);
+  });
+
+  // Navegación inferior (placeholder: solo cambia el estado visual activo)
+  document.querySelectorAll('.nav-item').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  document.querySelectorAll('.service-card').forEach(card => {
+    card.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (card.dataset.service === 'mas-servicios') {
+        document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+        document.querySelector('[data-tab="servicios"]').classList.add('active');
+        console.log('Navegando al catálogo completo de servicios');
+        return;
+      }
+      console.log('Servicio seleccionado:', card.dataset.service);
+    });
+  });
+
+  // Chat flotante: abrir/cerrar overlay
+  const chatFab = document.getElementById('chatFab');
+  const chatOverlay = document.getElementById('chatOverlay');
+  const chatClose = document.getElementById('chatClose');
+  const chatBadge = document.getElementById('chatBadge');
+  const chatMessages = document.querySelector('.chat-messages');
+  const chatInput = document.getElementById('chatInput');
+  const chatSend = document.getElementById('chatSend');
+
+  function openChat(){
+    chatOverlay.classList.add('open');
+    chatBadge.classList.add('hidden'); // se limpia el indicador al abrir el chat
+  }
+  function closeChat(){
+    chatOverlay.classList.remove('open');
+  }
+
+  chatFab.addEventListener('click', openChat);
+  chatClose.addEventListener('click', closeChat);
+  chatOverlay.addEventListener('click', (e) => {
+    if (e.target === chatOverlay) closeChat(); // cerrar al tocar fuera del panel
+  });
+
+  function sendMessage(){
+    const text = chatInput.value.trim();
+    if (!text) return;
+    const msg = document.createElement('div');
+    msg.className = 'chat-msg sent';
+    msg.innerHTML = `<p>${text}</p><span class="chat-time">Ahora</span>`;
+    chatMessages.appendChild(msg);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    chatInput.value = '';
+  }
+  chatSend.addEventListener('click', sendMessage);
+  chatInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') sendMessage();
+  });
+
+  // Ver todas las solicitudes -> activa el tab "Mis solicitudes"
+  document.getElementById('verSolicitudesBtn').addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+    document.querySelector('[data-tab="solicitudes"]').classList.add('active');
+    console.log('Navegando a Mis solicitudes');
+  });
+
+  // Agregar nueva solicitud
+  document.getElementById('agregarSolicitudBtn').addEventListener('click', () => {
+    console.log('Abriendo flujo para agregar nueva solicitud');
+  });
+
+  // Sección Descubrir más
+  document.querySelectorAll('.discover-card').forEach(card => {
+    card.addEventListener('click', () => {
+      console.log('Espacio seleccionado:', card.dataset.space);
+    });
+  });
+  document.getElementById('aboutBtn').addEventListener('click', () => {
+    console.log('Navegando a Sobre nosotros');
+  });
+</script>
+
+</body>
+</html>

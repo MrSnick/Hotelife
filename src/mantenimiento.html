@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HOTELIFE — Mantenimiento</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Manrope:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy: #1a222d;
+    --bg-outer: #f9f6f0;
+    --gold: #d4b285;
+    --border-light: #e0e0e0;
+    --text-muted: rgba(26,34,45,0.6);
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{
+    font-family: "Manrope", -apple-system, sans-serif;
+    background: #e5e2db;
+    min-height: 100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 24px;
+    color: var(--navy);
+  }
+  .phone{
+    background: var(--bg-outer);
+    border: 0.8px solid var(--gold);
+    border-radius: 44px;
+    box-shadow: 0 25px 50px -12px rgba(26,34,45,0.25);
+    width: 100%;
+    max-width: 390px;
+    overflow: hidden;
+    display:flex;
+    flex-direction:column;
+    height: 844px;
+    position: relative;
+  }
+  .status-bar{
+    flex-shrink:0;
+    display:flex; align-items:center; justify-content:space-between;
+    height:44px; padding: 0 24px;
+    font-weight:600; font-size:14px;
+  }
+  .status-icons{ display:flex; gap:6px; align-items:center; font-size:12px; }
+
+  .header{
+    flex-shrink:0;
+    background: var(--navy);
+    border-bottom: 1px solid var(--gold);
+    display:flex; align-items:center; gap:12px;
+    height:70px; padding: 0 20px;
+    color:#fff;
+  }
+  .back-btn{ background:none; border:none; color: var(--gold); font-size:16px; cursor:pointer; }
+  .header-text{ flex:1; min-width:0; }
+  .header-title{ font-family:"Cormorant Garamond", serif; font-weight:700; font-size:16px; }
+  .header-subtitle{ font-size:10px; color: var(--gold); }
+  .room-badge{
+    background: rgba(212,178,133,0.15); border:1px solid var(--gold);
+    border-radius:12px; padding:4px 10px; font-weight:700; font-size:11px; color: var(--gold);
+    white-space:nowrap;
+  }
+
+  .scroll-content{
+    flex:1;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+    padding: 16px 20px 24px;
+    display:flex; flex-direction:column; gap:20px;
+  }
+  .scroll-content::-webkit-scrollbar{ display:none; }
+
+  .section-title{
+    font-weight:700; font-size:11px; text-transform:uppercase;
+    color: var(--text-muted); letter-spacing:0.4px;
+  }
+
+  .category-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+  .category-card{
+    display:flex; flex-direction:column; gap:6px;
+    padding:12px; border-radius:12px;
+    border:1px solid var(--border-light);
+    background:#fff;
+    cursor:pointer;
+  }
+  .category-card .icon{ font-size:20px; }
+  .category-card .label{ font-weight:600; font-size:12px; }
+  .category-card.selected{
+    background: var(--navy);
+    border-color: var(--navy);
+  }
+  .category-card.selected .label{ color:#fff; }
+
+  .desc-box{
+    border:1px solid var(--border-light); border-radius:12px;
+    padding:10px 12px; background:#fff;
+  }
+  .desc-textarea{
+    width:100%; height:56px; border:none; outline:none; resize:none;
+    font-family:inherit; font-size:12px; color: var(--navy);
+  }
+  .desc-textarea::placeholder{ color: rgba(26,34,45,0.45); }
+  .photo-btn{
+    margin-top:10px;
+    display:inline-flex; align-items:center; gap:6px;
+    border:1px solid var(--gold); border-radius:10px;
+    padding:8px 14px; background:none;
+    font-weight:600; font-size:11px; color: var(--navy);
+    cursor:pointer;
+  }
+  .photo-preview{
+    margin-top:10px; display:none; align-items:center; gap:8px;
+    font-size:11px; color: var(--text-muted);
+  }
+  .photo-preview.visible{ display:flex; }
+  .photo-thumb{
+    width:36px; height:36px; border-radius:8px;
+    background: var(--bg-outer); border:1px solid var(--border-light);
+    display:flex; align-items:center; justify-content:center; font-size:16px;
+  }
+
+  .urgency-row{ display:flex; gap:10px; }
+  .urgency-chip{
+    flex:1; display:flex; flex-direction:column; align-items:center; gap:2px;
+    padding:8px 6px; border-radius:12px;
+    border:1px solid var(--border-light); background:#fff;
+    cursor:pointer;
+  }
+  .urgency-chip .label{ font-weight:700; font-size:12px; }
+  .urgency-chip .sub{ font-size:9px; color: var(--text-muted); }
+  .urgency-chip.selected{ background: var(--navy); border-color: var(--navy); }
+  .urgency-chip.selected .label{ color: var(--gold); }
+  .urgency-chip.selected .sub{ color: rgba(255,255,255,0.7); }
+
+  .access-col{ display:flex; flex-direction:column; gap:8px; }
+  .access-row{
+    display:flex; align-items:center; gap:10px;
+    padding:10px 12px; border-radius:10px;
+    border:1px solid var(--border-light); background:#fff;
+    cursor:pointer;
+  }
+  .access-row.selected{ background: rgba(212,178,133,0.12); border-color: var(--gold); }
+  .radio{
+    width:14px; height:14px; border-radius:7px;
+    border:1.5px solid var(--border-light); flex-shrink:0; position:relative;
+  }
+  .access-row.selected .radio{ border-color: var(--gold); }
+  .access-row.selected .radio::after{
+    content:''; position:absolute; inset:2px; border-radius:7px; background: var(--navy);
+  }
+  .access-row .label{ font-weight:600; font-size:12px; }
+
+  .submit-btn{
+    width:100%; height:52px; border-radius:16px;
+    background: var(--gold); border:none;
+    font-weight:700; font-size:13px; text-transform:uppercase;
+    color: var(--navy); cursor:pointer;
+  }
+  .submit-btn:active{ filter:brightness(0.95); }
+  .submit-btn:disabled{ opacity:0.5; cursor:not-allowed; }
+
+  .bottom-nav{
+    flex-shrink:0;
+    background: var(--navy);
+    border-top: 1px solid var(--gold);
+    height:70px;
+    display:flex; align-items:center; justify-content:space-around;
+  }
+  .nav-item{
+    display:flex; flex-direction:column; align-items:center; gap:4px;
+    color:#fff; opacity:0.6; font-size:9px; text-decoration:none; cursor:pointer;
+    background:none; border:none;
+  }
+  .nav-item.active{ color: var(--gold); opacity:1; }
+  .nav-icon{ font-size:16px; }
+
+  .chat-fab{
+    position:absolute;
+    right:20px;
+    bottom:86px;
+    width:52px; height:52px;
+    border-radius:26px;
+    background: var(--gold);
+    border:none;
+    display:flex; align-items:center; justify-content:center;
+    font-size:22px;
+    box-shadow: 0 8px 16px rgba(26,34,45,0.2);
+    cursor:pointer;
+    z-index:10;
+  }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="status-bar">
+    <span>12:40</span>
+    <span class="status-icons">📶 📡 🔋</span>
+  </div>
+
+  <div class="header">
+    <button class="back-btn" id="backBtn">◀</button>
+    <div class="header-text">
+      <p class="header-title">Mantenimiento</p>
+      <p class="header-subtitle">Reporta un problema técnico</p>
+    </div>
+    <span class="room-badge">Suite 405</span>
+  </div>
+
+  <div class="scroll-content">
+
+    <div>
+      <p class="section-title">Categoría del problema</p>
+      <div class="category-grid" id="categoryGrid" style="margin-top:8px;">
+        <div class="category-card selected" data-category="ac"><span class="icon">🌡️</span><span class="label">Aire acondicionado</span></div>
+        <div class="category-card" data-category="plomeria"><span class="icon">🚿</span><span class="label">Plomería</span></div>
+        <div class="category-card" data-category="electrico"><span class="icon">💡</span><span class="label">Eléctrico</span></div>
+        <div class="category-card" data-category="tv-wifi"><span class="icon">📺</span><span class="label">TV / WiFi</span></div>
+        <div class="category-card" data-category="puerta"><span class="icon">🚪</span><span class="label">Puerta / Cerradura</span></div>
+        <div class="category-card" data-category="muebles"><span class="icon">🪑</span><span class="label">Muebles / Otro</span></div>
+      </div>
+    </div>
+
+    <div>
+      <p class="section-title">Describe el problema</p>
+      <div class="desc-box" style="margin-top:8px;">
+        <textarea class="desc-textarea" id="descTextarea" placeholder="Ej: el aire acondicionado hace un ruido extraño y no enfría bien..."></textarea>
+        <button class="photo-btn" id="photoBtn">📷 Adjuntar foto (opcional)</button>
+        <div class="photo-preview" id="photoPreview">
+          <div class="photo-thumb">🖼️</div>
+          <span>foto-problema.jpg</span>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <p class="section-title">Nivel de urgencia</p>
+      <div class="urgency-row" id="urgencyRow" style="margin-top:8px;">
+        <div class="urgency-chip selected" data-urgency="normal">
+          <span class="label">Normal</span>
+          <span class="sub">Puede esperar</span>
+        </div>
+        <div class="urgency-chip" data-urgency="urgente">
+          <span class="label">Urgente</span>
+          <span class="sub">Afecta la habitabilidad</span>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <p class="section-title">Preferencia de acceso</p>
+      <div class="access-col" id="accessCol" style="margin-top:8px;">
+        <div class="access-row selected" data-access="ahora"><div class="radio"></div><span class="label">Ahora mismo, estoy en la habitación</span></div>
+        <div class="access-row" data-access="fuera"><div class="radio"></div><span class="label">Prefiero que entren cuando no esté</span></div>
+        <div class="access-row" data-access="hora"><div class="radio"></div><span class="label">Hora específica</span></div>
+      </div>
+    </div>
+
+    <button class="submit-btn" id="submitBtn">🔧 Enviar solicitud de mantenimiento</button>
+
+  </div>
+
+  <nav class="bottom-nav">
+    <button class="nav-item" data-tab="inicio">
+      <span class="nav-icon">🏠</span>
+      <span>Inicio</span>
+    </button>
+    <button class="nav-item active" data-tab="servicios">
+      <span class="nav-icon">🗂️</span>
+      <span>Servicios</span>
+    </button>
+    <button class="nav-item" data-tab="solicitudes">
+      <span class="nav-icon">📋</span>
+      <span>Mis solicitudes</span>
+    </button>
+    <button class="nav-item" data-tab="cuenta">
+      <span class="nav-icon">🧾</span>
+      <span>Mi cuenta</span>
+    </button>
+  </nav>
+
+  <button class="chat-fab" id="chatFab" aria-label="Abrir chat con recepción">💬</button>
+</div>
+
+<script>
+  document.getElementById('backBtn').addEventListener('click', () => {
+    console.log('Volviendo al catálogo de Servicios');
+  });
+
+  // Selección de categoría (única)
+  let selectedCategory = 'ac';
+  document.querySelectorAll('.category-card').forEach(card => {
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.category-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedCategory = card.dataset.category;
+    });
+  });
+
+  // Adjuntar foto (simulado)
+  const photoBtn = document.getElementById('photoBtn');
+  const photoPreview = document.getElementById('photoPreview');
+  let photoAttached = false;
+  photoBtn.addEventListener('click', () => {
+    photoAttached = true;
+    photoPreview.classList.add('visible');
+    photoBtn.textContent = '📷 Cambiar foto';
+  });
+
+  // Nivel de urgencia (único)
+  let selectedUrgency = 'normal';
+  document.querySelectorAll('.urgency-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.urgency-chip').forEach(c => c.classList.remove('selected'));
+      chip.classList.add('selected');
+      selectedUrgency = chip.dataset.urgency;
+    });
+  });
+
+  // Preferencia de acceso (único)
+  let selectedAccess = 'ahora';
+  document.querySelectorAll('.access-row').forEach(row => {
+    row.addEventListener('click', () => {
+      document.querySelectorAll('.access-row').forEach(r => r.classList.remove('selected'));
+      row.classList.add('selected');
+      selectedAccess = row.dataset.access;
+    });
+  });
+
+  // Envío de la solicitud
+  document.getElementById('submitBtn').addEventListener('click', () => {
+    const description = document.getElementById('descTextarea').value.trim();
+    const payload = {
+      category: selectedCategory,
+      description,
+      photoAttached,
+      urgency: selectedUrgency,
+      access: selectedAccess
+    };
+    console.log('Solicitud de mantenimiento enviada:', payload);
+    document.getElementById('submitBtn').textContent = '✓ Solicitud enviada';
+    document.getElementById('submitBtn').disabled = true;
+  });
+
+  document.querySelectorAll('.nav-item').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      console.log('Navegando a tab:', btn.dataset.tab);
+    });
+  });
+
+  document.getElementById('chatFab').addEventListener('click', () => {
+    console.log('Abrir chat con recepción');
+  });
+</script>
+
+</body>
+</html>

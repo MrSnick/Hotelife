@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HOTELIFE — Identificación del huésped</title>
+<style>
+  :root{
+    --navy: #1a222d;
+    --bg-outer: #f9f6f0;
+    --bg-screen: #f2ede0;
+    --panel: #ffffff;
+    --gold: #8b6534;
+    --gold-border: rgba(212,178,133,0.4);
+    --field-border: #d4b285;
+    --text-muted: #6b6459;
+    --footer-muted: #666666;
+    --input-placeholder: rgba(26,34,45,0.55);
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{
+    font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #e5e2db;
+    min-height: 100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 24px;
+  }
+  .phone{
+    background: var(--bg-outer);
+    border: 0.8px solid var(--field-border);
+    border-radius: 44px;
+    box-shadow: 0 25px 50px -12px rgba(26,34,45,0.25);
+    width: 100%;
+    max-width: 390px;
+    overflow: hidden;
+  }
+  .login-screen{
+    background: var(--bg-screen);
+    min-height: 842px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    padding: 80px 24px 30px;
+  }
+  .brand-header{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap: 6px;
+  }
+  .brand-logo{
+    font-weight: 300;
+    font-size: 32px;
+    letter-spacing: 4px;
+    color: var(--gold);
+    text-align:center;
+  }
+  .brand-tagline{
+    font-weight: 300;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-align:center;
+  }
+  .login-form{
+    background: var(--panel);
+    border: 0.8px solid var(--gold-border);
+    border-radius: 20px;
+    padding: 20px;
+    display:flex;
+    flex-direction:column;
+    gap: 14px;
+  }
+  .form-label{
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--navy);
+  }
+  .field-wrap{ position:relative; width:100%; }
+  select, input[type="text"]{
+    width: 100%;
+    height: 42px;
+    background: var(--panel);
+    border: 0.8px solid var(--field-border);
+    border-radius: 10px;
+    padding: 0 16px;
+    font-family: inherit;
+    font-weight: 300;
+    font-size: 11px;
+    color: var(--navy);
+    outline: none;
+  }
+  select{
+    appearance: none;
+    -webkit-appearance: none;
+    color: var(--input-placeholder);
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='6'%3E%3Cpath d='M1 1l3 3 3-3' stroke='%231a222d' stroke-width='1.3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;
+    background-position: right 14px center;
+    padding-right: 30px;
+  }
+  select:invalid{ color: var(--input-placeholder); }
+  select option{ color: var(--navy); }
+  input[type="text"]::placeholder{ color: #757575; }
+  select:focus, input[type="text"]:focus{
+    border-color: var(--field-border);
+    box-shadow: 0 0 0 3px rgba(212,178,133,0.25);
+  }
+  .login-btn{
+    background: var(--field-border);
+    border: none;
+    border-radius: 22px;
+    height: 48px;
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: var(--navy);
+    cursor: pointer;
+    margin-top: 2px;
+  }
+  .login-btn:hover{ filter: brightness(0.95); }
+  .login-footer p{
+    font-weight: 300;
+    font-size: 10px;
+    color: var(--footer-muted);
+    text-align:center;
+  }
+</style>
+</head>
+<body>
+
+  <div class="phone">
+    <form class="login-screen" id="loginForm">
+      <div class="brand-header">
+        <p class="brand-logo">HOTELIFE</p>
+        <p class="brand-tagline">Todo a través de un clic</p>
+      </div>
+
+      <div class="login-form">
+        <p class="form-label">Identificación del huésped</p>
+
+        <div class="field-wrap">
+          <select id="tipoDocumento" name="tipoDocumento" required>
+            <option value="" disabled selected>Seleccione tipo de documento</option>
+            <option value="CC">Cédula de ciudadanía</option>
+            <option value="PA">Pasaporte</option>
+            <option value="CE">Cédula de extranjería</option>
+            <option value="PPT">PPT</option>
+            <option value="DI">Documento de identidad</option>
+          </select>
+        </div>
+
+        <div class="field-wrap">
+          <input
+            type="text"
+            id="numeroDocumento"
+            name="numeroDocumento"
+            inputmode="numeric"
+            autocomplete="off"
+            placeholder="Número de Documento"
+            required
+          >
+        </div>
+
+        <button type="submit" class="login-btn">INICIAR SESIÓN</button>
+      </div>
+
+      <div class="login-footer">
+        <p>¿Problemas con el acceso? Contacte a Recepción</p>
+      </div>
+    </form>
+  </div>
+
+<script>
+  const select = document.getElementById('tipoDocumento');
+  const input = document.getElementById('numeroDocumento');
+  const form = document.getElementById('loginForm');
+
+  select.addEventListener('change', () => {
+    input.setAttribute('inputmode', select.value === 'PA' ? 'text' : 'numeric');
+    input.value = '';
+  });
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (!select.value) { select.focus(); return; }
+    if (!input.value.trim()) { input.focus(); return; }
+    console.log('Login:', select.value, input.value.trim());
+    alert('Ingresando con: ' + select.value + ' ' + input.value.trim());
+  });
+</script>
+
+</body>
+</html>
