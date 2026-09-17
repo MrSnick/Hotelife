@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HOTELIFE — Mis solicitudes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Manrope:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy: #1a222d;
+    --bg-outer: #f9f6f0;
+    --gold: #d4b285;
+    --border-light: #eae5dc;
+    --text-muted: rgba(26,34,45,0.6);
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{
+    font-family: "Manrope", -apple-system, sans-serif;
+    background: #e5e2db;
+    min-height: 100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 24px;
+    color: var(--navy);
+  }
+  .phone{
+    background: var(--bg-outer);
+    border: 0.8px solid var(--gold);
+    border-radius: 44px;
+    box-shadow: 0 25px 50px -12px rgba(26,34,45,0.25);
+    width: 100%;
+    max-width: 390px;
+    overflow: hidden;
+    display:flex;
+    flex-direction:column;
+    height: 844px;
+    position: relative;
+  }
+  .status-bar{
+    flex-shrink:0;
+    display:flex; align-items:center; justify-content:space-between;
+    height:44px; padding: 0 24px;
+    font-weight:600; font-size:14px;
+  }
+  .status-icons{ display:flex; gap:6px; align-items:center; font-size:12px; }
+  .header-bar{
+    flex-shrink:0;
+    display:flex; align-items:center; gap:12px;
+    height:64px; padding: 0 24px;
+  }
+  .back-btn{
+    width:40px; height:40px; border-radius:20px;
+    background:#fff; border:1px solid var(--border-light);
+    display:flex; align-items:center; justify-content:center;
+    font-size:16px; cursor:pointer; flex-shrink:0;
+  }
+  .header-title{
+    font-family:"Cormorant Garamond", serif;
+    font-weight:700; font-size:22px;
+  }
+
+  .filters{
+    flex-shrink:0;
+    display:flex; gap:8px;
+    padding: 4px 24px 12px;
+  }
+  .filter-chip{
+    padding: 8px 14px;
+    border-radius: 16px;
+    border: 1px solid var(--border-light);
+    background:#fff;
+    font-size:12px; font-weight:600;
+    color: var(--text-muted);
+    cursor:pointer;
+  }
+  .filter-chip.active{
+    background: var(--navy);
+    border-color: var(--navy);
+    color: #fff;
+  }
+
+  .new-request-btn{
+    flex-shrink:0;
+    margin: 0 24px 12px;
+    height:46px;
+    border-radius:14px;
+    background: var(--gold);
+    border:none;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    font-weight:700; font-size:13px; text-transform:uppercase;
+    color: var(--navy); cursor:pointer;
+  }
+  .new-request-btn:active{ filter:brightness(0.95); }
+
+  .scroll-content{
+    flex:1;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+    padding: 0 24px 16px;
+  }
+  .scroll-content::-webkit-scrollbar{ display:none; }
+
+  .request-card{
+    display:flex; align-items:flex-start; gap:14px;
+    background:#fff; border:1px solid var(--border-light);
+    border-radius:16px; padding:16px;
+    margin-bottom:10px;
+  }
+  .request-icon{
+    width:40px; height:40px; border-radius:14px;
+    background: var(--bg-outer);
+    display:flex; align-items:center; justify-content:center;
+    font-size:19px; flex-shrink:0;
+  }
+  .request-info{ flex:1; min-width:0; }
+  .request-name{ font-weight:600; font-size:14px; margin-bottom:2px; }
+  .request-time{ font-size:12px; color: var(--text-muted); }
+  .request-right{ display:flex; flex-direction:column; align-items:flex-end; gap:8px; flex-shrink:0; }
+  .status-pill{
+    font-size:10px; font-weight:700; text-transform:uppercase;
+    padding:4px 9px; border-radius:8px; white-space:nowrap;
+  }
+  .status-pending{ background: rgba(180,180,180,0.25); color:#6b6459; }
+  .status-progress{ background: rgba(212,178,133,0.25); color:#a3762f; }
+  .status-confirmed{ background: rgba(160,190,120,0.25); color:#5a7a2e; }
+  .status-done{ background: rgba(26,34,45,0.08); color: var(--text-muted); }
+  .cancel-link{
+    font-size:11px; font-weight:700; color:#b5573a;
+    background:none; border:none; cursor:pointer; padding:0;
+  }
+
+  .bottom-nav{
+    flex-shrink:0;
+    background: var(--navy);
+    border-top: 1px solid var(--gold);
+    height:70px;
+    display:flex; align-items:center; justify-content:space-around;
+  }
+  .nav-item{
+    display:flex; flex-direction:column; align-items:center; gap:4px;
+    color:#fff; opacity:0.6; font-size:9px; text-decoration:none; cursor:pointer;
+    background:none; border:none;
+  }
+  .nav-item.active{ color: var(--gold); opacity:1; }
+  .nav-icon{ font-size:16px; }
+
+  .chat-fab{
+    position:absolute;
+    right:20px;
+    bottom:86px;
+    width:52px; height:52px;
+    border-radius:26px;
+    background: var(--gold);
+    border:none;
+    display:flex; align-items:center; justify-content:center;
+    font-size:22px;
+    box-shadow: 0 8px 16px rgba(26,34,45,0.2);
+    cursor:pointer;
+    z-index:10;
+  }
+  .chat-badge{
+    position:absolute;
+    top:-2px; right:-2px;
+    min-width:18px; height:18px;
+    border-radius:9px;
+    background: #b5573a;
+    color:#fff;
+    font-size:10px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+    padding:0 4px;
+    border: 2px solid var(--bg-outer);
+  }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="status-bar">
+    <span>12:40</span>
+    <span class="status-icons">📶 📡 🔋</span>
+  </div>
+
+  <div class="header-bar">
+    <button class="back-btn" id="backBtn" aria-label="Volver">←</button>
+    <p class="header-title">Mis solicitudes</p>
+  </div>
+
+  <div class="filters">
+    <button class="filter-chip active" data-filter="todas">Todas</button>
+    <button class="filter-chip" data-filter="progreso">En proceso</button>
+    <button class="filter-chip" data-filter="completadas">Completadas</button>
+  </div>
+
+  <button class="new-request-btn" id="newRequestBtn">➕ Nueva solicitud</button>
+
+  <div class="scroll-content" id="scrollContent">
+
+    <div class="request-card" data-status="progreso">
+      <div class="request-icon">🔧</div>
+      <div class="request-info">
+        <p class="request-name">Mantenimiento — Aire acondicionado</p>
+        <p class="request-time">Hoy · 1:10 PM</p>
+      </div>
+      <div class="request-right">
+        <span class="status-pill status-progress">En camino</span>
+        <button class="cancel-link">Cancelar</button>
+      </div>
+    </div>
+
+    <div class="request-card" data-status="pendiente">
+      <div class="request-icon">🚗</div>
+      <div class="request-info">
+        <p class="request-name">Traslado al aeropuerto</p>
+        <p class="request-time">Mañana · 7:00 AM</p>
+      </div>
+      <div class="request-right">
+        <span class="status-pill status-pending">Pendiente</span>
+        <button class="cancel-link">Cancelar</button>
+      </div>
+    </div>
+
+    <div class="request-card" data-status="progreso">
+      <div class="request-icon">🍽️</div>
+      <div class="request-info">
+        <p class="request-name">Room Service</p>
+        <p class="request-time">Hoy · 12:35 PM</p>
+      </div>
+      <div class="request-right">
+        <span class="status-pill status-progress">En camino</span>
+        <button class="cancel-link">Cancelar</button>
+      </div>
+    </div>
+
+    <div class="request-card" data-status="confirmado">
+      <div class="request-icon">🧖‍♀️</div>
+      <div class="request-info">
+        <p class="request-name">Spa & Wellness</p>
+        <p class="request-time">Hoy · 5:00 PM</p>
+      </div>
+      <div class="request-right">
+        <span class="status-pill status-confirmed">Confirmado</span>
+      </div>
+    </div>
+
+    <div class="request-card" data-status="completada">
+      <div class="request-icon">🧺</div>
+      <div class="request-info">
+        <p class="request-name">Limpieza matutina</p>
+        <p class="request-time">Hoy · 9:15 AM</p>
+      </div>
+      <div class="request-right">
+        <span class="status-pill status-done">Completada</span>
+      </div>
+    </div>
+
+    <div class="request-card" data-status="completada">
+      <div class="request-icon">🧴</div>
+      <div class="request-info">
+        <p class="request-name">Toallas extra</p>
+        <p class="request-time">Ayer · 6:40 PM</p>
+      </div>
+      <div class="request-right">
+        <span class="status-pill status-done">Completada</span>
+      </div>
+    </div>
+
+  </div>
+
+  <nav class="bottom-nav">
+    <button class="nav-item" data-tab="inicio">
+      <span class="nav-icon">🏠</span>
+      <span>Inicio</span>
+    </button>
+    <button class="nav-item" data-tab="servicios">
+      <span class="nav-icon">🗂️</span>
+      <span>Servicios</span>
+    </button>
+    <button class="nav-item active" data-tab="solicitudes">
+      <span class="nav-icon">📋</span>
+      <span>Mis solicitudes</span>
+    </button>
+    <button class="nav-item" data-tab="cuenta">
+      <span class="nav-icon">🧾</span>
+      <span>Mi cuenta</span>
+    </button>
+  </nav>
+
+  <button class="chat-fab" id="chatFab" aria-label="Abrir chat con recepción">
+    💬
+    <span class="chat-badge" id="chatBadge">2</span>
+  </button>
+</div>
+
+<script>
+  document.getElementById('backBtn').addEventListener('click', () => {
+    console.log('Volviendo al Inicio');
+  });
+
+  document.getElementById('newRequestBtn').addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+    document.querySelector('[data-tab="servicios"]').classList.add('active');
+    console.log('Navegando al catálogo de servicios para crear una nueva solicitud');
+  });
+
+  // Filtros: Todas / En proceso / Completadas
+  const filterMap = {
+    todas: null,
+    progreso: ['pendiente', 'progreso', 'confirmado'],
+    completadas: ['completada']
+  };
+  document.querySelectorAll('.filter-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      const allowed = filterMap[chip.dataset.filter];
+      document.querySelectorAll('.request-card').forEach(card => {
+        card.style.display = (!allowed || allowed.includes(card.dataset.status)) ? 'flex' : 'none';
+      });
+    });
+  });
+
+  // Cancelar solicitud
+  document.querySelectorAll('.cancel-link').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const card = e.target.closest('.request-card');
+      console.log('Cancelando solicitud:', card.querySelector('.request-name').textContent);
+      card.style.opacity = '0.4';
+      btn.textContent = 'Cancelada';
+      btn.disabled = true;
+    });
+  });
+
+  document.querySelectorAll('.nav-item').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      console.log('Navegando a tab:', btn.dataset.tab);
+    });
+  });
+
+  document.getElementById('chatFab').addEventListener('click', () => {
+    console.log('Abrir chat con recepción');
+  });
+</script>
+
+</body>
+</html>

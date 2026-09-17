@@ -1,0 +1,16 @@
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Dependencias (si luego se agrega un framework/build tool)
+node_modules/
+dist/
+build/
+
+# Variables de entorno
+.env
+.env.local
+
+# Editor
+.vscode/
+.idea/

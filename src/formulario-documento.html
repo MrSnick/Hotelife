@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registro de huésped</title>
+<style>
+  :root{
+    --bg: #f9f6f0;
+    --card: #ffffff;
+    --ink: #1a222d;
+    --muted: #6b6459;
+    --line: #eae5dc;
+    --accent: #d4b285;
+    --accent-soft: rgba(212,178,133,0.25);
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 24px;
+    color: var(--ink);
+  }
+  .card{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 32px 28px;
+    max-width: 380px;
+    width: 100%;
+    box-shadow: 0 8px 24px rgba(43,42,39,0.06);
+  }
+  .card h1{
+    font-size: 19px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .card p.sub{
+    font-size: 13.5px;
+    color: var(--muted);
+    margin-bottom: 24px;
+  }
+  label{
+    display:block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .field{ margin-bottom: 18px; }
+  select, input[type="text"]{
+    width: 100%;
+    font-size: 15px;
+    padding: 11px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: #fdfcfa;
+    color: var(--ink);
+    outline: none;
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+  select{ appearance: none; -webkit-appearance:none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23857f72' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;
+    background-position: right 12px center;
+    padding-right: 34px;
+  }
+  select:focus, input[type="text"]:focus{
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+  .hint{
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+  button{
+    width: 100%;
+    background: var(--accent);
+    color: var(--ink);
+    border: none;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 4px;
+  }
+  button:hover{ filter: brightness(0.95); }
+</style>
+</head>
+<body>
+
+  <form class="card" id="docForm">
+    <h1>Identifícate para continuar</h1>
+    <p class="sub">Necesitamos tu documento para activar los servicios del hotel.</p>
+
+    <div class="field">
+      <label for="tipoDocumento">Tipo de documento</label>
+      <select id="tipoDocumento" name="tipoDocumento" required>
+        <option value="" disabled selected>Selecciona una opción</option>
+        <option value="CC">Cédula de ciudadanía</option>
+        <option value="PA">Pasaporte</option>
+        <option value="CE">Cédula de extranjería</option>
+        <option value="PPT">Permiso por Protección Temporal (PPT)</option>
+        <option value="DI">Documento de identidad</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="numeroDocumento">Número de documento</label>
+      <input
+        type="text"
+        id="numeroDocumento"
+        name="numeroDocumento"
+        inputmode="numeric"
+        autocomplete="off"
+        placeholder="Escribe tu número de documento"
+        required
+      >
+      <p class="hint" id="hintText">Sin puntos ni espacios.</p>
+    </div>
+
+    <button type="submit">Continuar</button>
+  </form>
+
+<script>
+  const select = document.getElementById('tipoDocumento');
+  const input = document.getElementById('numeroDocumento');
+  const hint = document.getElementById('hintText');
+  const form = document.getElementById('docForm');
+
+  // Ajusta el tipo de teclado y el hint según el tipo de documento elegido
+  select.addEventListener('change', () => {
+    if (select.value === 'PA') {
+      input.setAttribute('inputmode', 'text');
+      hint.textContent = 'Incluye letras y números tal como aparece en tu pasaporte.';
+    } else {
+      input.setAttribute('inputmode', 'numeric');
+      hint.textContent = 'Sin puntos ni espacios.';
+    }
+    input.value = '';
+    input.focus();
+  });
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (!select.value) {
+      select.focus();
+      return;
+    }
+    if (!input.value.trim()) {
+      input.focus();
+      return;
+    }
+    console.log('Documento:', select.value, input.value.trim());
+    alert('Documento recibido: ' + select.value + ' ' + input.value.trim());
+  });
+</script>
+
+</body>
+</html>

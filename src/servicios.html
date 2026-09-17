@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HOTELIFE — Servicios</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Manrope:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy: #1a222d;
+    --bg-outer: #f9f6f0;
+    --gold: #d4b285;
+    --border-light: #eae5dc;
+    --text-muted: rgba(26,34,45,0.6);
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{
+    font-family: "Manrope", -apple-system, sans-serif;
+    background: #e5e2db;
+    min-height: 100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 24px;
+    color: var(--navy);
+  }
+  .phone{
+    background: var(--bg-outer);
+    border: 0.8px solid var(--gold);
+    border-radius: 44px;
+    box-shadow: 0 25px 50px -12px rgba(26,34,45,0.25);
+    width: 100%;
+    max-width: 390px;
+    overflow: hidden;
+    display:flex;
+    flex-direction:column;
+    height: 844px;
+    position: relative;
+  }
+  .status-bar{
+    flex-shrink:0;
+    display:flex; align-items:center; justify-content:space-between;
+    height:44px; padding: 0 24px;
+    font-weight:600; font-size:14px;
+  }
+  .status-icons{ display:flex; gap:6px; align-items:center; font-size:12px; }
+  .header-bar{
+    flex-shrink:0;
+    display:flex; align-items:center; gap:12px;
+    height:64px; padding: 0 24px;
+  }
+  .back-btn{
+    width:40px; height:40px; border-radius:20px;
+    background:#fff; border:1px solid var(--border-light);
+    display:flex; align-items:center; justify-content:center;
+    font-size:16px; cursor:pointer; flex-shrink:0;
+  }
+  .header-title{
+    font-family:"Cormorant Garamond", serif;
+    font-weight:700; font-size:22px;
+  }
+  .search-wrap{ padding: 4px 24px 12px; flex-shrink:0; }
+  .search-input{
+    width:100%; height:42px;
+    border:1px solid var(--border-light);
+    border-radius:12px;
+    padding:0 16px;
+    font-size:13px;
+    font-family:inherit;
+    background:#fff;
+    outline:none;
+  }
+  .search-input:focus{ border-color: var(--gold); }
+
+  .scroll-content{
+    flex:1;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+    padding-bottom:16px;
+  }
+  .scroll-content::-webkit-scrollbar{ display:none; }
+
+  .category{ padding: 16px 24px 4px; }
+  .category-title{
+    font-weight:700; font-size:11px; text-transform:uppercase;
+    color: var(--text-muted); margin-bottom:10px; letter-spacing:0.5px;
+  }
+  .service-row{
+    display:flex; align-items:center; gap:14px;
+    background:#fff; border:1px solid var(--border-light);
+    border-radius:14px; padding:12px 14px;
+    margin-bottom:8px;
+    cursor:pointer;
+  }
+  .service-row-icon{
+    width:36px; height:36px; border-radius:12px;
+    background: var(--bg-outer);
+    display:flex; align-items:center; justify-content:center;
+    font-size:17px; flex-shrink:0;
+  }
+  .service-row-name{ font-weight:600; font-size:13px; flex:1; }
+  .service-row-chevron{ color: var(--text-muted); font-size:13px; }
+
+  .bottom-nav{
+    flex-shrink:0;
+    background: var(--navy);
+    border-top: 1px solid var(--gold);
+    height:70px;
+    display:flex; align-items:center; justify-content:space-around;
+  }
+  .nav-item{
+    display:flex; flex-direction:column; align-items:center; gap:4px;
+    color:#fff; opacity:0.6; font-size:9px; text-decoration:none; cursor:pointer;
+    background:none; border:none;
+  }
+  .nav-item.active{ color: var(--gold); opacity:1; }
+  .nav-icon{ font-size:16px; }
+
+  .chat-fab{
+    position:absolute;
+    right:20px;
+    bottom:86px;
+    width:52px; height:52px;
+    border-radius:26px;
+    background: var(--gold);
+    border:none;
+    display:flex; align-items:center; justify-content:center;
+    font-size:22px;
+    box-shadow: 0 8px 16px rgba(26,34,45,0.2);
+    cursor:pointer;
+    z-index:10;
+  }
+  .chat-badge{
+    position:absolute;
+    top:-2px; right:-2px;
+    min-width:18px; height:18px;
+    border-radius:9px;
+    background: #b5573a;
+    color:#fff;
+    font-size:10px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+    padding:0 4px;
+    border: 2px solid var(--bg-outer);
+  }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="status-bar">
+    <span>12:40</span>
+    <span class="status-icons">📶 📡 🔋</span>
+  </div>
+
+  <div class="header-bar">
+    <button class="back-btn" id="backBtn" aria-label="Volver">←</button>
+    <p class="header-title">Servicios</p>
+  </div>
+
+  <div class="search-wrap">
+    <input type="text" class="search-input" id="searchInput" placeholder="Buscar un servicio...">
+  </div>
+
+  <div class="scroll-content" id="scrollContent">
+
+    <div class="category" data-category="Alojamiento y habitación">
+      <p class="category-title">Alojamiento y habitación</p>
+      <div class="service-row" data-service="room-service"><div class="service-row-icon">🍽️</div><p class="service-row-name">Room Service</p><span class="service-row-chevron">→</span></div>
+      <div class="service-row" data-service="housekeeping"><div class="service-row-icon">🧺</div><p class="service-row-name">Housekeeping</p><span class="service-row-chevron">→</span></div>
+      <div class="service-row" data-service="amenities"><div class="service-row-icon">🧴</div><p class="service-row-name">Amenities adicionales</p><span class="service-row-chevron">→</span></div>
+      <div class="service-row" data-service="lavanderia"><div class="service-row-icon">👔</div><p class="service-row-name">Lavandería y planchado</p><span class="service-row-chevron">→</span></div>
+      <div class="service-row" data-service="checkout"><div class="service-row-icon">🕒</div><p class="service-row-name">Late check-out / early check-in</p><span class="service-row-chevron">→</span></div>
+      <div class="service-row" data-service="minibar"><div class="service-row-icon">🥤</div><p class="service-row-name">Minibar</p><span class="service-row-chevron">→</span></div>
+      <div class="service-row" data-service="mantenimiento"><div class="service-row-icon">🔧</div><p class="service-row-name">Mantenimiento</p><span class="service-row-chevron">→</span></div>
+    </div>
+
+    <div class="category" data-category="Alimentos y bebidas">
+      <p class="category-title">Alimentos y bebidas</p>
+      <div class="service-row" data-service="restaurante"><div class="service-row-icon">🍷</div><p class="service-row-name">Restaurante</p><span class="service-row-chevron">→</span></div>
+      <div class="service-row" data-service="bar"><div class="service-row-icon">🍸</div><p class="service-row-name">Bar / Lounge</p><span class="service-row-chevron">→</span></div>
+      <div class="service-row" data-service="desayuno"><div class="service-row-icon">🥐</div><p class="service-row-name">Desayuno</p><span class="service-row-chevron">→</span></div>
+    </div>
+
+    <div class="category" data-category="Bienestar y recreación">
+      <p class="category-title">Bienestar y recreación</p>
+      <div class="service-row" data-service="spa"><div class="service-row-icon">🧖‍♀️</div><p class="service-row-name">Spa & Wellness</p><span class="service-row-chevron">→</span></div>
+      <div class="service-row" data-service="gimnasio"><div class="service-row-icon">🏋️</div><p class="service-row-name">Gimnasio</p><span class="service-row-chevron">→</span></div>
+      <div class="service-row" data-service="piscina"><div class="service-row-icon">🏊</div><p class="service-row-name">Piscina</p><span class="service-row-chevron">→</span></div>
+      <div class="service-row" data-service="sauna"><div class="service-row-icon">♨️</div><p class="service-row-name">Sauna / Jacuzzi</p><span class="service-row-chevron">→</span></div>
+      <div class="service-row" data-service="clases"><div class="service-row-icon">🧘</div><p class="service-row-name">Clases (yoga, pilates)</p><span class="service-row-chevron">→</span></div>
+    </div>
+
+    <div class="category" data-category="Conserjería y asistencia">
+      <p class="category-title">Conserjería y asistencia</p>
+      <div class="service-row" data-service="traslados"><div class="service-row-icon">🚗</div><p class="service-row-name">Traslados</p><span class="service-row-chevron">→</span></div>
+      <div class="service-row" data-service="vehiculos"><div class="service-row-icon">🚙</div><p class="service-row-name">Alquiler de vehículos</p><span class="service-row-chevron">→</span></div>
+      <div class="service-row" data-service="tours"><div class="service-row-icon">🗺️</div><p class="service-row-name">Tours y actividades</p><span class="service-row-chevron">→</span></div>
+      <div class="service-row" data-service="entradas"><div class="service-row-icon">🎟️</div><p class="service-row-name">Reserva de entradas</p><span class="service-row-chevron">→</span></div>
+      <div class="service-row" data-service="ninera"><div class="service-row-icon">🧸</div><p class="service-row-name">Niñera / Kids club</p><span class="service-row-chevron">→</span></div>
+    </div>
+
+    <div class="category" data-category="Negocios y eventos">
+      <p class="category-title">Negocios y eventos</p>
+      <div class="service-row" data-service="salones"><div class="service-row-icon">🏛️</div><p class="service-row-name">Salones de eventos</p><span class="service-row-chevron">→</span></div>
+      <div class="service-row" data-service="negocios"><div class="service-row-icon">🖨️</div><p class="service-row-name">Centro de negocios</p><span class="service-row-chevron">→</span></div>
+      <div class="service-row" data-service="wifi"><div class="service-row-icon">📶</div><p class="service-row-name">WiFi de alta velocidad</p><span class="service-row-chevron">→</span></div>
+    </div>
+
+    <div class="category" data-category="Seguridad y operación">
+      <p class="category-title">Seguridad y operación</p>
+      <div class="service-row" data-service="caja-fuerte"><div class="service-row-icon">🔐</div><p class="service-row-name">Caja fuerte</p><span class="service-row-chevron">→</span></div>
+      <div class="service-row" data-service="valet"><div class="service-row-icon">🅿️</div><p class="service-row-name">Estacionamiento / Valet</p><span class="service-row-chevron">→</span></div>
+      <div class="service-row" data-service="equipaje"><div class="service-row-icon">🧳</div><p class="service-row-name">Custodia de equipaje</p><span class="service-row-chevron">→</span></div>
+    </div>
+
+    <div class="category" data-category="Otros servicios">
+      <p class="category-title">Otros servicios</p>
+      <div class="service-row" data-service="tienda"><div class="service-row-icon">🛍️</div><p class="service-row-name">Tienda del hotel</p><span class="service-row-chevron">→</span></div>
+      <div class="service-row" data-service="mascotas"><div class="service-row-icon">🐾</div><p class="service-row-name">Servicio de mascotas</p><span class="service-row-chevron">→</span></div>
+      <div class="service-row" data-service="medico"><div class="service-row-icon">🩺</div><p class="service-row-name">Servicio médico</p><span class="service-row-chevron">→</span></div>
+    </div>
+
+  </div>
+
+  <nav class="bottom-nav">
+    <button class="nav-item" data-tab="inicio">
+      <span class="nav-icon">🏠</span>
+      <span>Inicio</span>
+    </button>
+    <button class="nav-item active" data-tab="servicios">
+      <span class="nav-icon">🗂️</span>
+      <span>Servicios</span>
+    </button>
+    <button class="nav-item" data-tab="solicitudes">
+      <span class="nav-icon">📋</span>
+      <span>Mis solicitudes</span>
+    </button>
+    <button class="nav-item" data-tab="cuenta">
+      <span class="nav-icon">🧾</span>
+      <span>Mi cuenta</span>
+    </button>
+  </nav>
+
+  <button class="chat-fab" id="chatFab" aria-label="Abrir chat con recepción">
+    💬
+    <span class="chat-badge" id="chatBadge">2</span>
+  </button>
+</div>
+
+<script>
+  // Volver al home
+  document.getElementById('backBtn').addEventListener('click', () => {
+    console.log('Volviendo al Inicio');
+  });
+
+  // Búsqueda: filtra las filas de servicio por nombre, oculta categorías vacías
+  const searchInput = document.getElementById('searchInput');
+  searchInput.addEventListener('input', () => {
+    const q = searchInput.value.trim().toLowerCase();
+    document.querySelectorAll('.category').forEach(cat => {
+      let visibleCount = 0;
+      cat.querySelectorAll('.service-row').forEach(row => {
+        const name = row.querySelector('.service-row-name').textContent.toLowerCase();
+        const match = name.includes(q);
+        row.style.display = match ? 'flex' : 'none';
+        if (match) visibleCount++;
+      });
+      cat.style.display = visibleCount > 0 ? 'block' : 'none';
+    });
+  });
+
+  // Navegación inferior
+  document.querySelectorAll('.nav-item').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      console.log('Navegando a tab:', btn.dataset.tab);
+    });
+  });
+
+  // Selección de un servicio
+  document.querySelectorAll('.service-row').forEach(row => {
+    row.addEventListener('click', () => {
+      console.log('Servicio seleccionado:', row.dataset.service);
+    });
+  });
+
+  // FAB de chat (placeholder de navegación; el overlay completo vive en home)
+  document.getElementById('chatFab').addEventListener('click', () => {
+    console.log('Abrir chat con recepción');
+  });
+</script>
+
+</body>
+</html>

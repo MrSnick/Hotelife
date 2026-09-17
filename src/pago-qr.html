@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HOTELIFE — Pago QR</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy: #1a222d;
+    --bg-outer: #f9f6f0;
+    --gold: #d4b285;
+    --border-light: #e0e0e0;
+    --muted: #8c8c8c;
+    --text-dark: #4a4a4a;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{
+    font-family: "Manrope", -apple-system, sans-serif;
+    background: #e5e2db;
+    min-height: 100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 24px;
+    color: var(--navy);
+  }
+  .phone{
+    background: var(--bg-outer);
+    border: 0.8px solid var(--gold);
+    border-radius: 40px;
+    box-shadow: 0 25px 50px -12px rgba(26,34,45,0.3);
+    width: 100%;
+    max-width: 390px;
+    overflow: hidden;
+    display:flex;
+    flex-direction:column;
+    height: 844px;
+  }
+  .header{
+    flex-shrink:0;
+    background: var(--bg-outer);
+    border-bottom: 0.8px solid var(--border-light);
+    display:flex; align-items:center; justify-content:space-between;
+    height:73px; padding: 12px 18px 0;
+  }
+  .back-btn{
+    background:none; border:none; font-weight:700; font-size:13px;
+    color: var(--navy); cursor:pointer;
+  }
+  .title{ font-weight:700; font-size:12px; letter-spacing:1.5px; text-transform:uppercase; }
+  .room-badge{
+    background: var(--navy); border-radius:12px; padding:4px 10px;
+    font-weight:700; font-size:10px; color: var(--gold);
+  }
+
+  .content{
+    flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none;
+    display:flex; flex-direction:column; align-items:center; gap:14px;
+    padding: 20px 18px;
+  }
+  .content::-webkit-scrollbar{ display:none; }
+
+  .qr-card{
+    background:#fff; border:0.8px solid var(--border-light); border-radius:20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+    padding:20px 16px; width:100%;
+    display:flex; flex-direction:column; align-items:center; gap:10px;
+  }
+  .qr-title{ font-weight:700; font-size:13px; }
+  .qr-subtitle{ font-weight:300; font-size:11px; color: var(--muted); text-align:center; }
+  .qr-frame{
+    width:170px; height:170px; border-radius:16px;
+    border:1.6px dashed var(--gold);
+    display:flex; align-items:center; justify-content:center;
+    padding:10px;
+  }
+  .qr-grid{
+    width:147px; height:147px;
+    display:grid; grid-template-columns: repeat(11, 1fr); grid-template-rows: repeat(11, 1fr);
+    gap:2px;
+  }
+  .qr-grid div{ background: var(--navy); border-radius:1px; }
+  .qr-grid div.off{ background: transparent; }
+  .timer-badge{
+    background:#faf6f0; border:0.8px solid var(--gold); border-radius:10px;
+    padding:4px 12px; font-weight:700; font-size:10px;
+  }
+
+  .summary-box{
+    background:#fff; border:0.8px solid var(--border-light); border-radius:16px;
+    padding:12px 14px; width:100%; display:flex; flex-direction:column; gap:6px;
+  }
+  .row{ display:flex; justify-content:space-between; font-size:11px; }
+  .row .label{ color: var(--text-dark); font-weight:300; }
+  .row .value{ font-weight:700; color: var(--navy); }
+  .row .value.mono{ font-weight:700; }
+  .divider{ height:1px; background: var(--border-light); margin:2px 0; }
+  .total-row{ display:flex; justify-content:space-between; align-items:baseline; }
+  .total-row .label{ font-weight:700; font-size:13px; }
+  .total-row .value{ font-weight:700; font-size:15px; }
+
+  .instructions{
+    background:#faf9f6; border:0.8px solid var(--border-light); border-radius:12px;
+    display:flex; gap:10px; align-items:center; padding:10px 12px; width:100%;
+  }
+  .instructions p{ font-weight:300; font-size:10px; line-height:1.35; color: var(--text-dark); }
+
+  .footer-area{
+    flex-shrink:0; background: var(--bg-outer); border-top: 0.8px solid var(--border-light);
+    display:flex; flex-direction:column; align-items:center; gap:10px;
+    padding: 10px 18px 20px;
+  }
+  .action-btn{
+    width:100%; height:44px; border-radius:22px;
+    background: var(--navy); border:0.8px solid var(--gold);
+    box-shadow: 0 4px 6px rgba(26,34,45,0.2);
+    font-weight:700; font-size:12px; color: var(--gold);
+    cursor:pointer;
+  }
+  .secondary-btn{
+    width:100%; height:36px; border-radius:18px;
+    background:transparent; border:0.8px solid var(--border-light);
+    font-weight:700; font-size:11px; color: var(--navy);
+    cursor:pointer;
+  }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="header">
+    <button class="back-btn" id="backBtn">⬅️ Menú</button>
+    <p class="title">Pago directo QR</p>
+    <span class="room-badge">Suite 405</span>
+  </div>
+
+  <div class="content">
+    <div class="qr-card">
+      <p class="qr-title">Escanea para liquidar</p>
+      <p class="qr-subtitle">Usa la app de tu banco, Bancolombia, Nequi o Mercado Pago</p>
+      <div class="qr-frame">
+        <div class="qr-grid" id="qrGrid"></div>
+      </div>
+      <div class="timer-badge">⏱️ QR válido por: <span id="timer">14:57</span> min</div>
+    </div>
+
+    <div class="summary-box">
+      <div class="row"><span class="label">Subtotal cuenta HOTELIFE</span><span class="value">$137.500 COP</span></div>
+      <div class="row"><span class="label">Impuestos</span><span class="value">$20.625 COP</span></div>
+      <div class="row"><span class="label">Referencia de pago</span><span class="value mono">#HST-405-982</span></div>
+      <div class="divider"></div>
+      <div class="total-row"><span class="label">Monto total</span><span class="value">$158.125 COP</span></div>
+    </div>
+
+    <div class="instructions">
+      <span>💡</span>
+      <p>Al completar el pago, la recepción recibirá la notificación automática y tu estado de check-out quedará actualizado.</p>
+    </div>
+  </div>
+
+  <div class="footer-area">
+    <button class="action-btn" id="downloadBtn">📄 Descargar comprobante PDF</button>
+    <button class="secondary-btn" id="verifyBtn">🔄 Verificar estado del pago</button>
+  </div>
+</div>
+
+<script>
+  document.getElementById('backBtn').addEventListener('click', () => {
+    console.log('Volviendo al menú');
+  });
+
+  // Generar un patrón tipo QR (visual, no escaneable de verdad)
+  const grid = document.getElementById('qrGrid');
+  const seed = [1,1,1,1,1,0,1,1,1,1,1, 1,0,0,0,1,0,1,0,0,0,1, 1,0,1,0,1,0,1,0,1,0,1, 1,0,1,0,1,0,1,0,1,0,1, 1,0,0,0,1,0,1,0,0,0,1, 1,1,1,1,1,0,1,1,1,1,1, 0,0,0,0,0,1,0,0,0,0,0, 1,1,0,1,1,0,1,1,0,1,1, 0,1,1,0,0,1,0,0,1,1,0, 1,0,1,1,0,0,1,0,1,0,1, 1,1,0,0,1,1,0,1,1,0,1];
+  seed.forEach(v => {
+    const cell = document.createElement('div');
+    if (!v) cell.classList.add('off');
+    grid.appendChild(cell);
+  });
+
+  // Cuenta regresiva del QR
+  let seconds = 14 * 60 + 57;
+  const timerEl = document.getElementById('timer');
+  setInterval(() => {
+    if (seconds <= 0) return;
+    seconds--;
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    timerEl.textContent = `${m}:${s.toString().padStart(2, '0')}`;
+  }, 1000);
+
+  document.getElementById('downloadBtn').addEventListener('click', () => {
+    console.log('Descargando comprobante PDF');
+  });
+
+  document.getElementById('verifyBtn').addEventListener('click', () => {
+    console.log('Verificando estado del pago... redirigiendo a Check-out exitoso si ya se pagó');
+  });
+</script>
+
+</body>
+</html>
