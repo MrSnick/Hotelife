@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HOTELIFE — Prototipo interactivo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Manrope:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy: #1a222d;
+    --gold: #d4b285;
+    --gold-soft: #b8925f;
+    --cream: #f9f6f0;
+    --border: #e2ddd0;
+    --text-muted: rgba(26,34,45,0.62);
+    --surface: #ffffff;
+    --page-bg: #eeece4;
+  }
+  *{ box-sizing:border-box; }
+  html, body{ height:100%; }
+  body{
+    margin:0;
+    background: var(--page-bg);
+    color: var(--navy);
+    font-family: "Manrope", -apple-system, "Segoe UI", sans-serif;
+    display:flex;
+    flex-direction:column;
+    min-height:100vh;
+  }
+  header{
+    padding: 20px 20px 16px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+  }
+  .eyebrow{
+    font-size:11px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color: var(--gold-soft);
+    font-weight:700;
+  }
+  h1{
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: 28px;
+    font-weight:700;
+    margin:0;
+  }
+  nav{
+    display:flex;
+    gap:8px;
+    overflow-x:auto;
+    padding: 12px 20px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    -webkit-overflow-scrolling: touch;
+  }
+  .tab{
+    flex: 0 0 auto;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor:pointer;
+    white-space:nowrap;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  .tab:hover{ border-color: var(--gold); color: var(--navy); }
+  .tab.active{
+    background: var(--navy);
+    border-color: var(--navy);
+    color: var(--cream);
+  }
+  main{
+    flex:1;
+    display:flex;
+    align-items:stretch;
+    justify-content:center;
+    padding: 24px 16px 40px;
+  }
+  .frame-wrap{
+    width:100%;
+    max-width: 430px;
+    display:flex;
+  }
+  iframe{
+    width:100%;
+    min-height: 700px;
+    border: none;
+    border-radius: 18px;
+    background: var(--cream);
+    box-shadow: 0 20px 45px -18px rgba(20,20,20,0.35);
+  }
+  .caption{
+    text-align:center;
+    font-size:12px;
+    color: var(--text-muted);
+    padding: 0 20px 20px;
+  }
+  a.repo-link{ color: var(--gold-soft); font-weight:600; }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="eyebrow">Prototipo interactivo</span>
+  <h1 id="screenTitle">HOTELIFE</h1>
+</header>
+
+<nav id="tabs"></nav>
+
+<main>
+  <div class="frame-wrap">
+    <iframe id="screen" title="Pantalla de Hotelife"></iframe>
+  </div>
+</main>
+<p class="caption">Cada botón carga la pantalla original del repositorio. El diseño definitivo vive en Figma · <a class="repo-link" href="https://github.com/MrSnick/Hotelife" target="_blank" rel="noopener">Ver código en GitHub</a></p>
+
+<script>
+(function(){
+  var screens = [
+    { file: "src/login.html", label: "Login" },
+    { file: "src/home.html", label: "Home" },
+    { file: "src/servicios.html", label: "Servicios" },
+    { file: "src/solicitudes.html", label: "Solicitudes" },
+    { file: "src/cuenta.html", label: "Cuenta" },
+    { file: "src/pasarela-pago.html", label: "Pasarela de pago" },
+    { file: "src/pago-qr.html", label: "Pago QR" },
+    { file: "src/checkout-exitoso.html", label: "Checkout exitoso" },
+    { file: "src/mantenimiento.html", label: "Mantenimiento" },
+    { file: "src/formulario-documento.html", label: "Formulario (borrador)" }
+  ];
+
+  var nav = document.getElementById("tabs");
+  var iframe = document.getElementById("screen");
+  var title = document.getElementById("screenTitle");
+
+  screens.forEach(function(s, i){
+    var btn = document.createElement("button");
+    btn.className = "tab";
+    btn.type = "button";
+    btn.textContent = s.label;
+    btn.addEventListener("click", function(){ select(i); });
+    nav.appendChild(btn);
+  });
+
+  function select(i){
+    var s = screens[i];
+    Array.prototype.forEach.call(nav.children, function(btn, idx){
+      btn.classList.toggle("active", idx === i);
+    });
+    iframe.src = s.file;
+    title.textContent = "HOTELIFE — " + s.label;
+    if (history.replaceState) history.replaceState(null, "", "#" + s.file.split("/")[1].replace(".html",""));
+  }
+
+  var startIndex = 0;
+  var hash = (location.hash || "").replace("#", "");
+  if (hash){
+    var found = screens.findIndex(function(s){ return s.file.indexOf(hash + ".html") !== -1; });
+    if (found !== -1) startIndex = found;
+  }
+  select(startIndex);
+})();
+</script>
+
+</body>
+</html>
