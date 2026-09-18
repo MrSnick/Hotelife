@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HOTELIFE Staff — Mantenimiento</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy: #1a222d;
+    --bg-outer: #f9f6f0;
+    --gold: #d4b285;
+    --border-light: #e5e1d8;
+    --text-muted: rgba(26,34,45,0.6);
+    --green: #4c8c4a;
+    --red: #b5573a;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{
+    font-family: "Manrope", -apple-system, sans-serif;
+    background: #e5e2db;
+    min-height: 100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 24px;
+    color: var(--navy);
+  }
+  .phone{
+    background: var(--bg-outer);
+    border: 0.8px solid var(--gold);
+    border-radius: 44px;
+    box-shadow: 0 25px 50px -12px rgba(26,34,45,0.25);
+    width: 100%;
+    max-width: 390px;
+    overflow: hidden;
+    display:flex;
+    flex-direction:column;
+    height: 844px;
+    position: relative;
+  }
+  .status-bar{
+    flex-shrink:0;
+    display:flex; align-items:center; justify-content:space-between;
+    height:44px; padding: 0 24px;
+    font-weight:600; font-size:14px;
+  }
+  .status-icons{ display:flex; gap:6px; align-items:center; font-size:12px; }
+
+  .header{
+    flex-shrink:0;
+    background: var(--navy);
+    padding: 14px 20px 18px;
+    color:#fff;
+  }
+  .header-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+  .staff-info{ display:flex; align-items:center; gap:10px; }
+  .staff-avatar{
+    width:38px; height:38px; border-radius:12px;
+    background: var(--gold); color: var(--navy);
+    display:flex; align-items:center; justify-content:center;
+    font-weight:800; font-size:14px;
+  }
+  .staff-name{ font-weight:700; font-size:13px; }
+  .staff-role{ font-size:10px; color: rgba(255,255,255,0.6); }
+  .icon-btn{
+    width:36px; height:36px; border-radius:10px;
+    background: rgba(255,255,255,0.08); border:none;
+    display:flex; align-items:center; justify-content:center;
+    font-size:15px; color:#fff; cursor:pointer; position:relative;
+  }
+  .icon-btn .dot{
+    position:absolute; top:5px; right:5px; width:7px; height:7px;
+    border-radius:4px; background: var(--red); border:1.5px solid var(--navy);
+  }
+  .summary-row{ display:flex; gap:10px; }
+  .summary-chip{
+    flex:1; background: rgba(255,255,255,0.06); border-radius:12px;
+    padding:10px 12px;
+  }
+  .summary-chip .value{ font-family:"Cormorant Garamond", serif; font-size:22px; font-weight:700; }
+  .summary-chip .label{ font-size:9px; color: rgba(255,255,255,0.6); text-transform:uppercase; font-weight:700; letter-spacing:0.3px; }
+  .summary-chip.alert .value{ color: var(--gold); }
+
+  .filters{
+    flex-shrink:0;
+    display:flex; gap:8px;
+    padding: 14px 20px 10px;
+  }
+  .filter-chip{
+    padding: 7px 13px; border-radius:14px;
+    border: 1px solid var(--border-light); background:#fff;
+    font-size:11px; font-weight:700; color: var(--text-muted); cursor:pointer;
+  }
+  .filter-chip.active{ background: var(--navy); border-color: var(--navy); color:#fff; }
+
+  .scroll-content{
+    flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none;
+    padding: 4px 20px 20px;
+    display:flex; flex-direction:column; gap:12px;
+  }
+  .scroll-content::-webkit-scrollbar{ display:none; }
+
+  .ticket{
+    background:#fff; border:1px solid var(--border-light); border-radius:16px;
+    padding:16px; display:flex; flex-direction:column; gap:10px;
+  }
+  .ticket.urgent{ border-color: var(--red); border-width:1.5px; }
+  .ticket-top{ display:flex; align-items:flex-start; justify-content:space-between; }
+  .ticket-room{ display:flex; align-items:center; gap:8px; }
+  .room-badge{
+    background: var(--bg-outer); border-radius:8px; padding:4px 9px;
+    font-weight:800; font-size:12px;
+  }
+  .guest-name{ font-weight:700; font-size:13px; }
+  .urgency-tag{
+    font-size:9px; font-weight:800; text-transform:uppercase;
+    padding:3px 8px; border-radius:7px;
+  }
+  .urgency-tag.urgente{ background: rgba(181,87,58,0.15); color: var(--red); }
+  .urgency-tag.normal{ background: rgba(212,178,133,0.25); color:#a3762f; }
+
+  .ticket-category{ font-weight:700; font-size:13px; display:flex; align-items:center; gap:6px; }
+  .ticket-desc{ font-size:12px; color: var(--text-muted); line-height:1.4; }
+  .ticket-meta{ display:flex; justify-content:space-between; font-size:11px; color: var(--text-muted); }
+  .ticket-access{ font-size:11px; font-weight:600; background: var(--bg-outer); border-radius:8px; padding:5px 9px; display:inline-block; width:fit-content; }
+
+  .ticket-actions{ display:flex; gap:8px; margin-top:2px; }
+  .btn{
+    flex:1; height:38px; border-radius:12px; border:none;
+    font-weight:700; font-size:11px; text-transform:uppercase; cursor:pointer;
+  }
+  .btn-primary{ background: var(--gold); color: var(--navy); }
+  .btn-outline{ background:#fff; border:1px solid var(--border-light); color: var(--navy); }
+  .btn-success{ background: var(--green); color:#fff; }
+  .btn:disabled{ opacity:0.5; cursor:not-allowed; }
+
+  .bottom-nav{
+    flex-shrink:0;
+    background: var(--navy);
+    border-top: 1px solid var(--gold);
+    height:70px;
+    display:flex; align-items:center; justify-content:space-around;
+  }
+  .nav-item{
+    display:flex; flex-direction:column; align-items:center; gap:4px;
+    color:#fff; opacity:0.6; font-size:9px; cursor:pointer;
+    background:none; border:none;
+  }
+  .nav-item.active{ color: var(--gold); opacity:1; }
+  .nav-icon{ font-size:16px; }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="status-bar">
+    <span>12:40</span>
+    <span class="status-icons">📶 📡 🔋</span>
+  </div>
+
+  <div class="header">
+    <div class="header-top">
+      <div class="staff-info">
+        <div class="staff-avatar">JM</div>
+        <div>
+          <p class="staff-name">Jefe de Mantenimiento</p>
+          <p class="staff-role">HOTELIFE · Turno activo</p>
+        </div>
+      </div>
+      <button class="icon-btn" id="notifBtn">🔔<span class="dot"></span></button>
+    </div>
+    <div class="summary-row">
+      <div class="summary-chip alert"><p class="value">3</p><p class="label">Pendientes</p></div>
+      <div class="summary-chip"><p class="value">2</p><p class="label">En proceso</p></div>
+      <div class="summary-chip"><p class="value">1</p><p class="label">Urgentes</p></div>
+    </div>
+  </div>
+
+  <div class="filters">
+    <button class="filter-chip active" data-filter="todas">Todas</button>
+    <button class="filter-chip" data-filter="pendientes">Pendientes</button>
+    <button class="filter-chip" data-filter="proceso">En proceso</button>
+    <button class="filter-chip" data-filter="completadas">Completadas</button>
+  </div>
+
+  <div class="scroll-content" id="ticketList">
+
+    <div class="ticket urgent" data-status="pendiente" data-urgency="urgente">
+      <div class="ticket-top">
+        <div class="ticket-room">
+          <span class="room-badge">405</span>
+          <span class="guest-name">Sr Snick</span>
+        </div>
+        <span class="urgency-tag urgente">Urgente</span>
+      </div>
+      <p class="ticket-category">🌡️ Aire acondicionado</p>
+      <p class="ticket-desc">"El aire acondicionado hace un ruido extraño y no enfría bien."</p>
+      <span class="ticket-access">🔑 Prefiere que entren cuando no esté</span>
+      <div class="ticket-meta"><span>Hace 22 min</span><span>Suite Deluxe</span></div>
+      <div class="ticket-actions">
+        <button class="btn btn-outline" data-action="ver">Ver detalle</button>
+        <button class="btn btn-primary" data-action="aceptar">Aceptar</button>
+      </div>
+    </div>
+
+    <div class="ticket" data-status="pendiente" data-urgency="normal">
+      <div class="ticket-top">
+        <div class="ticket-room">
+          <span class="room-badge">212</span>
+          <span class="guest-name">Sra. Londoño</span>
+        </div>
+        <span class="urgency-tag normal">Normal</span>
+      </div>
+      <p class="ticket-category">💡 Eléctrico</p>
+      <p class="ticket-desc">"Un enchufe del baño no funciona."</p>
+      <span class="ticket-access">🔑 Ahora mismo, está en la habitación</span>
+      <div class="ticket-meta"><span>Hace 8 min</span><span>Habitación Estándar</span></div>
+      <div class="ticket-actions">
+        <button class="btn btn-outline" data-action="ver">Ver detalle</button>
+        <button class="btn btn-primary" data-action="aceptar">Aceptar</button>
+      </div>
+    </div>
+
+    <div class="ticket" data-status="proceso" data-urgency="normal">
+      <div class="ticket-top">
+        <div class="ticket-room">
+          <span class="room-badge">318</span>
+          <span class="guest-name">Sr. Gómez</span>
+        </div>
+        <span class="urgency-tag normal">Normal</span>
+      </div>
+      <p class="ticket-category">🚿 Plomería</p>
+      <p class="ticket-desc">"Fuga leve debajo del lavamanos."</p>
+      <span class="ticket-access">🔑 Hora específica: 3:00 PM</span>
+      <div class="ticket-meta"><span>Asignado hace 40 min</span><span>Suite Junior</span></div>
+      <div class="ticket-actions">
+        <button class="btn btn-outline" data-action="ver">Ver detalle</button>
+        <button class="btn btn-success" data-action="completar">Marcar completada</button>
+      </div>
+    </div>
+
+    <div class="ticket" data-status="proceso" data-urgency="urgente">
+      <div class="ticket-top">
+        <div class="ticket-room">
+          <span class="room-badge">509</span>
+          <span class="guest-name">Sra. Pardo</span>
+        </div>
+        <span class="urgency-tag urgente">Urgente</span>
+      </div>
+      <p class="ticket-category">🚪 Puerta / Cerradura</p>
+      <p class="ticket-desc">"La cerradura electrónica no responde."</p>
+      <span class="ticket-access">🔑 Ahora mismo, está en la habitación</span>
+      <div class="ticket-meta"><span>Asignado hace 5 min</span><span>Suite Presidencial</span></div>
+      <div class="ticket-actions">
+        <button class="btn btn-outline" data-action="ver">Ver detalle</button>
+        <button class="btn btn-success" data-action="completar">Marcar completada</button>
+      </div>
+    </div>
+
+    <div class="ticket" data-status="completada" data-urgency="normal">
+      <div class="ticket-top">
+        <div class="ticket-room">
+          <span class="room-badge">104</span>
+          <span class="guest-name">Sr. Duarte</span>
+        </div>
+        <span class="urgency-tag normal">Normal</span>
+      </div>
+      <p class="ticket-category">🪑 Muebles / Otro</p>
+      <p class="ticket-desc">"Una silla del escritorio está floja."</p>
+      <div class="ticket-meta"><span>Completada hace 1 h</span><span>Habitación Estándar</span></div>
+      <div class="ticket-actions">
+        <button class="btn btn-outline" data-action="ver" style="flex:1;">Ver detalle</button>
+      </div>
+    </div>
+
+  </div>
+
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-tab="solicitudes">
+      <span class="nav-icon">📋</span>
+      <span>Solicitudes</span>
+    </button>
+    <button class="nav-item" data-tab="historial">
+      <span class="nav-icon">🗂️</span>
+      <span>Historial</span>
+    </button>
+    <button class="nav-item" data-tab="perfil">
+      <span class="nav-icon">👤</span>
+      <span>Perfil</span>
+    </button>
+  </nav>
+</div>
+
+<script>
+  // Filtros
+  document.querySelectorAll('.filter-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      const filter = chip.dataset.filter;
+      const map = { todas: null, pendientes: 'pendiente', proceso: 'proceso', completadas: 'completada' };
+      const target = map[filter];
+      document.querySelectorAll('.ticket').forEach(t => {
+        t.style.display = (!target || t.dataset.status === target) ? 'flex' : 'none';
+      });
+    });
+  });
+
+  // Aceptar solicitud -> pasa a "en proceso"
+  document.querySelectorAll('[data-action="aceptar"]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const ticket = e.target.closest('.ticket');
+      ticket.dataset.status = 'proceso';
+      const meta = ticket.querySelector('.ticket-meta span');
+      meta.textContent = 'Asignado hace instantes';
+      const actions = ticket.querySelector('.ticket-actions');
+      actions.innerHTML = '<button class="btn btn-outline" data-action="ver">Ver detalle</button><button class="btn btn-success" data-action="completar">Marcar completada</button>';
+      attachCompleteHandler(ticket);
+      console.log('Solicitud aceptada:', ticket.querySelector('.guest-name').textContent);
+    });
+  });
+
+  function attachCompleteHandler(ticket) {
+    const btn = ticket.querySelector('[data-action="completar"]');
+    btn.addEventListener('click', () => {
+      ticket.dataset.status = 'completada';
+      ticket.querySelector('.ticket-meta span').textContent = 'Completada hace instantes';
+      ticket.querySelector('.ticket-actions').innerHTML = '<button class="btn btn-outline" data-action="ver" style="flex:1;">Ver detalle</button>';
+      console.log('Solicitud marcada como completada');
+    });
+  }
+  document.querySelectorAll('[data-action="completar"]').forEach(attachCompleteHandler);
+
+  document.querySelectorAll('.nav-item').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      console.log('Navegando a tab:', btn.dataset.tab);
+    });
+  });
+
+  document.getElementById('notifBtn').addEventListener('click', () => {
+    console.log('Abrir notificaciones');
+  });
+</script>
+
+</body>
+</html>

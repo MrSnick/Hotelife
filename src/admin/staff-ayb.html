@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HOTELIFE Staff — A&B</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy: #1a222d; --bg-outer: #f9f6f0; --gold: #d4b285; --border-light: #e5e1d8;
+    --text-muted: rgba(26,34,45,0.6); --green: #4c8c4a; --red: #b5573a; --blue:#3d6b9c;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{ font-family:"Manrope",-apple-system,sans-serif; background:#e5e2db; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; color:var(--navy); }
+  .phone{ background:var(--bg-outer); border:0.8px solid var(--gold); border-radius:44px; box-shadow:0 25px 50px -12px rgba(26,34,45,0.25); width:100%; max-width:390px; overflow:hidden; display:flex; flex-direction:column; height:844px; position:relative; }
+  .status-bar{ flex-shrink:0; display:flex; align-items:center; justify-content:space-between; height:44px; padding:0 24px; font-weight:600; font-size:14px; }
+  .status-icons{ display:flex; gap:6px; align-items:center; font-size:12px; }
+  .header{ flex-shrink:0; background:var(--navy); padding:14px 20px 18px; color:#fff; }
+  .header-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+  .staff-info{ display:flex; align-items:center; gap:10px; }
+  .staff-avatar{ width:38px; height:38px; border-radius:12px; background:var(--gold); color:var(--navy); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:14px; }
+  .staff-name{ font-weight:700; font-size:13px; }
+  .staff-role{ font-size:10px; color:rgba(255,255,255,0.6); }
+  .icon-btn{ width:36px; height:36px; border-radius:10px; background:rgba(255,255,255,0.08); border:none; display:flex; align-items:center; justify-content:center; font-size:15px; color:#fff; cursor:pointer; position:relative; }
+  .icon-btn .dot{ position:absolute; top:5px; right:5px; width:7px; height:7px; border-radius:4px; background:var(--red); border:1.5px solid var(--navy); }
+  .summary-row{ display:flex; gap:10px; }
+  .summary-chip{ flex:1; background:rgba(255,255,255,0.06); border-radius:12px; padding:10px 12px; }
+  .summary-chip .value{ font-family:"Cormorant Garamond",serif; font-size:22px; font-weight:700; }
+  .summary-chip .label{ font-size:9px; color:rgba(255,255,255,0.6); text-transform:uppercase; font-weight:700; letter-spacing:0.3px; }
+  .summary-chip.alert .value{ color:var(--gold); }
+  .filters{ flex-shrink:0; display:flex; gap:8px; padding:14px 20px 10px; overflow-x:auto; }
+  .filter-chip{ padding:7px 13px; border-radius:14px; border:1px solid var(--border-light); background:#fff; font-size:11px; font-weight:700; color:var(--text-muted); cursor:pointer; white-space:nowrap; }
+  .filter-chip.active{ background:var(--navy); border-color:var(--navy); color:#fff; }
+  .scroll-content{ flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; padding:4px 20px 20px; display:flex; flex-direction:column; gap:12px; }
+  .scroll-content::-webkit-scrollbar{ display:none; }
+  .ticket{ background:#fff; border:1px solid var(--border-light); border-radius:16px; padding:16px; display:flex; flex-direction:column; gap:10px; }
+  .ticket-top{ display:flex; align-items:flex-start; justify-content:space-between; }
+  .ticket-room{ display:flex; align-items:center; gap:8px; }
+  .room-badge{ background:var(--bg-outer); border-radius:8px; padding:4px 9px; font-weight:800; font-size:12px; }
+  .guest-name{ font-weight:700; font-size:13px; }
+  .stage-tag{ font-size:9px; font-weight:800; text-transform:uppercase; padding:3px 8px; border-radius:7px; }
+  .stage-nuevo{ background: rgba(181,87,58,0.15); color: var(--red); }
+  .stage-preparando{ background: rgba(212,178,133,0.25); color:#a3762f; }
+  .stage-camino{ background: rgba(61,107,156,0.15); color: var(--blue); }
+  .stage-entregado{ background: rgba(76,140,74,0.15); color: var(--green); }
+  .order-source{ font-weight:700; font-size:13px; }
+  .order-items{ font-size:12px; color: var(--text-muted); line-height:1.6; }
+  .order-items b{ color: var(--navy); }
+  .order-total{ font-size:12px; font-weight:700; text-align:right; }
+  .ticket-meta{ display:flex; justify-content:space-between; font-size:11px; color: var(--text-muted); }
+  .ticket-actions{ display:flex; gap:8px; margin-top:2px; }
+  .btn{ flex:1; height:38px; border-radius:12px; border:none; font-weight:700; font-size:11px; text-transform:uppercase; cursor:pointer; }
+  .btn-primary{ background: var(--gold); color: var(--navy); }
+  .btn-outline{ background:#fff; border:1px solid var(--border-light); color: var(--navy); }
+  .btn-blue{ background: var(--blue); color:#fff; }
+  .btn-success{ background: var(--green); color:#fff; }
+  .bottom-nav{ flex-shrink:0; background:var(--navy); border-top:1px solid var(--gold); height:70px; display:flex; align-items:center; justify-content:space-around; }
+  .nav-item{ display:flex; flex-direction:column; align-items:center; gap:4px; color:#fff; opacity:0.6; font-size:9px; cursor:pointer; background:none; border:none; }
+  .nav-item.active{ color:var(--gold); opacity:1; }
+  .nav-icon{ font-size:16px; }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="status-bar"><span>12:40</span><span class="status-icons">📶 📡 🔋</span></div>
+
+  <div class="header">
+    <div class="header-top">
+      <div class="staff-info">
+        <div class="staff-avatar">AB</div>
+        <div><p class="staff-name">Jefe de Alimentos y Bebidas</p><p class="staff-role">HOTELIFE · Turno activo</p></div>
+      </div>
+      <button class="icon-btn" id="notifBtn">🔔<span class="dot"></span></button>
+    </div>
+    <div class="summary-row">
+      <div class="summary-chip alert"><p class="value" id="countNuevos">5</p><p class="label">Nuevos</p></div>
+      <div class="summary-chip"><p class="value" id="countPreparando">4</p><p class="label">Preparando</p></div>
+      <div class="summary-chip"><p class="value" id="countCamino">2</p><p class="label">En camino</p></div>
+    </div>
+  </div>
+
+  <div class="filters">
+    <button class="filter-chip active" data-filter="todas">Todas</button>
+    <button class="filter-chip" data-filter="nuevo">Nuevos</button>
+    <button class="filter-chip" data-filter="preparando">Preparando</button>
+    <button class="filter-chip" data-filter="camino">En camino</button>
+    <button class="filter-chip" data-filter="entregado">Entregados</button>
+  </div>
+
+  <div class="scroll-content" id="ticketList">
+
+    <div class="ticket" data-status="nuevo">
+      <div class="ticket-top">
+        <div class="ticket-room"><span class="room-badge">212</span><span class="guest-name">Sra. Londoño</span></div>
+        <span class="stage-tag stage-nuevo">Nuevo</span>
+      </div>
+      <p class="order-source">🍽️ Room Service</p>
+      <p class="order-items"><b>1x</b> Club Sandwich<br><b>1x</b> Jugo natural de naranja<br><i>Nota: sin cebolla</i></p>
+      <p class="order-total">Total: $18.500</p>
+      <div class="ticket-meta"><span>Hace 3 min</span><span>Habitación Estándar</span></div>
+      <div class="ticket-actions">
+        <button class="btn btn-outline" data-action="ver">Ver pedido</button>
+        <button class="btn btn-primary" data-action="preparar">Aceptar y preparar</button>
+      </div>
+    </div>
+
+    <div class="ticket" data-status="preparando">
+      <div class="ticket-top">
+        <div class="ticket-room"><span class="room-badge">405</span><span class="guest-name">Sr Snick</span></div>
+        <span class="stage-tag stage-preparando">Preparando</span>
+      </div>
+      <p class="order-source">🍽️ Room Service</p>
+      <p class="order-items"><b>1x</b> Filete Mignon Trufado<br><b>1x</b> Ensalada César VIP</p>
+      <p class="order-total">Total: $66.500</p>
+      <div class="ticket-meta"><span>Hace 12 min</span><span>Suite Deluxe</span></div>
+      <div class="ticket-actions">
+        <button class="btn btn-outline" data-action="ver">Ver pedido</button>
+        <button class="btn btn-blue" data-action="camino">Marcar en camino</button>
+      </div>
+    </div>
+
+    <div class="ticket" data-status="camino">
+      <div class="ticket-top">
+        <div class="ticket-room"><span class="room-badge">318</span><span class="guest-name">Sr. Gómez</span></div>
+        <span class="stage-tag stage-camino">En camino</span>
+      </div>
+      <p class="order-source">🍸 Bar / Lounge</p>
+      <p class="order-items"><b>2x</b> Mojito clásico</p>
+      <p class="order-total">Total: $34.000</p>
+      <div class="ticket-meta"><span>Hace 18 min</span><span>Terraza · Suite Junior</span></div>
+      <div class="ticket-actions">
+        <button class="btn btn-outline" data-action="ver">Ver pedido</button>
+        <button class="btn btn-success" data-action="entregar">Marcar entregado</button>
+      </div>
+    </div>
+
+    <div class="ticket" data-status="entregado">
+      <div class="ticket-top">
+        <div class="ticket-room"><span class="room-badge">509</span><span class="guest-name">Sra. Pardo</span></div>
+        <span class="stage-tag stage-entregado">Entregado</span>
+      </div>
+      <p class="order-source">🥐 Desayuno</p>
+      <p class="order-items"><b>1x</b> Desayuno continental</p>
+      <p class="order-total">Total: $28.000</p>
+      <div class="ticket-meta"><span>Entregado hace 40 min</span><span>Suite Presidencial</span></div>
+      <div class="ticket-actions"><button class="btn btn-outline" data-action="ver" style="flex:1;">Ver pedido</button></div>
+    </div>
+
+  </div>
+
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-tab="pedidos"><span class="nav-icon">📋</span><span>Pedidos</span></button>
+    <button class="nav-item" data-tab="menu"><span class="nav-icon">📖</span><span>Menú</span></button>
+    <button class="nav-item" data-tab="perfil"><span class="nav-icon">👤</span><span>Perfil</span></button>
+  </nav>
+</div>
+
+<script>
+  // Leer pedidos reales enviados por huéspedes desde el "almacén compartido" (localStorage)
+  function loadRealOrders() {
+    const orders = JSON.parse(localStorage.getItem('hotelife_shared_orders') || '[]');
+    const list = document.getElementById('ticketList');
+    orders.forEach(order => {
+      // Evitar duplicados si ya se insertó antes
+      if (document.getElementById(order.id)) return;
+
+      const ticket = document.createElement('div');
+      ticket.className = 'ticket';
+      ticket.id = order.id;
+      ticket.dataset.status = 'nuevo';
+
+      const itemsHtml = order.items.replace(/\n/g, '<br>');
+      const minutesAgo = Math.max(0, Math.round((Date.now() - new Date(order.createdAt)) / 60000));
+
+      ticket.innerHTML = `
+        <div class="ticket-top">
+          <div class="ticket-room"><span class="room-badge">${order.room}</span><span class="guest-name">${order.guest}</span></div>
+          <span class="stage-tag stage-nuevo">Nuevo</span>
+        </div>
+        <p class="order-source">${order.source}</p>
+        <p class="order-items">${itemsHtml}</p>
+        <p class="order-total">Total: ${order.total}</p>
+        <div class="ticket-meta"><span>Hace ${minutesAgo} min</span><span>${order.roomType}</span></div>
+        <div class="ticket-actions">
+          <button class="btn btn-outline" data-action="ver">Ver pedido</button>
+          <button class="btn btn-primary" data-action="preparar">Aceptar y preparar</button>
+        </div>
+      `;
+      list.insertBefore(ticket, list.firstChild);
+      attachHandlers(ticket);
+    });
+  }
+</script>
+<script>
+  document.querySelectorAll('.filter-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      const map = { todas: null, nuevo: 'nuevo', preparando: 'preparando', camino: 'camino', entregado: 'entregado' };
+      const target = map[chip.dataset.filter];
+      document.querySelectorAll('.ticket').forEach(t => { t.style.display = (!target || t.dataset.status === target) ? 'flex' : 'none'; });
+    });
+  });
+
+  function setStage(ticket, stage) {
+    ticket.dataset.status = stage;
+    const tag = ticket.querySelector('.stage-tag');
+    tag.className = 'stage-tag stage-' + stage;
+    tag.textContent = { nuevo: 'Nuevo', preparando: 'Preparando', camino: 'En camino', entregado: 'Entregado' }[stage];
+    updateSummaryCounts();
+  }
+
+  function updateSummaryCounts() {
+    const all = document.querySelectorAll('.ticket');
+    const count = (status) => [...all].filter(t => t.dataset.status === status).length;
+    document.getElementById('countNuevos').textContent = count('nuevo');
+    document.getElementById('countPreparando').textContent = count('preparando');
+    document.getElementById('countCamino').textContent = count('camino');
+  }
+
+  function attachHandlers(ticket) {
+    const preparar = ticket.querySelector('[data-action="preparar"]');
+    if (preparar) preparar.addEventListener('click', () => {
+      setStage(ticket, 'preparando');
+      ticket.querySelector('.ticket-actions').innerHTML = '<button class="btn btn-outline" data-action="ver">Ver pedido</button><button class="btn btn-blue" data-action="camino">Marcar en camino</button>';
+      attachHandlers(ticket);
+    });
+    const camino = ticket.querySelector('[data-action="camino"]');
+    if (camino) camino.addEventListener('click', () => {
+      setStage(ticket, 'camino');
+      ticket.querySelector('.ticket-actions').innerHTML = '<button class="btn btn-outline" data-action="ver">Ver pedido</button><button class="btn btn-success" data-action="entregar">Marcar entregado</button>';
+      attachHandlers(ticket);
+    });
+    const entregar = ticket.querySelector('[data-action="entregar"]');
+    if (entregar) entregar.addEventListener('click', () => {
+      setStage(ticket, 'entregado');
+      ticket.querySelector('.ticket-actions').innerHTML = '<button class="btn btn-outline" data-action="ver" style="flex:1;">Ver pedido</button>';
+    });
+  }
+  document.querySelectorAll('.ticket').forEach(attachHandlers);
+
+  document.querySelectorAll('.nav-item').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  // Ahora sí, cargar pedidos reales enviados por huéspedes (attachHandlers ya existe)
+  loadRealOrders();
+  updateSummaryCounts();
+</script>
+
+</body>
+</html>

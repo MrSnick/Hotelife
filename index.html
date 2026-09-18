@@ -137,7 +137,13 @@
     { file: "src/pago-qr.html", label: "Pago QR" },
     { file: "src/checkout-exitoso.html", label: "Checkout exitoso" },
     { file: "src/mantenimiento.html", label: "Mantenimiento" },
-    { file: "src/formulario-documento.html", label: "Formulario (borrador)" }
+    { file: "src/formulario-documento.html", label: "Formulario (borrador)" },
+    { file: "src/admin/dashboard.html", label: "Admin · Recepción" },
+    { file: "src/admin/staff-mantenimiento.html", label: "Admin · Mantenimiento" },
+    { file: "src/admin/staff-amadellaves.html", label: "Admin · Ama de llaves" },
+    { file: "src/admin/staff-ayb.html", label: "Admin · A&B" },
+    { file: "src/admin/staff-spa.html", label: "Admin · Spa" },
+    { file: "src/admin/staff-conserjeria.html", label: "Admin · Conserjería" }
   ];
 
   var nav = document.getElementById("tabs");
@@ -160,13 +166,14 @@
     });
     iframe.src = s.file;
     title.textContent = "HOTELIFE — " + s.label;
-    if (history.replaceState) history.replaceState(null, "", "#" + s.file.split("/")[1].replace(".html",""));
+    var slug = s.file.split("/").pop().replace(".html", "");
+    if (history.replaceState) history.replaceState(null, "", "#" + slug);
   }
 
   var startIndex = 0;
   var hash = (location.hash || "").replace("#", "");
   if (hash){
-    var found = screens.findIndex(function(s){ return s.file.indexOf(hash + ".html") !== -1; });
+    var found = screens.findIndex(function(s){ return s.file.split("/").pop() === hash + ".html"; });
     if (found !== -1) startIndex = found;
   }
   select(startIndex);

@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HOTELIFE Admin — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy: #1a222d;
+    --navy-light: #232d3a;
+    --bg: #f4f2ed;
+    --gold: #d4b285;
+    --border-light: #e5e1d8;
+    --text-muted: rgba(26,34,45,0.6);
+    --green: #4c8c4a;
+    --red: #b5573a;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{
+    font-family: "Manrope", -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--navy);
+    min-height: 100vh;
+    display:flex;
+  }
+
+  /* Sidebar */
+  .sidebar{
+    width:240px; flex-shrink:0;
+    background: var(--navy);
+    color:#fff;
+    display:flex; flex-direction:column;
+    padding: 24px 0;
+    height:100vh;
+    position:sticky; top:0;
+  }
+  .sidebar-logo{
+    font-family:"Cormorant Garamond", serif;
+    font-weight:700; font-size:22px; letter-spacing:2px;
+    color: var(--gold);
+    padding: 0 24px 28px;
+  }
+  .sidebar-logo span{ display:block; font-family:"Manrope"; font-size:10px; letter-spacing:1px; color: rgba(255,255,255,0.5); font-weight:600; margin-top:2px; }
+  .nav-group{ display:flex; flex-direction:column; gap:2px; padding: 0 12px; }
+  .nav-link{
+    display:flex; align-items:center; gap:12px;
+    padding:11px 14px; border-radius:10px;
+    color: rgba(255,255,255,0.65); text-decoration:none;
+    font-size:13px; font-weight:600; cursor:pointer;
+    background:none; border:none; width:100%; text-align:left;
+  }
+  .nav-link .icon{ font-size:15px; width:18px; }
+  .nav-link.active{ background: rgba(212,178,133,0.12); color: var(--gold); }
+  .nav-link:hover:not(.active){ background: rgba(255,255,255,0.05); color:#fff; }
+  .sidebar-footer{
+    margin-top:auto; padding: 16px 24px 0;
+    border-top:1px solid rgba(255,255,255,0.08);
+    display:flex; align-items:center; gap:10px;
+  }
+  .staff-avatar{
+    width:34px; height:34px; border-radius:10px;
+    background: var(--gold); color: var(--navy);
+    display:flex; align-items:center; justify-content:center;
+    font-weight:800; font-size:13px; flex-shrink:0;
+  }
+  .staff-name{ font-size:12px; font-weight:700; }
+  .staff-role{ font-size:10px; color: rgba(255,255,255,0.5); }
+
+  /* Main */
+  .main{ flex:1; display:flex; flex-direction:column; min-width:0; }
+  .topbar{
+    height:72px; flex-shrink:0;
+    background:#fff; border-bottom:1px solid var(--border-light);
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 0 32px;
+  }
+  .topbar-title{ font-family:"Cormorant Garamond", serif; font-weight:700; font-size:22px; }
+  .topbar-date{ font-size:12px; color: var(--text-muted); }
+  .topbar-actions{ display:flex; align-items:center; gap:14px; }
+  .icon-btn{
+    width:38px; height:38px; border-radius:10px;
+    border:1px solid var(--border-light); background:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-size:15px; cursor:pointer; position:relative;
+  }
+  .icon-btn .dot{
+    position:absolute; top:6px; right:6px; width:7px; height:7px;
+    border-radius:4px; background: var(--red);
+  }
+
+  .content{ flex:1; overflow-y:auto; padding: 28px 32px 40px; }
+
+  .kpi-grid{ display:grid; grid-template-columns: repeat(4, 1fr); gap:18px; margin-bottom:26px; }
+  .kpi-card{
+    background:#fff; border:1px solid var(--border-light); border-radius:16px;
+    padding:20px;
+  }
+  .kpi-label{ font-size:11px; font-weight:700; text-transform:uppercase; color: var(--text-muted); letter-spacing:0.4px; margin-bottom:10px; }
+  .kpi-value{ font-family:"Cormorant Garamond", serif; font-size:32px; font-weight:700; }
+  .kpi-sub{ font-size:12px; margin-top:6px; font-weight:600; }
+  .kpi-sub.up{ color: var(--green); }
+  .kpi-sub.down{ color: var(--red); }
+  .kpi-sub.neutral{ color: var(--text-muted); }
+
+  .grid-2col{ display:grid; grid-template-columns: 1.6fr 1fr; gap:20px; align-items:start; }
+
+  .panel{
+    background:#fff; border:1px solid var(--border-light); border-radius:16px;
+    padding:22px; margin-bottom:20px;
+  }
+  .panel-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
+  .panel-title{ font-weight:700; font-size:15px; }
+  .panel-link{ font-size:12px; font-weight:700; color: var(--gold); background:none; border:none; cursor:pointer; }
+
+  table{ width:100%; border-collapse:collapse; }
+  th{ text-align:left; font-size:10px; text-transform:uppercase; color: var(--text-muted); font-weight:700; padding-bottom:10px; border-bottom:1px solid var(--border-light); }
+  td{ padding:12px 0; border-bottom:1px solid var(--border-light); font-size:13px; }
+  tr:last-child td{ border-bottom:none; }
+  .guest-cell{ display:flex; align-items:center; gap:10px; }
+  .room-pill{ font-weight:700; font-size:11px; background: var(--bg); padding:3px 8px; border-radius:6px; }
+  .status-pill{ font-size:10px; font-weight:700; text-transform:uppercase; padding:4px 9px; border-radius:8px; display:inline-block; }
+  .status-pending{ background: rgba(180,180,180,0.25); color:#6b6459; }
+  .status-progress{ background: rgba(212,178,133,0.3); color:#a3762f; }
+  .status-urgent{ background: rgba(181,87,58,0.15); color: var(--red); }
+  .status-done{ background: rgba(76,140,74,0.15); color: var(--green); }
+  .row-action{ font-size:11px; font-weight:700; color: var(--navy); background: var(--bg); border:none; padding:6px 10px; border-radius:8px; cursor:pointer; }
+  .dept-pill{
+    font-size:11px; font-weight:600; background: var(--bg);
+    padding:4px 9px; border-radius:8px; white-space:nowrap;
+  }
+  .escalation-flag{
+    font-size:10px; font-weight:700; color: var(--red);
+    margin-top:4px;
+  }
+
+  .activity-item{ display:flex; gap:12px; padding:12px 0; border-bottom:1px solid var(--border-light); }
+  .activity-item:last-child{ border-bottom:none; padding-bottom:0; }
+  .activity-icon{
+    width:32px; height:32px; border-radius:10px; background: var(--bg);
+    display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0;
+  }
+  .activity-text{ font-size:12.5px; line-height:1.4; }
+  .activity-text b{ font-weight:700; }
+  .activity-time{ font-size:11px; color: var(--text-muted); margin-top:2px; }
+
+  .occupancy-bar-wrap{ display:flex; flex-direction:column; gap:10px; }
+  .occupancy-row{ display:flex; align-items:center; gap:10px; }
+  .occupancy-label{ font-size:12px; font-weight:600; width:90px; flex-shrink:0; }
+  .occupancy-track{ flex:1; height:8px; border-radius:4px; background: var(--bg); overflow:hidden; }
+  .occupancy-fill{ height:100%; border-radius:4px; background: var(--gold); }
+  .occupancy-value{ font-size:12px; font-weight:700; width:36px; text-align:right; flex-shrink:0; }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">HOTELIFE<span>PANEL DE ADMINISTRACIÓN</span></div>
+  <nav class="nav-group">
+    <button class="nav-link active" data-view="dashboard"><span class="icon">📊</span>Dashboard</button>
+    <button class="nav-link" data-view="solicitudes"><span class="icon">📋</span>Solicitudes</button>
+    <button class="nav-link" data-view="huespedes"><span class="icon">🧳</span>Huéspedes</button>
+    <button class="nav-link" data-view="habitaciones"><span class="icon">🛏️</span>Habitaciones</button>
+    <button class="nav-link" data-view="mantenimiento"><span class="icon">🔧</span>Mantenimiento</button>
+    <button class="nav-link" data-view="reportes"><span class="icon">📈</span>Reportes</button>
+    <button class="nav-link" data-view="configuracion"><span class="icon">⚙️</span>Configuración</button>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="staff-avatar">MR</div>
+    <div>
+      <p class="staff-name">María Restrepo</p>
+      <p class="staff-role">Recepción · Turno AM</p>
+    </div>
+  </div>
+</aside>
+
+<div class="main">
+  <header class="topbar">
+    <div>
+      <p class="topbar-title">Dashboard</p>
+      <p class="topbar-date">Jueves, 17 de septiembre · 12:40 PM</p>
+    </div>
+    <div class="topbar-actions">
+      <button class="icon-btn" id="notifBtn">🔔<span class="dot"></span></button>
+      <button class="icon-btn" id="settingsBtn">⚙️</button>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <p class="kpi-label">Ocupación</p>
+        <p class="kpi-value">87%</p>
+        <p class="kpi-sub up">▲ 4% vs. ayer</p>
+      </div>
+      <div class="kpi-card">
+        <p class="kpi-label">Ingresos de hoy</p>
+        <p class="kpi-value">$18.4M</p>
+        <p class="kpi-sub up">▲ 12% vs. ayer</p>
+      </div>
+      <div class="kpi-card">
+        <p class="kpi-label">Solicitudes pendientes</p>
+        <p class="kpi-value">7</p>
+        <p class="kpi-sub down">2 urgentes</p>
+      </div>
+      <div class="kpi-card">
+        <p class="kpi-label">Huéspedes activos</p>
+        <p class="kpi-value">142</p>
+        <p class="kpi-sub neutral">38 habitaciones</p>
+      </div>
+    </div>
+
+    <div class="grid-2col">
+      <div>
+        <div class="panel">
+          <div class="panel-header">
+            <p class="panel-title">Solicitudes recientes</p>
+            <button class="panel-link" id="viewAllRequests">Ver todas →</button>
+          </div>
+          <table>
+            <thead>
+              <tr><th>Huésped</th><th>Habitación</th><th>Solicitud</th><th>Área</th><th>Estado</th><th></th></tr>
+            </thead>
+            <tbody id="requestsTableBody">
+              <tr>
+                <td><div class="guest-cell">🧑 Sr Snick</div></td>
+                <td><span class="room-pill">405</span></td>
+                <td>Mantenimiento — A/C</td>
+                <td><span class="dept-pill">🔧 Mantenimiento</span></td>
+                <td>
+                  <span class="status-pill status-urgent">Urgente</span>
+                  <div class="escalation-flag">⚠️ Sin respuesta 22 min</div>
+                </td>
+                <td><button class="row-action">Atender</button></td>
+              </tr>
+              <tr>
+                <td><div class="guest-cell">🧑 Sra. Londoño</div></td>
+                <td><span class="room-pill">212</span></td>
+                <td>Room Service</td>
+                <td><span class="dept-pill">🍽️ A&amp;B</span></td>
+                <td><span class="status-pill status-progress">En camino</span></td>
+                <td><button class="row-action">Ver</button></td>
+              </tr>
+              <tr>
+                <td><div class="guest-cell">🧑 Sr. Gómez</div></td>
+                <td><span class="room-pill">318</span></td>
+                <td>Traslado al aeropuerto</td>
+                <td><span class="dept-pill">🧭 Conserjería</span></td>
+                <td><span class="status-pill status-pending">Pendiente</span></td>
+                <td><button class="row-action">Asignar</button></td>
+              </tr>
+              <tr>
+                <td><div class="guest-cell">🧑 Sra. Pardo</div></td>
+                <td><span class="room-pill">509</span></td>
+                <td>Spa & Wellness</td>
+                <td><span class="dept-pill">🧖‍♀️ Spa</span></td>
+                <td><span class="status-pill status-done">Confirmado</span></td>
+                <td><button class="row-action">Ver</button></td>
+              </tr>
+              <tr>
+                <td><div class="guest-cell">🧑 Sr. Duarte</div></td>
+                <td><span class="room-pill">104</span></td>
+                <td>Housekeeping — Toallas extra</td>
+                <td><span class="dept-pill">🧺 Ama de llaves</span></td>
+                <td><span class="status-pill status-progress">En camino</span></td>
+                <td><button class="row-action">Ver</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <p class="panel-title">Ocupación por tipo de habitación</p>
+          </div>
+          <div class="occupancy-bar-wrap">
+            <div class="occupancy-row"><span class="occupancy-label">Estándar</span><div class="occupancy-track"><div class="occupancy-fill" style="width:92%"></div></div><span class="occupancy-value">92%</span></div>
+            <div class="occupancy-row"><span class="occupancy-label">Deluxe</span><div class="occupancy-track"><div class="occupancy-fill" style="width:85%"></div></div><span class="occupancy-value">85%</span></div>
+            <div class="occupancy-row"><span class="occupancy-label">Suite</span><div class="occupancy-track"><div class="occupancy-fill" style="width:78%"></div></div><span class="occupancy-value">78%</span></div>
+            <div class="occupancy-row"><span class="occupancy-label">Presidencial</span><div class="occupancy-track"><div class="occupancy-fill" style="width:50%"></div></div><span class="occupancy-value">50%</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="panel">
+          <div class="panel-header">
+            <p class="panel-title">Actividad en vivo</p>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon">🔧</div>
+            <div>
+              <p class="activity-text"><b>Sr Snick</b> reportó un problema de mantenimiento (A/C)</p>
+              <p class="activity-time">Hace 3 min · Suite 405</p>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon">💳</div>
+            <div>
+              <p class="activity-text"><b>Sra. Ibarra</b> completó el pago de check-out</p>
+              <p class="activity-time">Hace 11 min · Suite 220</p>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon">🔑</div>
+            <div>
+              <p class="activity-text"><b>Sr. Gómez</b> hizo check-in</p>
+              <p class="activity-time">Hace 24 min · Habitación 318</p>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon">🍽️</div>
+            <div>
+              <p class="activity-text"><b>Sra. Londoño</b> pidió Room Service</p>
+              <p class="activity-time">Hace 32 min · Habitación 212</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <p class="panel-title">Check-ins / Check-outs de hoy</p>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon">🟢</div>
+            <div>
+              <p class="activity-text">12 check-ins programados</p>
+              <p class="activity-time">8 ya completados</p>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon">🔴</div>
+            <div>
+              <p class="activity-text">9 check-outs programados</p>
+              <p class="activity-time">3 pendientes de pago</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', () => {
+      document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+      link.classList.add('active');
+      console.log('Navegando a vista:', link.dataset.view);
+    });
+  });
+
+  document.querySelectorAll('.row-action').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const row = e.target.closest('tr');
+      const guest = row.querySelector('.guest-cell').textContent.trim();
+      console.log('Acción sobre solicitud de:', guest);
+    });
+  });
+
+  document.getElementById('viewAllRequests').addEventListener('click', () => {
+    document.querySelector('[data-view="solicitudes"]').click();
+  });
+
+  document.getElementById('notifBtn').addEventListener('click', () => {
+    console.log('Abrir panel de notificaciones');
+  });
+  document.getElementById('settingsBtn').addEventListener('click', () => {
+    console.log('Abrir configuración');
+  });
+</script>
+
+</body>
+</html>
