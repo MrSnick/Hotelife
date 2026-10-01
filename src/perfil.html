@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HOTELIFE — Perfil</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Manrope:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy: #1a222d;
+    --bg-outer: #f9f6f0;
+    --gold: #d4b285;
+    --border-light: #eae5dc;
+    --text-muted: rgba(26,34,45,0.6);
+    --red: #b5573a;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{
+    font-family: "Manrope", -apple-system, sans-serif;
+    background: #e5e2db;
+    min-height: 100vh;
+    display:flex; align-items:center; justify-content:center;
+    padding: 24px; color: var(--navy);
+  }
+  .phone{
+    background: var(--bg-outer); border: 0.8px solid var(--gold); border-radius: 44px;
+    box-shadow: 0 25px 50px -12px rgba(26,34,45,0.25);
+    width: 100%; max-width: 390px; overflow: hidden;
+    display:flex; flex-direction:column; height: 844px; position: relative;
+  }
+  .status-bar{ flex-shrink:0; display:flex; align-items:center; justify-content:space-between; height:44px; padding: 0 24px; font-weight:600; font-size:14px; }
+  .status-icons{ display:flex; gap:6px; align-items:center; font-size:12px; }
+  .header-bar{ flex-shrink:0; display:flex; align-items:center; gap:12px; height:64px; padding: 0 24px; }
+  .back-btn{ width:40px; height:40px; border-radius:20px; background:#fff; border:1px solid var(--border-light); display:flex; align-items:center; justify-content:center; font-size:16px; cursor:pointer; flex-shrink:0; }
+  .header-title{ font-family:"Cormorant Garamond", serif; font-weight:700; font-size:20px; }
+
+  .scroll-content{ flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; padding: 4px 24px 24px; display:flex; flex-direction:column; gap:20px; }
+  .scroll-content::-webkit-scrollbar{ display:none; }
+
+  .profile-card{
+    background: var(--navy); border-radius:20px; padding:24px;
+    display:flex; flex-direction:column; align-items:center; gap:10px; color:#fff;
+  }
+  .avatar-big{
+    width:64px; height:64px; border-radius:20px; background: var(--gold);
+    color: var(--navy); display:flex; align-items:center; justify-content:center;
+    font-weight:800; font-size:22px;
+  }
+  .profile-name{ font-family:"Cormorant Garamond", serif; font-weight:700; font-size:22px; }
+  .profile-room{ font-size:12px; color: rgba(255,255,255,0.7); }
+  .profile-tier{
+    margin-top:4px; background: rgba(212,178,133,0.15); border:1px solid var(--gold);
+    border-radius:10px; padding:5px 12px; font-size:11px; font-weight:700; color: var(--gold);
+  }
+
+  .section-title{ font-weight:700; font-size:11px; text-transform:uppercase; color: var(--text-muted); }
+
+  .field-card{ background:#fff; border:1px solid var(--border-light); border-radius:16px; overflow:hidden; }
+  .field-row{ display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid var(--border-light); }
+  .field-row:last-child{ border-bottom:none; }
+  .field-label{ font-size:11px; color: var(--text-muted); }
+  .field-value{ font-size:13px; font-weight:600; text-align:right; }
+  .field-input{ border:none; outline:none; font-family:inherit; font-size:13px; font-weight:600; text-align:right; background:none; color:var(--navy); width:60%; }
+  .field-input:focus{ color: var(--gold); }
+
+  .toggle-row{ display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid var(--border-light); }
+  .toggle-row:last-child{ border-bottom:none; }
+  .toggle-label{ font-size:13px; font-weight:600; }
+  .toggle{ width:42px; height:24px; border-radius:12px; background: var(--border-light); position:relative; cursor:pointer; transition:background .2s; flex-shrink:0; }
+  .toggle.on{ background: var(--gold); }
+  .toggle-knob{ position:absolute; top:2px; left:2px; width:20px; height:20px; border-radius:10px; background:#fff; transition:left .2s; }
+  .toggle.on .toggle-knob{ left:20px; }
+
+  .payment-row{ display:flex; align-items:center; gap:12px; padding:14px 16px; border-bottom:1px solid var(--border-light); }
+  .payment-row:last-child{ border-bottom:none; }
+  .payment-logo{ width:34px; height:34px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:11px; color:#fff; flex-shrink:0; }
+  .payment-info{ flex:1; }
+  .payment-name{ font-size:13px; font-weight:700; }
+  .payment-sub{ font-size:11px; color: var(--text-muted); }
+  .payment-remove{ font-size:11px; font-weight:700; color: var(--red); background:none; border:none; cursor:pointer; }
+
+  .add-payment-btn{
+    background:none; border:1px dashed var(--gold); border-radius:16px;
+    padding:14px; font-weight:700; font-size:12px; color: var(--navy); cursor:pointer;
+  }
+
+  .logout-btn{
+    background:#fff; border:1px solid var(--red); border-radius:16px;
+    padding:14px; font-weight:700; font-size:12px; color: var(--red); cursor:pointer;
+    text-transform:uppercase;
+  }
+
+  .bottom-nav{ flex-shrink:0; background: var(--navy); border-top: 1px solid var(--gold); height:70px; display:flex; align-items:center; justify-content:space-around; }
+  .nav-item{ display:flex; flex-direction:column; align-items:center; gap:4px; color:#fff; opacity:0.6; font-size:9px; text-decoration:none; cursor:pointer; background:none; border:none; }
+  .nav-item.active{ color: var(--gold); opacity:1; }
+  .nav-icon{ font-size:16px; }
+</style>
+<link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+<div class="phone">
+  <div class="status-bar"><span>12:40</span><span class="status-icons">📶 📡 🔋</span></div>
+
+  <div class="header-bar">
+    <button class="back-btn" id="backBtn">←</button>
+    <p class="header-title">Perfil</p>
+  </div>
+
+  <div class="scroll-content">
+
+    <div class="profile-card">
+      <div class="avatar-big">SS</div>
+      <p class="profile-name">Sr Snick</p>
+      <p class="profile-room">Habitación 405 · Suite Deluxe</p>
+      <span class="profile-tier">✦ HUÉSPED GOLD</span>
+    </div>
+
+    <div>
+      <p class="section-title" style="margin-bottom:10px;">Datos personales</p>
+      <div class="field-card">
+        <div class="field-row"><span class="field-label">Nombre completo</span><span class="field-value">Sr Snick</span></div>
+        <div class="field-row"><span class="field-label">Documento</span><span class="field-value">Cédula de extranjería</span></div>
+        <div class="field-row"><span class="field-label">Correo electrónico</span><input class="field-input" type="email" value="snick@correo.com"></div>
+        <div class="field-row"><span class="field-label">Teléfono</span><input class="field-input" type="tel" value="+57 300 123 4567"></div>
+      </div>
+    </div>
+
+    <div>
+      <p class="section-title" style="margin-bottom:10px;">Preferencias</p>
+      <div class="field-card">
+        <div class="field-row"><span class="field-label">Idioma</span><span class="field-value">Español →</span></div>
+        <div class="toggle-row">
+          <span class="toggle-label">Notificaciones push</span>
+          <div class="toggle on" data-pref="notif"><div class="toggle-knob"></div></div>
+        </div>
+        <div class="toggle-row">
+          <span class="toggle-label">Ofertas y promociones</span>
+          <div class="toggle" data-pref="promos"><div class="toggle-knob"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <p class="section-title" style="margin-bottom:10px;">Accesos e invitados</p>
+      <a href="accesos-invitados.html" class="field-card" style="text-decoration:none; color:inherit; display:flex; align-items:center; justify-content:space-between; padding:14px 16px;">
+        <div>
+          <p style="font-weight:600; font-size:13px;">Registrar invitados</p>
+          <p style="font-size:11px; color:var(--text-muted); margin-top:2px;" id="aforoSummary">Cargando...</p>
+        </div>
+        <span style="color:var(--text-muted);">→</span>
+      </a>
+    </div>
+
+    <div>
+      <p class="section-title" style="margin-bottom:10px;">Métodos de pago</p>
+      <div class="field-card">
+        <div class="payment-row">
+          <div class="payment-logo" style="background:#3852ff;">W</div>
+          <div class="payment-info">
+            <p class="payment-name">Wompi</p>
+            <p class="payment-sub">Bancolombia •• 4417</p>
+          </div>
+          <button class="payment-remove" data-id="wompi">Quitar</button>
+        </div>
+        <div class="payment-row">
+          <div class="payment-logo" style="background:#009ee3;">MP</div>
+          <div class="payment-info">
+            <p class="payment-name">Mercado Pago</p>
+            <p class="payment-sub">Cuenta vinculada</p>
+          </div>
+          <button class="payment-remove" data-id="mp">Quitar</button>
+        </div>
+      </div>
+      <button class="add-payment-btn" id="addPaymentBtn" style="width:100%; margin-top:10px;">➕ Agregar método de pago</button>
+    </div>
+
+    <button class="logout-btn" id="logoutBtn">Cerrar sesión</button>
+
+  </div>
+
+  <nav class="bottom-nav">
+    <button class="nav-item" data-tab="inicio"><span class="nav-icon">🏠</span><span>Inicio</span></button>
+    <button class="nav-item" data-tab="servicios"><span class="nav-icon">🗂️</span><span>Servicios</span></button>
+    <button class="nav-item" data-tab="solicitudes"><span class="nav-icon">📋</span><span>Mis solicitudes</span></button>
+    <button class="nav-item" data-tab="cuenta"><span class="nav-icon">🧾</span><span>Mi cuenta</span></button>
+  </nav>
+</div>
+
+<script>
+  document.getElementById('backBtn').addEventListener('click', () => {
+    window.location.href = 'home.html';
+  });
+
+  document.querySelectorAll('.toggle').forEach(t => {
+    t.addEventListener('click', () => {
+      t.classList.toggle('on');
+      console.log('Preferencia', t.dataset.pref, '->', t.classList.contains('on'));
+    });
+  });
+
+  document.querySelectorAll('.payment-remove').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const row = e.target.closest('.payment-row');
+      row.remove();
+      console.log('Método de pago eliminado:', btn.dataset.id);
+    });
+  });
+
+  document.getElementById('addPaymentBtn').addEventListener('click', () => {
+    console.log('Abrir flujo para agregar método de pago');
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    console.log('Cerrando sesión...');
+    window.location.href = 'login.html';
+  });
+
+  document.querySelectorAll('.nav-item').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      console.log('Navegando a tab:', btn.dataset.tab);
+    });
+  });
+
+  // Calcular el aforo real a partir de los pases guardados (mismo origen de datos que Accesos e Invitados)
+  const MAX_AFORO = 4;
+  const passes = JSON.parse(localStorage.getItem('hotelife_access_passes') || '[]');
+  const activeCount = passes.filter(p => p.status === 'activo' || p.status === 'pendiente').length;
+  document.getElementById('aforoSummary').textContent = (1 + activeCount) + ' de ' + MAX_AFORO + ' personas autorizadas';
+</script>
+
+<script src="js/nav.js"></script>
+</body>
+</html>

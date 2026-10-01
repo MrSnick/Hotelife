@@ -133,6 +133,7 @@
     text-align:center;
   }
 </style>
+<link rel="stylesheet" href="css/responsive.css">
 </head>
 <body>
 
@@ -193,9 +194,10 @@
     if (!select.value) { select.focus(); return; }
     if (!input.value.trim()) { input.focus(); return; }
     console.log('Login:', select.value, input.value.trim());
-    alert('Ingresando con: ' + select.value + ' ' + input.value.trim());
+    window.location.href = 'home.html';
   });
 </script>
 
+<script src="js/nav.js"></script>
 </body>
 </html>

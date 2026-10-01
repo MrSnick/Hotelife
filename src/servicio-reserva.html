@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HOTELIFE — Reserva</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Manrope:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy: #1a222d; --bg-outer: #f9f6f0; --gold: #d4b285; --border-light: #eae5dc;
+    --text-muted: rgba(26,34,45,0.6);
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{ font-family:"Manrope",-apple-system,sans-serif; background:#e5e2db; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; color:var(--navy); }
+  .phone{ background:var(--bg-outer); border:0.8px solid var(--gold); border-radius:44px; box-shadow:0 25px 50px -12px rgba(26,34,45,0.25); width:100%; max-width:390px; overflow:hidden; display:flex; flex-direction:column; height:844px; position:relative; }
+  .status-bar{ flex-shrink:0; display:flex; align-items:center; justify-content:space-between; height:44px; padding:0 24px; font-weight:600; font-size:14px; }
+  .status-icons{ display:flex; gap:6px; align-items:center; font-size:12px; }
+  .header{ flex-shrink:0; display:flex; align-items:center; gap:12px; height:64px; padding:0 20px; }
+  .back-btn{ width:40px; height:40px; border-radius:20px; background:#fff; border:1px solid var(--border-light); display:flex; align-items:center; justify-content:center; font-size:16px; cursor:pointer; flex-shrink:0; }
+  .header-title{ font-family:"Cormorant Garamond", serif; font-weight:700; font-size:18px; flex:1; }
+  .room-badge{ background: var(--navy); border-radius:12px; padding:4px 10px; font-weight:700; font-size:10px; color: var(--gold); white-space:nowrap; }
+
+  .scroll-content{ flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; padding: 8px 24px 24px; display:flex; flex-direction:column; gap:18px; }
+  .scroll-content::-webkit-scrollbar{ display:none; }
+
+  .icon-hero{ display:flex; flex-direction:column; align-items:center; gap:8px; padding: 4px 0; }
+  .icon-circle{ width:64px; height:64px; border-radius:20px; background: var(--navy); display:flex; align-items:center; justify-content:center; font-size:28px; }
+  .icon-desc{ font-size:12px; color: var(--text-muted); text-align:center; }
+
+  .section-title{ font-weight:700; font-size:11px; text-transform:uppercase; color: var(--text-muted); }
+
+  .option-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+  .option-card{ display:flex; flex-direction:column; gap:4px; padding:12px; border-radius:14px; border:1px solid var(--border-light); background:#fff; cursor:pointer; }
+  .option-card.selected{ background: var(--navy); border-color: var(--navy); }
+  .option-card.selected .opt-name, .option-card.selected .opt-detail{ color:#fff; }
+  .opt-name{ font-weight:700; font-size:12.5px; }
+  .opt-detail{ font-size:10.5px; color: var(--text-muted); }
+
+  .date-row{ display:flex; gap:8px; overflow-x:auto; padding-bottom:2px; }
+  .date-chip{ flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:2px; padding:10px 14px; border-radius:14px; border:1px solid var(--border-light); background:#fff; cursor:pointer; min-width:56px; }
+  .date-chip.selected{ background: var(--navy); border-color: var(--navy); }
+  .date-chip.selected .date-day, .date-chip.selected .date-num{ color:#fff; }
+  .date-day{ font-size:9px; font-weight:700; color: var(--text-muted); text-transform:uppercase; }
+  .date-num{ font-family:"Cormorant Garamond", serif; font-weight:700; font-size:18px; }
+
+  .time-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; }
+  .time-chip{ padding:10px; border-radius:12px; border:1px solid var(--border-light); background:#fff; font-weight:700; font-size:12px; text-align:center; cursor:pointer; }
+  .time-chip.selected{ background: var(--gold); border-color: var(--gold); color: var(--navy); }
+
+  .summary-card{ background:#fff; border:1px solid var(--border-light); border-radius:16px; padding:14px 16px; display:flex; flex-direction:column; gap:6px; }
+  .summary-row{ display:flex; justify-content:space-between; font-size:12.5px; }
+  .summary-row .label{ color: var(--text-muted); }
+  .summary-row .value{ font-weight:700; }
+
+  .submit-btn{ width:100%; height:52px; border-radius:16px; background: var(--gold); border:none; font-weight:700; font-size:13px; text-transform:uppercase; color: var(--navy); cursor:pointer; }
+  .submit-btn:disabled{ opacity:0.5; cursor:not-allowed; }
+</style>
+<link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+<div class="phone">
+  <div class="status-bar"><span>12:40</span><span class="status-icons">📶 📡 🔋</span></div>
+  <div class="header">
+    <button class="back-btn" id="backBtn">←</button>
+    <p class="header-title" id="serviceTitle">Reservar</p>
+    <span class="room-badge">Suite 405</span>
+  </div>
+  <div class="scroll-content" id="content"></div>
+</div>
+
+<script>
+  const SERVICES = {
+    spa: { icon:'🧖‍♀️', title:'Spa & Wellness', desc:'Elige tu tratamiento y horario preferido.', dept:'🧖‍♀️ Spa',
+      options: [ {name:'Masaje relajante', detail:'60 min · $85.000'}, {name:'Masaje deportivo', detail:'45 min · $70.000'}, {name:'Facial hidratante', detail:'50 min · $65.000'}, {name:'Manicure & pedicure', detail:'75 min · $60.000'} ] },
+    gimnasio: { icon:'🏋️', title:'Gimnasio', desc:'Reserva tu sesión de entrenamiento libre o con instructor.', dept:'🧖‍♀️ Spa',
+      options: [ {name:'Sesión libre', detail:'Sin costo'}, {name:'Con entrenador personal', detail:'60 min · $50.000'} ] },
+    piscina: { icon:'🏊', title:'Piscina', desc:'Reserva una camastra o un horario en la piscina climatizada.', dept:'🧖‍♀️ Spa',
+      options: [ {name:'Camastro estándar', detail:'Sin costo'}, {name:'Cabana privada', detail:'$40.000 / día'} ] },
+    sauna: { icon:'♨️', title:'Sauna / Jacuzzi', desc:'Relájate en nuestras instalaciones térmicas.', dept:'🧖‍♀️ Spa',
+      options: [ {name:'Sauna (40 min)', detail:'$45.000'}, {name:'Jacuzzi (40 min)', detail:'$45.000'}, {name:'Ambos (70 min)', detail:'$75.000'} ] },
+    clases: { icon:'🧘', title:'Clases (Yoga, Pilates)', desc:'Clases grupales guiadas por instructores certificados.', dept:'🧖‍♀️ Spa',
+      options: [ {name:'Yoga matutino', detail:'45 min · Grupal'}, {name:'Pilates', detail:'45 min · Grupal'}, {name:'Yoga privado', detail:'45 min · $60.000'} ] },
+    restaurante: { icon:'🍷', title:'Restaurante', desc:'Reserva tu mesa en el restaurante principal.', dept:'🍽️ A&B',
+      options: [ {name:'Mesa para 2', detail:'Interior'}, {name:'Mesa para 2', detail:'Terraza'}, {name:'Mesa para 4+', detail:'Interior'} ] },
+    salones: { icon:'🏛️', title:'Salones de eventos', desc:'Cotiza y reserva un salón para tu evento.', dept:'🏨 Recepción',
+      options: [ {name:'Salón pequeño', detail:'Hasta 20 personas'}, {name:'Salón grande', detail:'Hasta 80 personas'}, {name:'Jardín exterior', detail:'Hasta 150 personas'} ] },
+    negocios: { icon:'🖨️', title:'Centro de negocios', desc:'Reserva una sala de juntas o estación de trabajo.', dept:'🏨 Recepción',
+      options: [ {name:'Estación individual', detail:'Por hora'}, {name:'Sala de juntas', detail:'Hasta 8 personas'} ] }
+  };
+
+  const params = new URLSearchParams(window.location.search);
+  const key = params.get('service') || 'spa';
+  const svc = SERVICES[key] || SERVICES.spa;
+  document.getElementById('serviceTitle').textContent = svc.title;
+
+  const today = new Date();
+  const dayNames = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  const dates = Array.from({length: 5}, (_, i) => {
+    const d = new Date(today); d.setDate(today.getDate() + i);
+    return { label: i === 0 ? 'Hoy' : dayNames[d.getDay()], num: d.getDate() };
+  });
+  const times = ['9:00 AM','11:00 AM','1:00 PM','3:00 PM','5:00 PM','7:00 PM'];
+
+  let selectedOption = 0, selectedDate = 0, selectedTime = 2;
+
+  function render() {
+    document.getElementById('content').innerHTML = `
+      <div class="icon-hero">
+        <div class="icon-circle">${svc.icon}</div>
+        <p class="icon-desc">${svc.desc}</p>
+      </div>
+
+      <div>
+        <p class="section-title" style="margin-bottom:8px;">ELIGE UNA OPCIÓN</p>
+        <div class="option-grid">
+          ${svc.options.map((o, i) => `
+            <div class="option-card ${i === selectedOption ? 'selected' : ''}" data-idx="${i}">
+              <span class="opt-name">${o.name}</span>
+              <span class="opt-detail">${o.detail}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <div>
+        <p class="section-title" style="margin-bottom:8px;">FECHA</p>
+        <div class="date-row">
+          ${dates.map((d, i) => `
+            <div class="date-chip ${i === selectedDate ? 'selected' : ''}" data-idx="${i}">
+              <span class="date-day">${d.label}</span>
+              <span class="date-num">${d.num}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <div>
+        <p class="section-title" style="margin-bottom:8px;">HORA</p>
+        <div class="time-grid">
+          ${times.map((t, i) => `<div class="time-chip ${i === selectedTime ? 'selected' : ''}" data-idx="${i}">${t}</div>`).join('')}
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-row"><span class="label">Opción</span><span class="value">${svc.options[selectedOption].name}</span></div>
+        <div class="summary-row"><span class="label">Fecha</span><span class="value">${dates[selectedDate].label} ${dates[selectedDate].num}</span></div>
+        <div class="summary-row"><span class="label">Hora</span><span class="value">${times[selectedTime]}</span></div>
+      </div>
+
+      <button class="submit-btn" id="submitBtn">Confirmar reserva</button>
+    `;
+
+    document.querySelectorAll('.option-card').forEach(el => el.addEventListener('click', () => { selectedOption = Number(el.dataset.idx); render(); }));
+    document.querySelectorAll('.date-chip').forEach(el => el.addEventListener('click', () => { selectedDate = Number(el.dataset.idx); render(); }));
+    document.querySelectorAll('.time-chip').forEach(el => el.addEventListener('click', () => { selectedTime = Number(el.dataset.idx); render(); }));
+    document.getElementById('submitBtn').addEventListener('click', () => {
+      const btn = document.getElementById('submitBtn');
+      btn.textContent = '✓ Reserva confirmada';
+      btn.disabled = true;
+
+      const request = {
+        id: 'REQ-' + Date.now(),
+        service: key,
+        title: svc.title,
+        dept: svc.dept,
+        room: '405',
+        roomType: 'Suite Deluxe',
+        guestName: 'Sr Snick',
+        option: svc.options[selectedOption].name,
+        date: dates[selectedDate].label + ' ' + dates[selectedDate].num,
+        time: times[selectedTime],
+        status: 'confirmada',
+        createdAt: new Date().toISOString()
+      };
+      const existing = JSON.parse(localStorage.getItem('hotelife_service_requests') || '[]');
+      existing.unshift(request);
+      localStorage.setItem('hotelife_service_requests', JSON.stringify(existing));
+
+      console.log('Reserva guardada y disponible para', svc.dept, ':', request);
+    });
+  }
+  render();
+
+  document.getElementById('backBtn').addEventListener('click', () => { window.location.href = 'servicios.html'; });
+</script>
+
+<script src="js/nav.js"></script>
+</body>
+</html>

@@ -3,183 +3,121 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HOTELIFE — Prototipo interactivo</title>
+<title>HOTELIFE — Demo interactivo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Manrope:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Manrope:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --navy: #1a222d;
+    --bg: #f9f6f0;
     --gold: #d4b285;
-    --gold-soft: #b8925f;
-    --cream: #f9f6f0;
-    --border: #e2ddd0;
-    --text-muted: rgba(26,34,45,0.62);
-    --surface: #ffffff;
-    --page-bg: #eeece4;
+    --gold-dark: #8b6534;
+    --border-light: #eae5dc;
+    --text-muted: rgba(26,34,45,0.65);
   }
-  *{ box-sizing:border-box; }
+  *{ box-sizing:border-box; margin:0; padding:0; }
   body{
-    margin:0;
-    background: var(--page-bg);
+    font-family:"Manrope", -apple-system, sans-serif;
+    background: var(--bg);
     color: var(--navy);
-    font-family: "Manrope", -apple-system, "Segoe UI", sans-serif;
-    display:flex;
-    flex-direction:column;
     min-height:100vh;
   }
-  header{
-    flex-shrink:0;
-    padding: 20px 20px 16px;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    display:flex;
-    flex-direction:column;
-    gap:2px;
-  }
-  .eyebrow{
-    font-size:11px;
-    letter-spacing:0.14em;
-    text-transform:uppercase;
-    color: var(--gold-soft);
-    font-weight:700;
-  }
-  h1{
-    font-family: "Cormorant Garamond", Georgia, serif;
-    font-size: 28px;
-    font-weight:700;
-    margin:0;
-  }
-  nav{
-    flex-shrink:0;
-    display:flex;
-    gap:8px;
-    overflow-x:auto;
-    overflow-y:hidden;
-    padding: 12px 20px;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    -webkit-overflow-scrolling: touch;
-  }
-  .tab{
-    flex: 0 0 auto;
-    padding: 8px 14px;
-    border-radius: 999px;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--text-muted);
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 600;
-    cursor:pointer;
-    white-space:nowrap;
-    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
-  }
-  .tab:hover{ border-color: var(--gold); color: var(--navy); }
-  .tab.active{
+  .hero{
     background: var(--navy);
-    border-color: var(--navy);
-    color: var(--cream);
-  }
-  main{
-    flex:1;
-    display:flex;
-    align-items:stretch;
-    justify-content:center;
-    padding: 24px 16px 40px;
-  }
-  .frame-wrap{
-    width:100%;
-    max-width: 430px;
-    display:flex;
-  }
-  iframe{
-    width:100%;
-    min-height: 700px;
-    border: none;
-    border-radius: 18px;
-    background: var(--cream);
-    box-shadow: 0 20px 45px -18px rgba(20,20,20,0.35);
-  }
-  .caption{
+    color:#fff;
+    padding: 56px 20px 48px;
     text-align:center;
-    font-size:12px;
-    color: var(--text-muted);
-    padding: 0 20px 20px;
+    border-bottom: 1px solid var(--gold);
   }
-  a.repo-link{ color: var(--gold-soft); font-weight:600; }
+  .logo{
+    font-family:"Cormorant Garamond", serif;
+    font-weight:700; font-size: clamp(36px, 8vw, 56px);
+    letter-spacing:6px; color: var(--gold);
+  }
+  .tagline{ margin-top:8px; font-size:12px; letter-spacing:2px; text-transform:uppercase; color: rgba(255,255,255,0.6); }
+  .intro{ max-width:560px; margin: 20px auto 0; font-size:14px; line-height:1.6; color: rgba(255,255,255,0.8); }
+  .cta{
+    display:inline-block; margin-top:28px;
+    background: var(--gold); color: var(--navy);
+    font-weight:700; font-size:13px; letter-spacing:1px; text-transform:uppercase;
+    padding: 16px 28px; border-radius:28px; text-decoration:none;
+  }
+  main{ max-width:1040px; margin:0 auto; padding: 40px 16px 64px; }
+  h2{
+    font-family:"Cormorant Garamond", serif;
+    font-size:28px; font-weight:600; margin-bottom:6px;
+  }
+  .section-sub{ font-size:13px; color: var(--text-muted); margin-bottom:18px; }
+  section + section{ margin-top:40px; }
+  .grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap:14px;
+  }
+  .card{
+    background:#fff; border:1px solid var(--border-light); border-radius:18px;
+    padding:18px; text-decoration:none; color:inherit;
+    display:flex; gap:14px; align-items:flex-start;
+    transition: border-color .15s, transform .15s;
+  }
+  .card:hover{ border-color: var(--gold); transform: translateY(-2px); }
+  .card-emoji{ font-size:26px; line-height:1; }
+  .card-title{ font-weight:700; font-size:14px; }
+  .card-desc{ font-size:12px; color: var(--text-muted); margin-top:4px; line-height:1.45; }
+  .tip{
+    margin-top:40px; background:#fff; border:1px dashed var(--gold);
+    border-radius:18px; padding:18px 20px; font-size:13px; line-height:1.6;
+  }
+  .tip strong{ color: var(--gold-dark); }
+  footer{ text-align:center; font-size:11px; color: var(--text-muted); padding-bottom:32px; }
 </style>
 </head>
 <body>
 
-<header>
-  <span class="eyebrow">Prototipo interactivo</span>
-  <h1 id="screenTitle">HOTELIFE</h1>
+<header class="hero">
+  <p class="logo">HOTELIFE</p>
+  <p class="tagline">Todo a través de un clic</p>
+  <p class="intro">Prototipo interactivo: el huésped accede a todos los servicios del hotel desde su celular, y recepción y cada jefe de área atienden esas solicitudes en vivo.</p>
+  <a class="cta" href="src/login.html">Entrar como huésped →</a>
 </header>
 
-<nav id="tabs"></nav>
-
 <main>
-  <div class="frame-wrap">
-    <iframe id="screen" title="Pantalla de Hotelife"></iframe>
+  <section>
+    <h2>App del huésped</h2>
+    <p class="section-sub">Lo que ve el huésped al escanear el QR de su habitación.</p>
+    <div class="grid">
+      <a class="card" href="src/login.html"><span class="card-emoji">🔑</span><div><p class="card-title">Ingreso</p><p class="card-desc">Identificación con documento</p></div></a>
+      <a class="card" href="src/home.html"><span class="card-emoji">🏠</span><div><p class="card-title">Inicio</p><p class="card-desc">Llave digital, servicios rápidos y chat</p></div></a>
+      <a class="card" href="src/servicios.html"><span class="card-emoji">🗂️</span><div><p class="card-title">Servicios</p><p class="card-desc">Catálogo completo de 29 servicios</p></div></a>
+      <a class="card" href="src/room-service.html"><span class="card-emoji">🍽️</span><div><p class="card-title">Room Service</p><p class="card-desc">Menú con carrito y pedido</p></div></a>
+      <a class="card" href="src/solicitudes.html"><span class="card-emoji">📋</span><div><p class="card-title">Mis solicitudes</p><p class="card-desc">Historial y estado</p></div></a>
+      <a class="card" href="src/cuenta.html"><span class="card-emoji">🧾</span><div><p class="card-title">Mi cuenta</p><p class="card-desc">Folio de consumos y check-out</p></div></a>
+      <a class="card" href="src/perfil.html"><span class="card-emoji">👤</span><div><p class="card-title">Perfil</p><p class="card-desc">Preferencias, pagos e invitados</p></div></a>
+      <a class="card" href="src/accesos-invitados.html"><span class="card-emoji">🎟️</span><div><p class="card-title">Accesos e invitados</p><p class="card-desc">Autorizar visitas con pase QR</p></div></a>
+    </div>
+  </section>
+
+  <section>
+    <h2>Recepción y staff</h2>
+    <p class="section-sub">Paneles que reciben en vivo lo que pide el huésped.</p>
+    <div class="grid">
+      <a class="card" href="src/admin/dashboard.html"><span class="card-emoji">📊</span><div><p class="card-title">Dashboard de recepción</p><p class="card-desc">KPIs y todas las solicitudes</p></div></a>
+      <a class="card" href="src/admin/mensajes.html"><span class="card-emoji">💬</span><div><p class="card-title">Mensajes</p><p class="card-desc">Chat con huéspedes</p></div></a>
+      <a class="card" href="src/admin/control-accesos.html"><span class="card-emoji">🛂</span><div><p class="card-title">Control de accesos</p><p class="card-desc">Validar pases de invitados</p></div></a>
+      <a class="card" href="src/admin/staff-mantenimiento.html"><span class="card-emoji">🔧</span><div><p class="card-title">Mantenimiento</p><p class="card-desc">App del jefe de área</p></div></a>
+      <a class="card" href="src/admin/staff-amadellaves.html"><span class="card-emoji">🧺</span><div><p class="card-title">Ama de Llaves</p><p class="card-desc">App de la jefa de área</p></div></a>
+      <a class="card" href="src/admin/staff-ayb.html"><span class="card-emoji">🍷</span><div><p class="card-title">Alimentos y Bebidas</p><p class="card-desc">App del jefe de área</p></div></a>
+      <a class="card" href="src/admin/staff-spa.html"><span class="card-emoji">🧖‍♀️</span><div><p class="card-title">Spa & Wellness</p><p class="card-desc">App del jefe de área</p></div></a>
+      <a class="card" href="src/admin/staff-conserjeria.html"><span class="card-emoji">🧭</span><div><p class="card-title">Conserjería</p><p class="card-desc">App del jefe de área</p></div></a>
+    </div>
+  </section>
+
+  <div class="tip">
+    <strong>Para verlo conectado en vivo:</strong> abre la app del huésped en una pestaña y el Dashboard (o la app del área) en otra pestaña del <em>mismo navegador</em>. Al hacer un pedido como huésped, aparece al instante del lado del staff.
   </div>
 </main>
-<p class="caption">Cada botón carga la pantalla original del repositorio. El diseño definitivo vive en Figma · <a class="repo-link" href="https://github.com/MrSnick/Hotelife" target="_blank" rel="noopener">Ver código en GitHub</a></p>
 
-<script>
-(function(){
-  var screens = [
-    { file: "src/login.html", label: "Login" },
-    { file: "src/home.html", label: "Home" },
-    { file: "src/servicios.html", label: "Servicios" },
-    { file: "src/room-service.html", label: "Room Service" },
-    { file: "src/solicitudes.html", label: "Solicitudes" },
-    { file: "src/cuenta.html", label: "Cuenta" },
-    { file: "src/pasarela-pago.html", label: "Pasarela de pago" },
-    { file: "src/pago-qr.html", label: "Pago QR" },
-    { file: "src/checkout-exitoso.html", label: "Checkout exitoso" },
-    { file: "src/mantenimiento.html", label: "Mantenimiento" },
-    { file: "src/formulario-documento.html", label: "Formulario (borrador)" },
-    { file: "src/admin/dashboard.html", label: "Admin · Recepción" },
-    { file: "src/admin/staff-mantenimiento.html", label: "Admin · Mantenimiento" },
-    { file: "src/admin/staff-amadellaves.html", label: "Admin · Ama de llaves" },
-    { file: "src/admin/staff-ayb.html", label: "Admin · A&B" },
-    { file: "src/admin/staff-spa.html", label: "Admin · Spa" },
-    { file: "src/admin/staff-conserjeria.html", label: "Admin · Conserjería" }
-  ];
-
-  var nav = document.getElementById("tabs");
-  var iframe = document.getElementById("screen");
-  var title = document.getElementById("screenTitle");
-
-  screens.forEach(function(s, i){
-    var btn = document.createElement("button");
-    btn.className = "tab";
-    btn.type = "button";
-    btn.textContent = s.label;
-    btn.addEventListener("click", function(){ select(i); });
-    nav.appendChild(btn);
-  });
-
-  function select(i){
-    var s = screens[i];
-    Array.prototype.forEach.call(nav.children, function(btn, idx){
-      btn.classList.toggle("active", idx === i);
-    });
-    iframe.src = s.file;
-    title.textContent = "HOTELIFE — " + s.label;
-    var slug = s.file.split("/").pop().replace(".html", "");
-    if (history.replaceState) history.replaceState(null, "", "#" + slug);
-  }
-
-  var startIndex = 0;
-  var hash = (location.hash || "").replace("#", "");
-  if (hash){
-    var found = screens.findIndex(function(s){ return s.file.split("/").pop() === hash + ".html"; });
-    if (found !== -1) startIndex = found;
-  }
-  select(startIndex);
-})();
-</script>
+<footer>HOTELIFE · Prototipo funcional</footer>
 
 </body>
 </html>

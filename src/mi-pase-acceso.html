@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HOTELIFE — Mi Pase de Acceso</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy: #1a222d; --bg-outer: #f9f6f0; --gold: #d4b285; --border-light: #eae5dc;
+    --text-muted: rgba(26,34,45,0.6); --green: #4c8c4a; --amber:#a3762f;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{ font-family:"Manrope",-apple-system,sans-serif; background:#e5e2db; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; color:var(--navy); }
+  .phone{ background:var(--bg-outer); border:0.8px solid var(--gold); border-radius:44px; box-shadow:0 25px 50px -12px rgba(26,34,45,0.25); width:100%; max-width:390px; overflow:hidden; display:flex; flex-direction:column; height:844px; position:relative; }
+  .status-bar{ flex-shrink:0; display:flex; align-items:center; justify-content:space-between; height:44px; padding:0 24px; font-weight:600; font-size:14px; }
+  .status-icons{ display:flex; gap:6px; align-items:center; font-size:12px; }
+  .header{ flex-shrink:0; text-align:center; padding: 8px 24px 4px; }
+  .header-title{ font-family:"Cormorant Garamond", serif; font-weight:700; font-size:20px; letter-spacing:1px; }
+
+  .content{ flex:1; overflow-y:auto; padding: 12px 24px 24px; display:flex; flex-direction:column; gap:16px; align-items:center; }
+
+  .status-banner{
+    width:100%; border-radius:14px; padding:12px 14px; font-size:12px; font-weight:600; text-align:center; line-height:1.4;
+  }
+  .status-banner.pendiente{ background: rgba(212,178,133,0.2); color: var(--amber); border:1px solid var(--gold); }
+  .status-banner.activo{ background: rgba(76,140,74,0.15); color: var(--green); border:1px solid var(--green); }
+
+  .pass-card{ width:100%; background:#fff; border:1px solid var(--border-light); border-radius:22px; padding:20px; display:flex; flex-direction:column; align-items:center; gap:12px; }
+  .guest-avatar{ width:52px; height:52px; border-radius:16px; background: var(--navy); color: var(--gold); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:18px; }
+  .guest-name{ font-weight:700; font-size:16px; }
+  .guest-doc{ font-size:11px; color: var(--text-muted); }
+  .active-pill{ background: rgba(76,140,74,0.15); color: var(--green); font-size:10px; font-weight:800; padding:3px 10px; border-radius:8px; text-transform:uppercase; }
+  .pending-pill{ background: rgba(212,178,133,0.25); color: var(--amber); font-size:10px; font-weight:800; padding:3px 10px; border-radius:8px; text-transform:uppercase; }
+
+  .qr-wrap{ position:relative; width:200px; height:200px; margin-top:6px; }
+  .qr-grid{ width:200px; height:200px; display:grid; grid-template-columns: repeat(13, 1fr); grid-template-rows: repeat(13, 1fr); gap:2px; border-radius:14px; overflow:hidden; }
+  .qr-grid div{ background: var(--navy); }
+  .qr-grid div.off{ background: transparent; }
+  .qr-wrap.locked .qr-grid{ filter: blur(3px) grayscale(0.6); opacity:0.5; }
+  .lock-overlay{
+    display:none; position:absolute; inset:0; flex-direction:column; align-items:center; justify-content:center; gap:6px;
+    background: rgba(249,246,240,0.55); border-radius:14px;
+  }
+  .qr-wrap.locked .lock-overlay{ display:flex; }
+  .lock-icon{ font-size:28px; }
+  .lock-text{ font-size:11px; font-weight:700; color: var(--navy); text-align:center; padding:0 20px; }
+
+  .scan-hint{ font-size:10px; color: var(--text-muted); text-align:center; }
+
+  .details-card{ width:100%; background:#fff; border:1px solid var(--border-light); border-radius:16px; padding:14px 16px; display:flex; flex-direction:column; gap:8px; }
+  .detail-row{ display:flex; justify-content:space-between; font-size:12px; }
+  .detail-row .label{ color: var(--text-muted); }
+  .detail-row .value{ font-weight:700; }
+
+  .action-btn{ width:100%; height:48px; border-radius:16px; border:none; font-weight:700; font-size:12px; cursor:pointer; }
+  .btn-whatsapp{ background:#25d366; color:#fff; }
+  .btn-save{ background:#fff; border:1px solid var(--border-light); color: var(--navy); }
+</style>
+<link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+<div class="phone">
+  <div class="status-bar"><span>12:40</span><span class="status-icons">📶 📡 🔋</span></div>
+
+  <div class="header"><p class="header-title">HOTELIFE</p></div>
+
+  <div class="content" id="content">
+    <!-- contenido se genera dinámicamente según el estado del pase -->
+  </div>
+</div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const passId = params.get('id');
+  const passes = JSON.parse(localStorage.getItem('hotelife_access_passes') || '[]');
+  const pass = passId ? passes.find(p => p.id === passId) : passes[0];
+
+  const content = document.getElementById('content');
+
+  if (!pass) {
+    content.innerHTML = `
+      <div class="pass-card" style="margin-top:60px;">
+        <p style="font-weight:700; font-size:14px;">No encontramos este pase de acceso.</p>
+        <p style="font-size:12px; color:var(--text-muted); text-align:center;">Pídele a tu anfitrión que te reenvíe el enlace desde la app HOTELIFE.</p>
+      </div>
+    `;
+  } else {
+    const isActive = pass.status === 'activo';
+    const initials = pass.guestName.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+
+    // Generar un patrón visual tipo QR (no escaneable de verdad)
+    const seed = [];
+    for (let i = 0; i < 169; i++) seed.push(Math.random() > 0.42 ? 1 : 0);
+    // Marcas de esquina típicas de QR
+    const cornerPattern = (row, col) => (row < 3 || row > 9) && (col < 3 || col > 9);
+
+    const gridCells = seed.map((v, i) => {
+      const row = Math.floor(i / 13);
+      const col = i % 13;
+      const isCorner = (row < 3 && col < 3) || (row < 3 && col > 9) || (row > 9 && col < 3);
+      const val = isCorner ? 1 : v;
+      return `<div class="${val ? '' : 'off'}"></div>`;
+    }).join('');
+
+    content.innerHTML = `
+      <div class="status-banner ${isActive ? 'activo' : 'pendiente'}">
+        ${isActive
+          ? '✅ Acceso activo — puedes ingresar a las zonas autorizadas.'
+          : '⏳ Pendiente de validar en recepción — presenta tu documento de identidad al llegar al hotel.'}
+      </div>
+
+      <div class="pass-card">
+        <div class="guest-avatar">${initials}</div>
+        <p class="guest-name">${pass.guestName}</p>
+        <p class="guest-doc">${pass.docType} •••• ${pass.docNumber.slice(-4).padStart(4, '•')}</p>
+        <span class="${isActive ? 'active-pill' : 'pending-pill'}">${isActive ? 'Activo' : 'Pendiente'}</span>
+
+        <div class="qr-wrap ${isActive ? '' : 'locked'}">
+          <div class="qr-grid">${gridCells}</div>
+          <div class="lock-overlay">
+            <div class="lock-icon">🔒</div>
+            <p class="lock-text">Este código se activará cuando recepción valide tu identidad</p>
+          </div>
+        </div>
+        <p class="scan-hint">${isActive ? 'Escanéalo en recepción o en los puntos de acceso' : 'Aún no es válido para ingresar'}</p>
+      </div>
+
+      <div class="details-card">
+        <div class="detail-row"><span class="label">Anfitrión</span><span class="value">${pass.primaryGuest}</span></div>
+        <div class="detail-row"><span class="label">Tipo de pase</span><span class="value">${pass.passType}</span></div>
+        <div class="detail-row"><span class="label">Habitación</span><span class="value">${pass.roomType} · ${pass.room}</span></div>
+      </div>
+
+      <button class="action-btn btn-whatsapp" id="whatsappBtn">💬 Enviar por WhatsApp</button>
+      <button class="action-btn btn-save" id="saveBtn">⬇️ Guardar en dispositivo</button>
+    `;
+
+    document.getElementById('whatsappBtn').addEventListener('click', () => {
+      console.log('Compartiendo pase por WhatsApp:', pass.id);
+    });
+    document.getElementById('saveBtn').addEventListener('click', () => {
+      console.log('Guardando pase en el dispositivo:', pass.id);
+    });
+  }
+</script>
+
+<script src="js/nav.js"></script>
+</body>
+</html>

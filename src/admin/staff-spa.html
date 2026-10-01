@@ -58,6 +58,7 @@
   .nav-item.active{ color:var(--gold); opacity:1; }
   .nav-icon{ font-size:16px; }
 </style>
+<link rel="stylesheet" href="../css/responsive.css">
 </head>
 <body>
 
@@ -193,6 +194,45 @@
       btn.classList.add('active');
     });
   });
+
+  // Cargar reservas reales (Spa, Gimnasio, Piscina, Sauna, Clases)
+  function loadRealRequests() {
+    const all = JSON.parse(localStorage.getItem('hotelife_service_requests') || '[]');
+    const mine = all.filter(r => r.dept && r.dept.includes('Spa'));
+    const list = document.getElementById('ticketList');
+
+    mine.forEach(req => {
+      if (document.getElementById(req.id)) return;
+
+      // req.time viene como "1:00 PM" -> separar número y AM/PM
+      const timeParts = (req.time || '').split(' ');
+      const timeNum = timeParts[0] || '--:--';
+      const ampm = timeParts[1] || '';
+
+      const ticket = document.createElement('div');
+      ticket.className = 'ticket';
+      ticket.id = req.id;
+      ticket.dataset.status = 'pendiente';
+      ticket.innerHTML = `
+        <div class="time-block"><p class="time">${timeNum}</p><p class="ampm">${ampm}</p></div>
+        <div class="ticket-body">
+          <div class="ticket-top">
+            <div><p class="guest-name">${req.guestName}</p><p class="room-sub">${req.roomType} · ${req.room}</p></div>
+            <span class="stage-tag stage-pendiente">Por confirmar</span>
+          </div>
+          <p class="service-name">${req.title}</p>
+          <p class="service-detail">${req.option || ''} · ${req.date || ''}</p>
+          <div class="ticket-actions">
+            <button class="btn btn-outline" data-action="ver">Ver</button>
+            <button class="btn btn-primary" data-action="confirmar">Confirmar</button>
+          </div>
+        </div>
+      `;
+      list.insertBefore(ticket, list.firstChild);
+      attachHandlers(ticket);
+    });
+  }
+  loadRealRequests();
 </script>
 
 </body>

@@ -5,383 +5,203 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HOTELIFE — Room Service</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --navy: #1a222d;
-    --bg-outer: #f9f6f0;
-    --gold: #d4b285;
-    --border-light: #e0e0e0;
+    --navy: #1a222d; --bg-outer: #f9f6f0; --gold: #d4b285; --border-light: #e5e1d8;
     --text-muted: rgba(26,34,45,0.6);
   }
   *{ box-sizing:border-box; margin:0; padding:0; }
-  body{
-    font-family: "Manrope", -apple-system, sans-serif;
-    background: #e5e2db;
-    min-height: 100vh;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding: 24px;
-    color: var(--navy);
-  }
-  .phone{
-    background: var(--bg-outer);
-    border: 0.8px solid var(--gold);
-    border-radius: 44px;
-    box-shadow: 0 25px 50px -12px rgba(26,34,45,0.25);
-    width: 100%;
-    max-width: 390px;
-    overflow: hidden;
-    display:flex;
-    flex-direction:column;
-    height: 844px;
-    position: relative;
-  }
-  .status-bar{
-    flex-shrink:0;
-    display:flex; align-items:center; justify-content:space-between;
-    height:44px; padding: 0 24px;
-    font-weight:600; font-size:14px;
-  }
+  body{ font-family:"Manrope",-apple-system,sans-serif; background:#e5e2db; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; color:var(--navy); }
+  .phone{ background:var(--bg-outer); border:0.8px solid var(--gold); border-radius:44px; box-shadow:0 25px 50px -12px rgba(26,34,45,0.25); width:100%; max-width:390px; overflow:hidden; display:flex; flex-direction:column; height:844px; position:relative; }
+  .status-bar{ flex-shrink:0; display:flex; align-items:center; justify-content:space-between; height:44px; padding:0 24px; font-weight:600; font-size:14px; }
   .status-icons{ display:flex; gap:6px; align-items:center; font-size:12px; }
+  .header{ flex-shrink:0; display:flex; align-items:center; gap:12px; height:64px; padding:0 20px; }
+  .back-btn{ width:40px; height:40px; border-radius:20px; background:#fff; border:1px solid var(--border-light); display:flex; align-items:center; justify-content:center; font-size:16px; cursor:pointer; flex-shrink:0; }
+  .header-title{ font-family:"Cormorant Garamond", serif; font-weight:700; font-size:20px; }
 
-  .header{
-    flex-shrink:0;
-    background: var(--navy);
-    border-bottom: 1px solid var(--gold);
-    display:flex; align-items:center; gap:12px;
-    height:70px; padding: 0 20px;
-    color:#fff;
-  }
-  .back-btn{ background:none; border:none; color: var(--gold); font-size:16px; cursor:pointer; }
-  .header-text{ flex:1; min-width:0; }
-  .header-title{ font-family:"Cormorant Garamond", serif; font-weight:700; font-size:16px; }
-  .header-subtitle{ font-size:10px; color: var(--gold); }
-  .room-badge{
-    background: rgba(212,178,133,0.15); border:1px solid var(--gold);
-    border-radius:12px; padding:4px 10px; font-weight:700; font-size:11px; color: var(--gold);
-    white-space:nowrap;
-  }
+  .search-wrap{ padding: 0 20px 10px; flex-shrink:0; }
+  .search-input{ width:100%; height:40px; border:1px solid var(--border-light); border-radius:12px; padding:0 14px; font-size:13px; font-family:inherit; background:#fff; outline:none; }
 
-  .categories{
-    flex-shrink:0;
-    display:flex; gap:8px;
-    overflow-x:auto;
-    padding: 14px 20px 10px;
-    scrollbar-width:none;
-  }
-  .categories::-webkit-scrollbar{ display:none; }
-  .category-chip{
-    flex:0 0 auto;
-    padding:7px 14px;
-    border-radius:14px;
-    border:1px solid var(--border-light);
-    background:#fff;
-    font-size:11px; font-weight:700; color: var(--text-muted);
-    cursor:pointer; white-space:nowrap;
-  }
-  .category-chip.active{ background: var(--navy); border-color: var(--navy); color:#fff; }
+  .filters{ flex-shrink:0; display:flex; gap:8px; padding: 4px 20px 12px; overflow-x:auto; }
+  .filter-chip{ padding:7px 14px; border-radius:16px; border:1px solid var(--border-light); background:#fff; font-size:12px; font-weight:700; color:var(--text-muted); cursor:pointer; white-space:nowrap; }
+  .filter-chip.active{ background:var(--navy); border-color:var(--navy); color:#fff; }
 
-  .scroll-content{
-    flex:1;
-    overflow-y:auto;
-    -webkit-overflow-scrolling:touch;
-    scrollbar-width:none;
-    padding: 4px 20px 20px;
-    display:flex; flex-direction:column; gap:12px;
-  }
+  .scroll-content{ flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; padding: 4px 20px 100px; display:flex; flex-direction:column; gap:12px; }
   .scroll-content::-webkit-scrollbar{ display:none; }
 
-  .menu-item{
-    display:flex; gap:12px;
-    background:#fff; border:1px solid var(--border-light); border-radius:16px;
-    padding:14px;
-  }
-  .menu-item-emoji{
-    flex-shrink:0; width:52px; height:52px; border-radius:12px;
-    background: var(--bg-outer); border:1px solid var(--border-light);
-    display:flex; align-items:center; justify-content:center; font-size:24px;
-  }
-  .menu-item-body{ flex:1; min-width:0; display:flex; flex-direction:column; gap:4px; }
-  .menu-item-name{ font-weight:700; font-size:13px; }
-  .menu-item-desc{ font-size:11px; color: var(--text-muted); line-height:1.4; }
-  .menu-item-row{ display:flex; align-items:center; justify-content:space-between; margin-top:4px; }
-  .menu-item-price{ font-weight:700; font-size:13px; }
+  .category-title{ font-weight:700; font-size:11px; text-transform:uppercase; color:var(--text-muted); margin-top:8px; }
 
-  .add-btn{
-    height:30px; padding:0 14px; border-radius:10px;
-    background: var(--gold); border:none;
-    font-weight:700; font-size:11px; text-transform:uppercase;
-    color: var(--navy); cursor:pointer;
-  }
-  .stepper{ display:flex; align-items:center; gap:10px; }
-  .stepper-btn{
-    width:26px; height:26px; border-radius:8px;
-    border:1px solid var(--gold); background:#fff;
-    color: var(--navy); font-weight:700; font-size:13px;
-    display:flex; align-items:center; justify-content:center; cursor:pointer;
-  }
-  .stepper-qty{ font-weight:700; font-size:13px; min-width:14px; text-align:center; }
+  .menu-item{ display:flex; gap:12px; background:#fff; border:1px solid var(--border-light); border-radius:16px; padding:14px; }
+  .menu-item.recommended{ border-color:var(--gold); border-width:1.5px; }
+  .item-emoji{ width:52px; height:52px; border-radius:12px; background:var(--bg-outer); display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0; }
+  .item-info{ flex:1; min-width:0; display:flex; flex-direction:column; gap:3px; }
+  .item-top{ display:flex; align-items:center; justify-content:space-between; gap:6px; }
+  .item-name{ font-weight:700; font-size:13.5px; }
+  .item-badge{ font-size:9px; font-weight:800; color:var(--gold); background:rgba(212,178,133,0.2); padding:2px 7px; border-radius:6px; text-transform:uppercase; }
+  .item-desc{ font-size:11.5px; color:var(--text-muted); line-height:1.4; }
+  .item-bottom{ display:flex; align-items:center; justify-content:space-between; margin-top:2px; }
+  .item-price{ font-weight:700; font-size:13px; }
+  .qty-control{ display:flex; align-items:center; gap:10px; }
+  .qty-btn{ width:26px; height:26px; border-radius:8px; border:1px solid var(--border-light); background:#fff; font-weight:700; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .qty-value{ font-weight:700; font-size:13px; min-width:14px; text-align:center; }
+  .add-btn{ height:30px; padding:0 14px; border-radius:9px; background:var(--gold); border:none; font-weight:700; font-size:11px; color:var(--navy); cursor:pointer; }
 
   .cart-bar{
-    flex-shrink:0;
-    display:none;
-    align-items:center; justify-content:space-between;
-    gap:12px;
-    margin: 0 20px 12px;
-    padding: 12px 16px;
-    background: var(--navy);
-    border-radius: 16px;
-    color:#fff;
-    cursor:pointer;
+    position:absolute; left:20px; right:20px; bottom:24px;
+    background:var(--navy); border-radius:18px; padding:14px 18px;
+    display:none; align-items:center; justify-content:space-between;
+    box-shadow:0 12px 24px rgba(26,34,45,0.3); cursor:pointer;
   }
   .cart-bar.visible{ display:flex; }
-  .cart-bar-info{ display:flex; flex-direction:column; }
-  .cart-bar-count{ font-size:10px; color: var(--gold); font-weight:700; text-transform:uppercase; }
-  .cart-bar-total{ font-family:"Cormorant Garamond", serif; font-size:18px; font-weight:700; }
-  .cart-bar-cta{ font-size:11px; font-weight:700; color: var(--navy); background: var(--gold); border-radius:10px; padding:8px 14px; }
+  .cart-info{ color:#fff; }
+  .cart-count{ font-size:11px; opacity:0.7; }
+  .cart-total{ font-family:"Cormorant Garamond", serif; font-weight:700; font-size:18px; }
+  .cart-cta{ background:var(--gold); color:var(--navy); font-weight:800; font-size:12px; text-transform:uppercase; padding:10px 16px; border-radius:12px; border:none; cursor:pointer; }
 
-  .bottom-nav{
-    flex-shrink:0;
-    background: var(--navy);
-    border-top: 1px solid var(--gold);
-    height:70px;
-    display:flex; align-items:center; justify-content:space-around;
+  /* Modal de confirmación */
+  .modal-overlay{
+    position:absolute; inset:0; background:rgba(26,34,45,0.5);
+    display:none; align-items:flex-end; z-index:30;
   }
-  .nav-item{
-    display:flex; flex-direction:column; align-items:center; gap:4px;
-    color:#fff; opacity:0.6; font-size:9px; text-decoration:none; cursor:pointer;
-    background:none; border:none;
+  .modal-overlay.open{ display:flex; }
+  .modal-panel{
+    width:100%; max-height:80%; background:#fff; border-radius:24px 24px 0 0;
+    display:flex; flex-direction:column; overflow:hidden;
   }
-  .nav-item.active{ color: var(--gold); opacity:1; }
-  .nav-icon{ font-size:16px; }
-
-  .cart-overlay{
-    position:absolute; inset:0;
-    background: rgba(26,34,45,0.45);
-    display:none; align-items:flex-end;
-    z-index:20;
-  }
-  .cart-overlay.open{ display:flex; }
-  .cart-panel{
-    width:100%; max-height:82%;
-    background:#fff;
-    border-radius:24px 24px 0 0;
-    display:flex; flex-direction:column;
-    overflow:hidden;
-  }
-  .cart-panel-header{
-    display:flex; align-items:center; justify-content:space-between;
-    padding:16px 20px;
-    border-bottom:1px solid var(--border-light);
-    flex-shrink:0;
-  }
-  .cart-panel-title{ font-family:"Cormorant Garamond", serif; font-weight:700; font-size:18px; }
-  .cart-close{ background:none; border:none; font-size:16px; color: var(--text-muted); cursor:pointer; }
-  .cart-panel-body{
-    flex:1; overflow-y:auto; padding:12px 20px; display:flex; flex-direction:column; gap:10px;
-  }
-  .cart-line{ display:flex; align-items:center; gap:10px; }
-  .cart-line-info{ flex:1; min-width:0; }
-  .cart-line-name{ font-weight:600; font-size:12px; }
-  .cart-line-price{ font-size:11px; color: var(--text-muted); }
-  .cart-empty{ text-align:center; color: var(--text-muted); font-size:12px; padding: 24px 0; }
-  .notes-box{
-    margin-top:6px;
-    border:1px solid var(--border-light); border-radius:12px; padding:10px 12px;
-  }
-  .notes-label{ font-weight:700; font-size:10px; text-transform:uppercase; color: var(--text-muted); margin-bottom:6px; }
-  .notes-textarea{
-    width:100%; height:48px; border:none; outline:none; resize:none;
-    font-family:inherit; font-size:12px; color: var(--navy);
-  }
-  .notes-textarea::placeholder{ color: rgba(26,34,45,0.45); }
-  .cart-panel-footer{
-    flex-shrink:0;
-    border-top:1px solid var(--border-light);
-    padding:14px 20px calc(14px + env(safe-area-inset-bottom, 0px));
-    display:flex; flex-direction:column; gap:10px;
-  }
-  .cart-total-row{ display:flex; justify-content:space-between; font-weight:700; font-size:14px; }
-  .confirm-btn{
-    width:100%; height:52px; border-radius:16px;
-    background: var(--gold); border:none;
-    font-weight:700; font-size:13px; text-transform:uppercase;
-    color: var(--navy); cursor:pointer;
-  }
+  .modal-header{ padding:18px 20px; border-bottom:1px solid var(--border-light); display:flex; align-items:center; justify-content:space-between; }
+  .modal-title{ font-weight:700; font-size:15px; }
+  .modal-close{ background:none; border:none; font-size:16px; color:var(--text-muted); cursor:pointer; }
+  .modal-body{ flex:1; overflow-y:auto; padding:16px 20px; display:flex; flex-direction:column; gap:10px; }
+  .cart-line{ display:flex; justify-content:space-between; font-size:13px; }
+  .cart-line b{ font-weight:700; }
+  .notes-box{ width:100%; height:60px; border:1px solid var(--border-light); border-radius:12px; padding:10px; font-family:inherit; font-size:12px; resize:none; outline:none; margin-top:4px; }
+  .notes-box:focus{ border-color:var(--gold); }
+  .modal-total-row{ display:flex; justify-content:space-between; font-weight:700; font-size:15px; padding-top:10px; border-top:1px solid var(--border-light); margin-top:6px; }
+  .modal-footer{ padding:16px 20px 20px; border-top:1px solid var(--border-light); }
+  .confirm-btn{ width:100%; height:50px; border-radius:16px; background:var(--gold); border:none; font-weight:700; font-size:13px; text-transform:uppercase; color:var(--navy); cursor:pointer; }
   .confirm-btn:disabled{ opacity:0.5; cursor:not-allowed; }
-  .confirm-btn.success{ background:#4c8c4a; color:#fff; }
+
+  .success-screen{
+    position:absolute; inset:0; background:var(--bg-outer);
+    display:none; flex-direction:column; align-items:center; justify-content:center; gap:14px;
+    padding:40px; text-align:center; z-index:40;
+  }
+  .success-screen.visible{ display:flex; }
+  .success-icon{ width:64px; height:64px; border-radius:32px; background:var(--navy); border:1.6px solid var(--gold); display:flex; align-items:center; justify-content:center; font-size:28px; color:var(--gold); }
+  .success-title{ font-family:"Cormorant Garamond", serif; font-weight:700; font-size:20px; }
+  .success-desc{ font-size:12.5px; color:var(--text-muted); line-height:1.5; }
+  .success-btn{ margin-top:10px; height:46px; padding:0 24px; border-radius:16px; background:var(--navy); border:none; font-weight:700; font-size:12px; color:var(--gold); cursor:pointer; }
 </style>
+<link rel="stylesheet" href="css/responsive.css">
 </head>
 <body>
 
 <div class="phone">
-  <div class="status-bar">
-    <span>12:40</span>
-    <span class="status-icons">📶 📡 🔋</span>
-  </div>
+  <div class="status-bar"><span>12:40</span><span class="status-icons">📶 📡 🔋</span></div>
 
   <div class="header">
-    <button class="back-btn" id="backBtn">◀</button>
-    <div class="header-text">
-      <p class="header-title">Room Service</p>
-      <p class="header-subtitle">Directo a tu habitación</p>
-    </div>
-    <span class="room-badge">Suite 405</span>
+    <button class="back-btn" id="backBtn">←</button>
+    <p class="header-title">Room Service</p>
   </div>
 
-  <div class="categories" id="categories">
-    <button class="category-chip active" data-category="todos">Todo el menú</button>
-    <button class="category-chip" data-category="desayuno">Desayuno</button>
-    <button class="category-chip" data-category="entradas">Entradas</button>
-    <button class="category-chip" data-category="fuertes">Platos fuertes</button>
-    <button class="category-chip" data-category="postres">Postres</button>
-    <button class="category-chip" data-category="bebidas">Bebidas</button>
+  <div class="search-wrap">
+    <input type="text" class="search-input" id="searchInput" placeholder="Buscar platillos o bebidas...">
+  </div>
+
+  <div class="filters">
+    <button class="filter-chip active" data-filter="todos">Todos</button>
+    <button class="filter-chip" data-filter="desayunos">Desayunos</button>
+    <button class="filter-chip" data-filter="fuertes">Fuertes</button>
+    <button class="filter-chip" data-filter="bebidas">Bebidas</button>
   </div>
 
   <div class="scroll-content" id="menuList">
 
-    <div class="menu-item" data-category="desayuno" data-name="Desayuno Continental" data-price="28000">
-      <div class="menu-item-emoji">🥐</div>
-      <div class="menu-item-body">
-        <p class="menu-item-name">Desayuno Continental</p>
-        <p class="menu-item-desc">Croissant, jugo natural, café o té, fruta de temporada.</p>
-        <div class="menu-item-row">
-          <span class="menu-item-price">$28.000</span>
-          <div class="item-control"><button class="add-btn" data-action="add">Agregar</button></div>
+    <p class="category-title">Recomendación del chef</p>
+    <div class="menu-item recommended" data-category="fuertes" data-id="filete" data-name="Filete Mignon Trufado" data-price="42000">
+      <div class="item-emoji">🥩</div>
+      <div class="item-info">
+        <div class="item-top"><p class="item-name">Filete Mignon Trufado</p><span class="item-badge">★ 4.9</span></div>
+        <p class="item-desc">Con puré de papa rústico y espárragos frescos · 25 min · Sin gluten</p>
+        <div class="item-bottom">
+          <p class="item-price">$42.000</p>
+          <div class="qty-control" data-state="add">
+            <button class="add-btn" data-action="add">+ Agregar</button>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="menu-item" data-category="desayuno" data-name="Bowl de Frutas y Granola" data-price="22000">
-      <div class="menu-item-emoji">🍓</div>
-      <div class="menu-item-body">
-        <p class="menu-item-name">Bowl de Frutas y Granola</p>
-        <p class="menu-item-desc">Yogur griego, granola artesanal, miel y frutos rojos.</p>
-        <div class="menu-item-row">
-          <span class="menu-item-price">$22.000</span>
-          <div class="item-control"><button class="add-btn" data-action="add">Agregar</button></div>
+    <p class="category-title">Fuertes</p>
+    <div class="menu-item" data-category="fuertes" data-id="cesar" data-name="Ensalada César VIP" data-price="24000">
+      <div class="item-emoji">🥗</div>
+      <div class="item-info">
+        <div class="item-top"><p class="item-name">Ensalada César VIP</p></div>
+        <p class="item-desc">Lechuga romana, crotones, pollo a la parrilla</p>
+        <div class="item-bottom">
+          <p class="item-price">$24.000</p>
+          <div class="qty-control" data-state="add">
+            <button class="add-btn" data-action="add">+ Agregar</button>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="menu-item" data-category="entradas" data-name="Tabla de Quesos" data-price="32000">
-      <div class="menu-item-emoji">🧀</div>
-      <div class="menu-item-body">
-        <p class="menu-item-name">Tabla de Quesos</p>
-        <p class="menu-item-desc">Selección de quesos importados, nueces y mermelada de mora.</p>
-        <div class="menu-item-row">
-          <span class="menu-item-price">$32.000</span>
-          <div class="item-control"><button class="add-btn" data-action="add">Agregar</button></div>
+    <div class="menu-item" data-category="fuertes" data-id="sandwich" data-name="Club Sandwich" data-price="18500">
+      <div class="item-emoji">🥪</div>
+      <div class="item-info">
+        <div class="item-top"><p class="item-name">Club Sandwich</p></div>
+        <p class="item-desc">Pollo, tocineta, lechuga y tomate · papas a la francesa</p>
+        <div class="item-bottom">
+          <p class="item-price">$18.500</p>
+          <div class="qty-control" data-state="add">
+            <button class="add-btn" data-action="add">+ Agregar</button>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="menu-item" data-category="entradas" data-name="Ceviche Clásico" data-price="38000">
-      <div class="menu-item-emoji">🍤</div>
-      <div class="menu-item-body">
-        <p class="menu-item-name">Ceviche Clásico</p>
-        <p class="menu-item-desc">Pescado blanco, leche de tigre, camote y choclo.</p>
-        <div class="menu-item-row">
-          <span class="menu-item-price">$38.000</span>
-          <div class="item-control"><button class="add-btn" data-action="add">Agregar</button></div>
+    <p class="category-title">Desayunos</p>
+    <div class="menu-item" data-category="desayunos" data-id="toast" data-name="Toast Artesanal" data-price="15000">
+      <div class="item-emoji">🍞</div>
+      <div class="item-info">
+        <div class="item-top"><p class="item-name">Toast Artesanal</p></div>
+        <p class="item-desc">Aguacate, huevo pochado y microvegetales</p>
+        <div class="item-bottom">
+          <p class="item-price">$15.000</p>
+          <div class="qty-control" data-state="add">
+            <button class="add-btn" data-action="add">+ Agregar</button>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="menu-item" data-category="fuertes" data-name="Club Sandwich" data-price="18500">
-      <div class="menu-item-emoji">🥪</div>
-      <div class="menu-item-body">
-        <p class="menu-item-name">Club Sandwich</p>
-        <p class="menu-item-desc">Pollo, tocineta, huevo, lechuga y tomate. Con papas fritas.</p>
-        <div class="menu-item-row">
-          <span class="menu-item-price">$18.500</span>
-          <div class="item-control"><button class="add-btn" data-action="add">Agregar</button></div>
+    <p class="category-title">Bebidas</p>
+    <div class="menu-item" data-category="bebidas" data-id="jugo" data-name="Jugo natural de naranja" data-price="8000">
+      <div class="item-emoji">🍊</div>
+      <div class="item-info">
+        <div class="item-top"><p class="item-name">Jugo natural de naranja</p></div>
+        <p class="item-desc">Recién exprimido</p>
+        <div class="item-bottom">
+          <p class="item-price">$8.000</p>
+          <div class="qty-control" data-state="add">
+            <button class="add-btn" data-action="add">+ Agregar</button>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="menu-item" data-category="fuertes" data-name="Filete Mignon Trufado" data-price="66500">
-      <div class="menu-item-emoji">🥩</div>
-      <div class="menu-item-body">
-        <p class="menu-item-name">Filete Mignon Trufado</p>
-        <p class="menu-item-desc">200g, puré trufado y vegetales salteados.</p>
-        <div class="menu-item-row">
-          <span class="menu-item-price">$66.500</span>
-          <div class="item-control"><button class="add-btn" data-action="add">Agregar</button></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="menu-item" data-category="fuertes" data-name="Salmón a la Plancha" data-price="58000">
-      <div class="menu-item-emoji">🐟</div>
-      <div class="menu-item-body">
-        <p class="menu-item-name">Salmón a la Plancha</p>
-        <p class="menu-item-desc">Con risotto de limón y espárragos.</p>
-        <div class="menu-item-row">
-          <span class="menu-item-price">$58.000</span>
-          <div class="item-control"><button class="add-btn" data-action="add">Agregar</button></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="menu-item" data-category="postres" data-name="Volcán de Chocolate" data-price="19000">
-      <div class="menu-item-emoji">🍫</div>
-      <div class="menu-item-body">
-        <p class="menu-item-name">Volcán de Chocolate</p>
-        <p class="menu-item-desc">Centro líquido, helado de vainilla.</p>
-        <div class="menu-item-row">
-          <span class="menu-item-price">$19.000</span>
-          <div class="item-control"><button class="add-btn" data-action="add">Agregar</button></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="menu-item" data-category="postres" data-name="Cheesecake de Maracuyá" data-price="17000">
-      <div class="menu-item-emoji">🍰</div>
-      <div class="menu-item-body">
-        <p class="menu-item-name">Cheesecake de Maracuyá</p>
-        <p class="menu-item-desc">Base de galleta, coulis de maracuyá.</p>
-        <div class="menu-item-row">
-          <span class="menu-item-price">$17.000</span>
-          <div class="item-control"><button class="add-btn" data-action="add">Agregar</button></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="menu-item" data-category="bebidas" data-name="Jugo Natural de Naranja" data-price="9000">
-      <div class="menu-item-emoji">🍊</div>
-      <div class="menu-item-body">
-        <p class="menu-item-name">Jugo Natural de Naranja</p>
-        <p class="menu-item-desc">Recién exprimido.</p>
-        <div class="menu-item-row">
-          <span class="menu-item-price">$9.000</span>
-          <div class="item-control"><button class="add-btn" data-action="add">Agregar</button></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="menu-item" data-category="bebidas" data-name="Mojito Clásico" data-price="17000">
-      <div class="menu-item-emoji">🍸</div>
-      <div class="menu-item-body">
-        <p class="menu-item-name">Mojito Clásico</p>
-        <p class="menu-item-desc">Ron blanco, hierbabuena, limón y soda.</p>
-        <div class="menu-item-row">
-          <span class="menu-item-price">$17.000</span>
-          <div class="item-control"><button class="add-btn" data-action="add">Agregar</button></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="menu-item" data-category="bebidas" data-name="Copa de Vino Tinto" data-price="24000">
-      <div class="menu-item-emoji">🍷</div>
-      <div class="menu-item-body">
-        <p class="menu-item-name">Copa de Vino Tinto</p>
-        <p class="menu-item-desc">Reserva de la casa.</p>
-        <div class="menu-item-row">
-          <span class="menu-item-price">$24.000</span>
-          <div class="item-control"><button class="add-btn" data-action="add">Agregar</button></div>
+    <div class="menu-item" data-category="bebidas" data-id="limonada" data-name="Limonada de coco" data-price="9000">
+      <div class="item-emoji">🥥</div>
+      <div class="item-info">
+        <div class="item-top"><p class="item-name">Limonada de coco</p></div>
+        <p class="item-desc">Limonada clásica con un toque de coco</p>
+        <div class="item-bottom">
+          <p class="item-price">$9.000</p>
+          <div class="qty-control" data-state="add">
+            <button class="add-btn" data-action="add">+ Agregar</button>
+          </div>
         </div>
       </div>
     </div>
@@ -389,200 +209,171 @@
   </div>
 
   <div class="cart-bar" id="cartBar">
-    <div class="cart-bar-info">
-      <span class="cart-bar-count" id="cartCount">0 items</span>
-      <span class="cart-bar-total" id="cartTotal">$0</span>
+    <div class="cart-info">
+      <p class="cart-count" id="cartCount">0 items</p>
+      <p class="cart-total" id="cartTotalMini">$0</p>
     </div>
-    <span class="cart-bar-cta">Ver pedido →</span>
+    <button class="cart-cta" id="viewCartBtn">Ver pedido</button>
   </div>
 
-  <nav class="bottom-nav">
-    <button class="nav-item" data-tab="inicio">
-      <span class="nav-icon">🏠</span>
-      <span>Inicio</span>
-    </button>
-    <button class="nav-item active" data-tab="servicios">
-      <span class="nav-icon">🗂️</span>
-      <span>Servicios</span>
-    </button>
-    <button class="nav-item" data-tab="solicitudes">
-      <span class="nav-icon">📋</span>
-      <span>Mis solicitudes</span>
-    </button>
-    <button class="nav-item" data-tab="cuenta">
-      <span class="nav-icon">🧾</span>
-      <span>Mi cuenta</span>
-    </button>
-  </nav>
-
-  <div class="cart-overlay" id="cartOverlay">
-    <div class="cart-panel">
-      <div class="cart-panel-header">
-        <p class="cart-panel-title">Tu pedido</p>
-        <button class="cart-close" id="cartClose" aria-label="Cerrar">✕</button>
+  <div class="modal-overlay" id="cartModal">
+    <div class="modal-panel">
+      <div class="modal-header">
+        <p class="modal-title">Tu pedido</p>
+        <button class="modal-close" id="closeModalBtn">✕</button>
       </div>
-      <div class="cart-panel-body" id="cartBody">
-        <p class="cart-empty">Aún no has agregado nada del menú.</p>
+      <div class="modal-body" id="cartLines">
+        <!-- líneas del carrito se insertan aquí -->
+        <textarea class="notes-box" id="notesInput" placeholder="Notas especiales (alergias, sin cebolla, etc.)"></textarea>
+        <div class="modal-total-row"><span>Total</span><span id="modalTotal">$0</span></div>
       </div>
-      <div class="cart-panel-footer">
-        <div class="cart-total-row"><span>Total</span><span id="cartFooterTotal">$0</span></div>
-        <button class="confirm-btn" id="confirmBtn" disabled>Confirmar pedido</button>
+      <div class="modal-footer">
+        <button class="confirm-btn" id="confirmOrderBtn">Confirmar pedido</button>
       </div>
     </div>
+  </div>
+
+  <div class="success-screen" id="successScreen">
+    <div class="success-icon">✓</div>
+    <p class="success-title">¡Pedido enviado!</p>
+    <p class="success-desc">Tu pedido llegó al equipo de Alimentos y Bebidas. Te avisaremos cuando esté en camino.</p>
+    <button class="success-btn" id="successBackBtn">Volver a Servicios</button>
   </div>
 </div>
 
 <script>
-  const GUEST = { room: '405', name: 'Sr Snick', roomType: 'Suite Deluxe' };
-  let cart = {}; // { itemName: { name, price, qty } }
+  const cart = {}; // { id: { name, price, qty } }
 
-  document.getElementById('backBtn').addEventListener('click', () => {
-    console.log('Volviendo al catálogo de Servicios');
+  function updateCartBar() {
+    const items = Object.values(cart);
+    const count = items.reduce((s, i) => s + i.qty, 0);
+    const total = items.reduce((s, i) => s + i.qty * i.price, 0);
+    const bar = document.getElementById('cartBar');
+    document.getElementById('cartCount').textContent = count + (count === 1 ? ' item' : ' items');
+    document.getElementById('cartTotalMini').textContent = '$' + total.toLocaleString('es-CO');
+    bar.classList.toggle('visible', count > 0);
+  }
+
+  document.querySelectorAll('.menu-item').forEach(item => {
+    const id = item.dataset.id;
+    const name = item.dataset.name;
+    const price = Number(item.dataset.price);
+    const control = item.querySelector('.qty-control');
+
+    function render() {
+      const qty = cart[id]?.qty || 0;
+      if (qty === 0) {
+        control.innerHTML = '<button class="add-btn" data-action="add">+ Agregar</button>';
+        control.querySelector('[data-action="add"]').addEventListener('click', () => {
+          cart[id] = { name, price, qty: 1 };
+          render();
+          updateCartBar();
+        });
+      } else {
+        control.innerHTML = '<button class="qty-btn" data-action="minus">−</button><span class="qty-value">' + qty + '</span><button class="qty-btn" data-action="plus">+</button>';
+        control.querySelector('[data-action="minus"]').addEventListener('click', () => {
+          cart[id].qty -= 1;
+          if (cart[id].qty <= 0) delete cart[id];
+          render();
+          updateCartBar();
+        });
+        control.querySelector('[data-action="plus"]').addEventListener('click', () => {
+          cart[id].qty += 1;
+          render();
+          updateCartBar();
+        });
+      }
+    }
+    render();
   });
 
-  // Filtro de categorías
-  document.querySelectorAll('.category-chip').forEach(chip => {
+  // Filtros de categoría
+  document.querySelectorAll('.filter-chip').forEach(chip => {
     chip.addEventListener('click', () => {
-      document.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
       chip.classList.add('active');
-      const cat = chip.dataset.category;
-      document.querySelectorAll('.menu-item').forEach(item => {
-        item.style.display = (cat === 'todos' || item.dataset.category === cat) ? 'flex' : 'none';
-      });
+      const filter = chip.dataset.filter;
+      document.querySelectorAll('.category-title, .menu-item').forEach(el => el.style.display = '');
+      if (filter !== 'todos') {
+        document.querySelectorAll('.menu-item').forEach(item => {
+          item.style.display = item.dataset.category === filter ? 'flex' : 'none';
+        });
+        document.querySelectorAll('.category-title').forEach(t => t.style.display = 'none');
+      }
     });
   });
 
-  function formatCOP(n){ return '$' + n.toLocaleString('es-CO'); }
-
-  function renderItemControl(item){
-    const name = item.dataset.name;
-    const control = item.querySelector('.item-control');
-    const qty = cart[name] ? cart[name].qty : 0;
-    if (qty <= 0){
-      control.innerHTML = '<button class="add-btn" data-action="add">Agregar</button>';
-      control.querySelector('[data-action="add"]').addEventListener('click', () => changeQty(item, 1));
-    } else {
-      control.innerHTML = '<div class="stepper"><button class="stepper-btn" data-action="dec">−</button><span class="stepper-qty">' + qty + '</span><button class="stepper-btn" data-action="inc">+</button></div>';
-      control.querySelector('[data-action="dec"]').addEventListener('click', () => changeQty(item, -1));
-      control.querySelector('[data-action="inc"]').addEventListener('click', () => changeQty(item, 1));
-    }
-  }
-
-  function changeQty(item, delta){
-    const name = item.dataset.name;
-    const price = parseInt(item.dataset.price, 10);
-    if (!cart[name]) cart[name] = { name, price, qty: 0 };
-    cart[name].qty += delta;
-    if (cart[name].qty <= 0) delete cart[name];
-    renderItemControl(item);
-    updateCartBar();
-    renderCartPanel();
-  }
-
-  document.querySelectorAll('.menu-item').forEach(renderItemControl);
-
-  function cartEntries(){ return Object.values(cart); }
-  function cartTotal(){ return cartEntries().reduce((sum, e) => sum + e.price * e.qty, 0); }
-  function cartCount(){ return cartEntries().reduce((sum, e) => sum + e.qty, 0); }
-
-  function updateCartBar(){
-    const bar = document.getElementById('cartBar');
-    const count = cartCount();
-    if (count === 0){ bar.classList.remove('visible'); return; }
-    bar.classList.add('visible');
-    document.getElementById('cartCount').textContent = count + (count === 1 ? ' item' : ' items');
-    document.getElementById('cartTotal').textContent = formatCOP(cartTotal());
-  }
-
-  function renderCartPanel(){
-    const body = document.getElementById('cartBody');
-    const entries = cartEntries();
-    const confirmBtn = document.getElementById('confirmBtn');
-
-    if (entries.length === 0){
-      body.innerHTML = '<p class="cart-empty">Aún no has agregado nada del menú.</p>';
-      confirmBtn.disabled = true;
-    } else {
-      body.innerHTML = entries.map(e => `
-        <div class="cart-line">
-          <div class="cart-line-info">
-            <p class="cart-line-name">${e.qty}x ${e.name}</p>
-            <p class="cart-line-price">${formatCOP(e.price)} c/u</p>
-          </div>
-        </div>
-      `).join('') + `
-        <div class="notes-box">
-          <p class="notes-label">Notas para cocina (opcional)</p>
-          <textarea class="notes-textarea" id="notesTextarea" placeholder="Ej: sin cebolla, alergia a los frutos secos...">${window.__orderNotes || ''}</textarea>
-        </div>
-      `;
-      const notesEl = document.getElementById('notesTextarea');
-      notesEl.addEventListener('input', () => { window.__orderNotes = notesEl.value; });
-      confirmBtn.disabled = false;
-    }
-    document.getElementById('cartFooterTotal').textContent = formatCOP(cartTotal());
-  }
-
-  document.getElementById('cartBar').addEventListener('click', () => {
-    renderCartPanel();
-    document.getElementById('cartOverlay').classList.add('open');
-  });
-  document.getElementById('cartClose').addEventListener('click', () => {
-    document.getElementById('cartOverlay').classList.remove('open');
-  });
-  document.getElementById('cartOverlay').addEventListener('click', (e) => {
-    if (e.target === document.getElementById('cartOverlay')) document.getElementById('cartOverlay').classList.remove('open');
+  // Búsqueda
+  document.getElementById('searchInput').addEventListener('input', (e) => {
+    const q = e.target.value.trim().toLowerCase();
+    document.querySelectorAll('.menu-item').forEach(item => {
+      const name = item.dataset.name.toLowerCase();
+      item.style.display = name.includes(q) ? 'flex' : 'none';
+    });
+    document.querySelectorAll('.category-title').forEach(t => t.style.display = q ? 'none' : '');
   });
 
-  // Envía el pedido al "almacén compartido" que lee el panel de A&B (staff-ayb.html)
-  function submitOrder(){
-    const entries = cartEntries();
-    if (entries.length === 0) return;
+  // Modal del carrito
+  const cartModal = document.getElementById('cartModal');
+  document.getElementById('viewCartBtn').addEventListener('click', () => {
+    const lines = Object.values(cart);
+    const container = document.getElementById('cartLines');
+    const notesBox = document.getElementById('notesInput');
+    container.innerHTML = '';
+    lines.forEach(l => {
+      const row = document.createElement('div');
+      row.className = 'cart-line';
+      row.innerHTML = `<span>${l.qty}x ${l.name}</span><b>$${(l.qty * l.price).toLocaleString('es-CO')}</b>`;
+      container.appendChild(row);
+    });
+    container.appendChild(notesBox);
+    const totalRow = document.createElement('div');
+    totalRow.className = 'modal-total-row';
+    const total = lines.reduce((s, i) => s + i.qty * i.price, 0);
+    totalRow.innerHTML = `<span>Total</span><span id="modalTotal">$${total.toLocaleString('es-CO')}</span>`;
+    container.appendChild(totalRow);
+    cartModal.classList.add('open');
+  });
+  document.getElementById('closeModalBtn').addEventListener('click', () => cartModal.classList.remove('open'));
+  cartModal.addEventListener('click', (e) => { if (e.target === cartModal) cartModal.classList.remove('open'); });
 
-    const itemsLines = entries.map(e => `<b>${e.qty}x</b> ${e.name}`);
-    const notes = (window.__orderNotes || '').trim();
-    if (notes) itemsLines.push(`<i>Nota: ${notes}</i>`);
+  // Confirmar pedido -> guardar en localStorage (base de datos compartida simulada) y mostrar éxito
+  document.getElementById('confirmOrderBtn').addEventListener('click', () => {
+    const lines = Object.values(cart);
+    if (lines.length === 0) return;
+    const notes = document.getElementById('notesInput').value.trim();
+    const total = lines.reduce((s, i) => s + i.qty * i.price, 0);
 
     const order = {
-      id: 'order_' + Date.now(),
-      room: GUEST.room,
-      guest: GUEST.name,
-      roomType: GUEST.roomType,
+      id: 'ORD-' + Date.now(),
+      room: '405',
+      guest: 'Sr Snick',
+      roomType: 'Suite Deluxe',
       source: '🍽️ Room Service',
-      items: itemsLines.join('\n'),
-      total: formatCOP(cartTotal()),
+      items: lines.map(l => `${l.qty}x ${l.name}`).join('\n') + (notes ? `\nNota: ${notes}` : ''),
+      total: '$' + total.toLocaleString('es-CO'),
+      stage: 'nuevo',
       createdAt: new Date().toISOString()
     };
 
     const existing = JSON.parse(localStorage.getItem('hotelife_shared_orders') || '[]');
-    existing.push(order);
+    existing.unshift(order);
     localStorage.setItem('hotelife_shared_orders', JSON.stringify(existing));
 
-    const confirmBtn = document.getElementById('confirmBtn');
-    confirmBtn.textContent = '✓ Pedido enviado a cocina';
-    confirmBtn.classList.add('success');
-    confirmBtn.disabled = true;
+    cartModal.classList.remove('open');
+    document.getElementById('successScreen').classList.add('visible');
+    console.log('Pedido guardado y disponible para el panel de A&B:', order);
+  });
 
-    setTimeout(() => {
-      cart = {};
-      window.__orderNotes = '';
-      document.querySelectorAll('.menu-item').forEach(renderItemControl);
-      updateCartBar();
-      document.getElementById('cartOverlay').classList.remove('open');
-      confirmBtn.textContent = 'Confirmar pedido';
-      confirmBtn.classList.remove('success');
-    }, 1600);
-  }
-  document.getElementById('confirmBtn').addEventListener('click', submitOrder);
+  document.getElementById('successBackBtn').addEventListener('click', () => {
+    window.location.href = 'servicios.html';
+  });
 
-  document.querySelectorAll('.nav-item').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      console.log('Navegando a tab:', btn.dataset.tab);
-    });
+  document.getElementById('backBtn').addEventListener('click', () => {
+    window.location.href = 'servicios.html';
   });
 </script>
 
+<script src="js/nav.js"></script>
 </body>
 </html>

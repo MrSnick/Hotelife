@@ -4,22 +4,22 @@ Esta carpeta contiene el lado del proyecto dirigido al **staff del hotel**, comp
 
 ## Arquitectura de 2 capas
 
-1. **Recepción (`dashboard.html`)** — panel de escritorio/tablet. Ve **absolutamente todas** las solicitudes de todas las áreas del hotel, siempre. Es el respaldo 24/7 cuando el jefe de área correspondiente no está disponible.
-2. **Apps móviles por jefe de área (`staff-*.html`)** — cada jefe de área tiene un celular corporativo con su propia vista, filtrada solo a las solicitudes de su categoría.
+1. **Recepción (`dashboard.html`)** — panel de escritorio/tablet. Ve **absolutamente todas** las solicitudes de todas las áreas del hotel, siempre (lee todo, sin filtrar por departamento). Es el respaldo 24/7 cuando el jefe de área correspondiente no está disponible. También incluye `mensajes.html` (chat con huéspedes) y `control-accesos.html` (validar pases de invitados).
+2. **Apps móviles por jefe de área (`staff-*.html`)** — cada jefe de área tiene un celular corporativo con su propia vista, filtrada solo a las solicitudes de su categoría (vía el campo `dept` de cada solicitud).
 
 ## Mapeo de categorías del catálogo de servicios → jefe de área
 
 | Archivo | Jefe de área | Categorías que atiende |
 |---|---|---|
 | `staff-mantenimiento.html` | Jefe de Mantenimiento | A/C, plomería, eléctrico, TV/WiFi, puertas, muebles |
-| `staff-amadellaves.html` | Jefa de Ama de Llaves | Limpieza, toallas/amenities, lavandería, minibar |
-| `staff-ayb.html` | Jefe de Alimentos y Bebidas | Room Service, restaurante, bar, desayuno |
-| `staff-spa.html` | Jefe de Spa & Wellness | Spa, gimnasio, piscina, clases |
-| `staff-conserjeria.html` | Jefe de Conserjería | Traslados, tours, alquiler de vehículos, entradas, niñera |
+| `staff-amadellaves.html` | Jefa de Ama de Llaves | Housekeeping, Lavandería, Minibar, Amenities adicionales |
+| `staff-ayb.html` | Jefe de Alimentos y Bebidas | Room Service, Bar, Desayuno, Restaurante |
+| `staff-spa.html` | Jefe de Spa & Wellness | Spa, Gimnasio, Piscina, Sauna, Clases |
+| `staff-conserjeria.html` | Jefe de Conserjería | Traslados, Alquiler de vehículos, Tours, Entradas, Niñera |
 
-**Sin jefe de área asignado (atendido directo por recepción):** caja fuerte, valet, equipaje, tienda, mascotas, médico, negocios.
+**Sin jefe de área asignado (atendido directo por recepción, solo visible en `dashboard.html`):** caja fuerte, valet, equipaje, tienda, mascotas, médico, late check-out/early check-in, salones de eventos, centro de negocios.
 
-## Vocabulario de estados (IMPORTANTE: debe coincidir con el lado del huésped)
+## Vocabulario de estados (sigue sin unificar entre apps)
 
 Cada app usa un flujo de estados ligeramente distinto según la naturaleza de su trabajo:
 
@@ -28,28 +28,30 @@ Cada app usa un flujo de estados ligeramente distinto según la naturaleza de su
 - **Spa (reservas):** Por confirmar → Confirmada → Completada
 - **Conserjería (coordinación):** Pendiente → Coordinando → Confirmado
 
-⚠️ Esto está definido de forma independiente por ahora. Si el lado del huésped (carpeta `src/solicitudes.html`, `src/home.html`) usa nombres de estado distintos para la misma solicitud, hay que unificar el vocabulario antes de construir un backend real — ver nota en el README raíz del repo.
+⚠️ Esto sigue sin unificarse formalmente. El Dashboard normaliza estos estados a 4 categorías visuales (Pendiente/En proceso/Confirmado/Completada) solo para mostrarlos en su tabla — pero cada app de staff internamente sigue usando su propio vocabulario. Antes de un backend real, vale la pena definir un único vocabulario canónico.
 
-## Conexión real entre huésped y staff (prototipo, no backend)
+## Conexión real entre huésped y staff — YA FUNCIONA EN LAS 5 ÁREAS
 
-`src/room-service.html` (huésped) y `staff-ayb.html` (staff) están conectados de verdad mediante `localStorage`, bajo la clave `hotelife_shared_orders`, como prueba de concepto de "los pedidos del huésped llegan al panel del jefe de área correspondiente":
+Todas las apps de staff (y el Dashboard) leen en vivo de `localStorage`, no solo A&B:
 
-- Cuando el huésped confirma un pedido en `room-service.html`, se guarda un objeto en `localStorage`.
-- Al cargar `staff-ayb.html`, se lee ese storage y el pedido aparece al tope de la lista, ya con el flujo completo de estados funcionando.
+- **`hotelife_service_requests`** (clave genérica) — la leen `staff-mantenimiento.html`, `staff-amadellaves.html`, `staff-spa.html`, `staff-conserjeria.html`, y parcialmente `staff-ayb.html` (Bar/Desayuno/Restaurante), filtrando por `dept.includes('NombreDelÁrea')`. La escriben: las 4 plantillas genéricas del huésped (`servicio-solicitud.html`, `servicio-menu.html`, `servicio-reserva.html`, `servicio-coordinacion.html`), más `mantenimiento.html` y `amenities.html`.
+- **`hotelife_shared_orders`** (específica de Room Service) — la lee `staff-ayb.html`, la escribe `room-service.html`.
+- **`hotelife_access_passes`** — conecta `accesos-invitados.html` (huésped) con `control-accesos.html` (recepción) y `mi-pase-acceso.html` (invitado). Reception debe escanear/aprobar antes de que el pase pase de `pendiente` a `activo`.
+- **`hotelife_chat_threads`** — conecta el FAB de chat de `home.html` con `mensajes.html` en recepción.
 
-**Limitación importante:** `localStorage` es del navegador local, no una base de datos real. Para que esto funcione en la demo, los archivos deben servirse desde un mismo servidor local (`python3 -m http.server`, por ejemplo) y no abrirse con doble clic — los navegadores modernos aíslan `localStorage` por archivo cuando se usa `file://`. En producción esto sería una API real conectada a una base de datos, para que funcione entre dispositivos distintos (celular del huésped ↔ celular del jefe de área), no solo pestañas del mismo navegador.
+`dashboard.html` lee **tanto** `hotelife_service_requests` **como** `hotelife_shared_orders`, sin filtrar por departamento, y recalcula su KPI de "Solicitudes pendientes" contando filas reales + las de ejemplo. Todas las vistas hacen *polling* (releen `localStorage` cada pocos segundos) para simular actualización en vivo — no hay push real.
 
-Los otros 3 paneles de staff (Mantenimiento, Ama de Llaves, Spa, Conserjería) **todavía no están conectados así** — solo A&B tiene la prueba de concepto completa. Sería el siguiente paso lógico si se sigue este patrón.
+**Limitación importante que sigue vigente:** `localStorage` es del navegador local, no una base de datos real — solo funciona entre pestañas del mismo navegador, sirviendo los archivos desde un servidor local (ver README raíz). En producción esto sería una API real para que funcione entre dispositivos distintos.
 
 ## Pendientes conocidos
 
-- [ ] Conectar Mantenimiento, Ama de Llaves, Spa y Conserjería al mismo patrón de `localStorage` (o a un backend real) que ya tiene A&B.
-- [ ] Los contadores de resumen (KPIs arriba de cada app) son en su mayoría estáticos — solo A&B recalcula sus 3 contadores en vivo según el estado real de los tickets.
+- [ ] Las solicitudes que van a "🏨 Recepción" (caja fuerte, valet, equipaje, mascotas, médico, etc.) no tienen una app de staff dedicada — solo se ven en la tabla del Dashboard. Podría bastar así, o podría necesitar su propia vista si el volumen lo justifica.
+- [ ] Los KPIs de "Ocupación", "Ingresos de hoy", "Actividad en vivo" y "Ocupación por tipo de habitación" del Dashboard siguen siendo 100% datos de ejemplo — solo "Solicitudes pendientes" y la tabla de solicitudes leen datos reales.
 - [ ] Unificar el vocabulario de estados entre huésped y staff (ver arriba).
-- [ ] El dashboard de recepción (`dashboard.html`) tiene datos 100% de ejemplo (KPIs, actividad, ocupación) — no lee nada del storage compartido todavía.
 - [ ] Ningún panel tiene autenticación real — se asume una sesión ya iniciada por jefe de área.
-- [ ] La lógica de "escalamiento" (si un jefe de área no responde en X minutos, recepción debe intervenir) solo existe como indicador visual estático en el dashboard (`⚠️ Sin respuesta 22 min`), no hay lógica real de tiempo transcurrido.
+- [ ] La lógica de "escalamiento" (si un jefe de área no responde en X minutos, recepción debe intervenir) solo existe como indicador visual estático en el dashboard (`⚠️ Sin respuesta 22 min`), no hay lógica real de tiempo transcurrido para solicitudes reales todavía.
+- [ ] Minibar llega a Ama de Llaves a través de la plantilla genérica de formulario simple — el rediseño de catálogo+carrito que ya existe en Figma para Minibar no se ha trasladado al código.
 
 ## Diseño
 
-El diseño visual de estas 6 pantallas también existe en Figma (mismo archivo del proyecto general), construido con el mismo sistema de columnas/paneles pero sin interactividad real (eso vive solo en este código).
+El diseño visual de estas pantallas también existe en Figma (mismo archivo del proyecto general). La interactividad real (filtros, cambios de estado, carga de datos) vive solo en este código — en Figma solo algunas piezas puntuales son interactivas de verdad (ver README raíz, sección "Figma: qué es real y qué es solo visual").

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HOTELIFE — Menú</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Manrope:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy: #1a222d; --bg-outer: #f9f6f0; --gold: #d4b285; --border-light: #eae5dc;
+    --text-muted: rgba(26,34,45,0.6);
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{ font-family:"Manrope",-apple-system,sans-serif; background:#e5e2db; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; color:var(--navy); }
+  .phone{ background:var(--bg-outer); border:0.8px solid var(--gold); border-radius:44px; box-shadow:0 25px 50px -12px rgba(26,34,45,0.25); width:100%; max-width:390px; overflow:hidden; display:flex; flex-direction:column; height:844px; position:relative; }
+  .status-bar{ flex-shrink:0; display:flex; align-items:center; justify-content:space-between; height:44px; padding:0 24px; font-weight:600; font-size:14px; }
+  .status-icons{ display:flex; gap:6px; align-items:center; font-size:12px; }
+  .header{ flex-shrink:0; display:flex; align-items:center; gap:12px; height:64px; padding:0 20px; }
+  .back-btn{ width:40px; height:40px; border-radius:20px; background:#fff; border:1px solid var(--border-light); display:flex; align-items:center; justify-content:center; font-size:16px; cursor:pointer; flex-shrink:0; }
+  .header-title{ font-family:"Cormorant Garamond", serif; font-weight:700; font-size:20px; flex:1; }
+
+  .scroll-content{ flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; padding: 4px 20px 100px; display:flex; flex-direction:column; gap:12px; }
+  .scroll-content::-webkit-scrollbar{ display:none; }
+
+  .menu-item{ display:flex; gap:12px; background:#fff; border:1px solid var(--border-light); border-radius:16px; padding:14px; }
+  .item-emoji{ width:52px; height:52px; border-radius:12px; background:var(--bg-outer); display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0; }
+  .item-info{ flex:1; min-width:0; display:flex; flex-direction:column; gap:3px; }
+  .item-name{ font-weight:700; font-size:13.5px; }
+  .item-desc{ font-size:11.5px; color:var(--text-muted); line-height:1.4; }
+  .item-bottom{ display:flex; align-items:center; justify-content:space-between; margin-top:2px; }
+  .item-price{ font-weight:700; font-size:13px; }
+  .qty-control{ display:flex; align-items:center; gap:10px; }
+  .qty-btn{ width:26px; height:26px; border-radius:8px; border:1px solid var(--border-light); background:#fff; font-weight:700; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .qty-value{ font-weight:700; font-size:13px; min-width:14px; text-align:center; }
+  .add-btn{ height:30px; padding:0 14px; border-radius:9px; background:var(--gold); border:none; font-weight:700; font-size:11px; color:var(--navy); cursor:pointer; }
+
+  .cart-bar{ position:absolute; left:20px; right:20px; bottom:24px; background:var(--navy); border-radius:18px; padding:14px 18px; display:none; align-items:center; justify-content:space-between; box-shadow:0 12px 24px rgba(26,34,45,0.3); cursor:pointer; }
+  .cart-bar.visible{ display:flex; }
+  .cart-info{ color:#fff; }
+  .cart-count{ font-size:11px; opacity:0.7; }
+  .cart-total{ font-family:"Cormorant Garamond", serif; font-weight:700; font-size:18px; }
+  .cart-cta{ background:var(--gold); color:var(--navy); font-weight:800; font-size:12px; text-transform:uppercase; padding:10px 16px; border-radius:12px; border:none; cursor:pointer; }
+
+  .success-screen{ position:absolute; inset:0; background:var(--bg-outer); display:none; flex-direction:column; align-items:center; justify-content:center; gap:14px; padding:40px; text-align:center; z-index:40; }
+  .success-screen.visible{ display:flex; }
+  .success-icon{ width:64px; height:64px; border-radius:32px; background:var(--navy); border:1.6px solid var(--gold); display:flex; align-items:center; justify-content:center; font-size:28px; color:var(--gold); }
+  .success-title{ font-family:"Cormorant Garamond", serif; font-weight:700; font-size:20px; }
+  .success-btn{ margin-top:10px; height:46px; padding:0 24px; border-radius:16px; background:var(--navy); border:none; font-weight:700; font-size:12px; color:var(--gold); cursor:pointer; }
+</style>
+<link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+<div class="phone">
+  <div class="status-bar"><span>12:40</span><span class="status-icons">📶 📡 🔋</span></div>
+  <div class="header">
+    <button class="back-btn" id="backBtn">←</button>
+    <p class="header-title" id="menuTitle">Menú</p>
+  </div>
+  <div class="scroll-content" id="menuList"></div>
+
+  <div class="cart-bar" id="cartBar">
+    <div class="cart-info"><p class="cart-count" id="cartCount">0 items</p><p class="cart-total" id="cartTotalMini">$0</p></div>
+    <button class="cart-cta" id="confirmBtn">Confirmar pedido</button>
+  </div>
+
+  <div class="success-screen" id="successScreen">
+    <div class="success-icon">✓</div>
+    <p class="success-title">¡Pedido enviado!</p>
+    <p style="font-size:12.5px; color:var(--text-muted);" id="successDesc"></p>
+    <button class="success-btn" id="successBackBtn">Volver a Servicios</button>
+  </div>
+</div>
+
+<script>
+  const MENUS = {
+    bar: { title: 'Bar / Lounge', dept:'🍸 A&B', items: [
+      { id:'mojito', icon:'🍹', name:'Mojito clásico', desc:'Ron, menta, lima', price:17000 },
+      { id:'copa-vino', icon:'🍷', name:'Copa de vino tinto', desc:'Reserva de la casa', price:22000 },
+      { id:'cerveza', icon:'🍺', name:'Cerveza artesanal', desc:'Botella 330ml', price:12000 },
+      { id:'whisky', icon:'🥃', name:'Whisky en las rocas', desc:'Etiqueta premium', price:28000 }
+    ]},
+    desayuno: { title: 'Desayuno', dept:'🍽️ A&B', items: [
+      { id:'continental', icon:'🥐', name:'Desayuno continental', desc:'Pan, mermelada, fruta, café', price:22000 },
+      { id:'americano', icon:'🍳', name:'Desayuno americano', desc:'Huevos, tocineta, tostadas', price:28000 },
+      { id:'saludable', icon:'🥣', name:'Bowl saludable', desc:'Yogurt, granola, frutos rojos', price:19000 },
+      { id:'jugo', icon:'🍊', name:'Jugo natural', desc:'Naranja recién exprimida', price:8000 }
+    ]},
+    tienda: { title: 'Tienda del hotel', dept:'🏨 Recepción', items: [
+      { id:'agua', icon:'💧', name:'Agua embotellada', desc:'500ml', price:6000 },
+      { id:'snack', icon:'🍫', name:'Snack / chocolatina', desc:'Variedad disponible', price:9000 },
+      { id:'protector', icon:'🧴', name:'Protector solar', desc:'FPS 50', price:35000 },
+      { id:'camiseta', icon:'👕', name:'Camiseta HOTELIFE', desc:'Souvenir oficial', price:45000 }
+    ]}
+  };
+
+  const params = new URLSearchParams(window.location.search);
+  const key = params.get('service') || 'bar';
+  const menu = MENUS[key] || MENUS.bar;
+  document.getElementById('menuTitle').textContent = menu.title;
+
+  const cart = {};
+  function money(n){ return '$' + n.toLocaleString('es-CO'); }
+
+  const list = document.getElementById('menuList');
+  list.innerHTML = menu.items.map(item => `
+    <div class="menu-item" data-id="${item.id}">
+      <div class="item-emoji">${item.icon}</div>
+      <div class="item-info">
+        <p class="item-name">${item.name}</p>
+        <p class="item-desc">${item.desc}</p>
+        <div class="item-bottom">
+          <p class="item-price">${money(item.price)}</p>
+          <div class="qty-control" id="qty-${item.id}"></div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  function renderQty(item) {
+    const el = document.getElementById('qty-' + item.id);
+    const qty = cart[item.id]?.qty || 0;
+    if (qty === 0) {
+      el.innerHTML = `<button class="add-btn" data-action="add">+ Agregar</button>`;
+      el.querySelector('[data-action="add"]').addEventListener('click', () => { cart[item.id] = { ...item, qty: 1 }; renderQty(item); updateCartBar(); });
+    } else {
+      el.innerHTML = `<button class="qty-btn" data-action="minus">−</button><span class="qty-value">${qty}</span><button class="qty-btn" data-action="plus">+</button>`;
+      el.querySelector('[data-action="minus"]').addEventListener('click', () => { cart[item.id].qty -= 1; if (cart[item.id].qty <= 0) delete cart[item.id]; renderQty(item); updateCartBar(); });
+      el.querySelector('[data-action="plus"]').addEventListener('click', () => { cart[item.id].qty += 1; renderQty(item); updateCartBar(); });
+    }
+  }
+  menu.items.forEach(renderQty);
+
+  function updateCartBar() {
+    const items = Object.values(cart);
+    const count = items.reduce((s, i) => s + i.qty, 0);
+    const total = items.reduce((s, i) => s + i.qty * i.price, 0);
+    document.getElementById('cartCount').textContent = count + (count === 1 ? ' item' : ' items');
+    document.getElementById('cartTotalMini').textContent = money(total);
+    document.getElementById('cartBar').classList.toggle('visible', count > 0);
+  }
+
+  document.getElementById('confirmBtn').addEventListener('click', () => {
+    const items = Object.values(cart);
+    if (items.length === 0) return;
+    const total = items.reduce((s, i) => s + i.qty * i.price, 0);
+
+    const request = {
+      id: 'REQ-' + Date.now(),
+      service: key,
+      title: menu.title,
+      dept: menu.dept,
+      room: '405',
+      roomType: 'Suite Deluxe',
+      guestName: 'Sr Snick',
+      items: items.map(i => `${i.qty}x ${i.name}`).join(', '),
+      total: money(total),
+      status: 'nuevo',
+      createdAt: new Date().toISOString()
+    };
+    const existing = JSON.parse(localStorage.getItem('hotelife_service_requests') || '[]');
+    existing.unshift(request);
+    localStorage.setItem('hotelife_service_requests', JSON.stringify(existing));
+
+    console.log('Pedido guardado y disponible para', menu.dept, ':', request);
+    document.getElementById('successDesc').textContent = `Tu pedido llegó al equipo de ${menu.dept}.`;
+    document.getElementById('successScreen').classList.add('visible');
+  });
+
+  document.getElementById('successBackBtn').addEventListener('click', () => { window.location.href = 'servicios.html'; });
+  document.getElementById('backBtn').addEventListener('click', () => { window.location.href = 'servicios.html'; });
+</script>
+
+<script src="js/nav.js"></script>
+</body>
+</html>

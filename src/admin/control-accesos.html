@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HOTELIFE Staff — Control de Accesos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy: #1a222d; --gold: #d4b285; --cream:#eae6df; --green:#4c8c4a; --red:#b5573a;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{ font-family:"Manrope",-apple-system,sans-serif; background:var(--cream); min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; }
+  .phone{ background:var(--navy); border:0.8px solid var(--gold); border-radius:44px; box-shadow:0 25px 50px -12px rgba(26,34,45,0.25); width:100%; max-width:390px; height:844px; overflow:hidden; display:flex; flex-direction:column; color:#fff; position:relative; }
+
+  .header{ flex-shrink:0; display:flex; align-items:center; justify-content:space-between; padding:44px 20px 16px; border-bottom:0.8px solid rgba(212,178,133,0.3); }
+  .header-title{ font-weight:800; font-size:13px; letter-spacing:1px; }
+  .header-subtitle{ font-size:10px; color: var(--gold); margin-top:2px; }
+  .role-badge{ background: var(--gold); color: var(--navy); font-weight:800; font-size:10px; padding:4px 10px; border-radius:12px; }
+
+  .scanner-body{ flex:1; overflow-y:auto; display:flex; flex-direction:column; align-items:center; gap:20px; padding:20px; }
+  .scanner-instructions{ font-size:12px; text-align:center; opacity:0.9; line-height:1.4; }
+
+  .viewfinder{
+    width:220px; height:220px; border-radius:24px; background:#0d1218; border:1.6px solid var(--gold);
+    box-shadow:0 0 20px rgba(212,178,133,0.2); position:relative; display:flex; align-items:center; justify-content:center;
+    cursor:pointer; flex-shrink:0;
+  }
+  .viewfinder .cam-icon{ font-size:36px; opacity:0.3; }
+  .corner{ position:absolute; width:20px; height:20px; border-color: var(--gold); border-style:solid; }
+  .corner.tl{ top:12px; left:12px; border-width:2.4px 0 0 2.4px; }
+  .corner.tr{ top:12px; right:12px; border-width:2.4px 2.4px 0 0; }
+  .corner.bl{ bottom:12px; left:12px; border-width:0 0 2.4px 2.4px; }
+  .corner.br{ bottom:12px; right:12px; border-width:0 2.4px 2.4px 0; }
+  .laser{ position:absolute; left:0; width:217px; height:2px; background:#25d366; box-shadow:0 0 10px #25d366; animation: scan 1.8s ease-in-out infinite; }
+  @keyframes scan { 0%,100%{ top:15%; } 50%{ top:85%; } }
+
+  .scan-btn{ width:100%; background: var(--gold); border:none; border-radius:22px; padding:14px; font-weight:800; font-size:11px; letter-spacing:1px; color: var(--navy); cursor:pointer; flex-shrink:0; }
+
+  .pending-list{ width:100%; }
+  .pending-title{ font-size:10px; font-weight:800; letter-spacing:0.5px; color: rgba(255,255,255,0.5); margin-bottom:8px; text-transform:uppercase; }
+  .pending-row{
+    display:flex; align-items:center; gap:10px; background: rgba(255,255,255,0.06); border-radius:12px; padding:10px 12px; margin-bottom:8px; cursor:pointer;
+  }
+  .pending-avatar{ width:32px; height:32px; border-radius:10px; background: var(--gold); color: var(--navy); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px; flex-shrink:0; }
+  .pending-info{ flex:1; min-width:0; }
+  .pending-name{ font-weight:700; font-size:12.5px; }
+  .pending-sub{ font-size:10px; color: rgba(255,255,255,0.6); }
+
+  .alerts-list{ width:100%; }
+  .alert-row{
+    background: rgba(181,87,58,0.18); border:1.4px solid var(--red); border-radius:12px;
+    padding:12px 14px; margin-bottom:10px; display:flex; gap:10px; align-items:flex-start;
+  }
+  .alert-icon{ font-size:16px; flex-shrink:0; }
+  .alert-text{ font-size:11.5px; line-height:1.4; }
+  .alert-text b{ font-weight:800; }
+  .alert-time{ font-size:9.5px; color: rgba(255,255,255,0.55); margin-top:3px; }
+  .alert-dismiss{ margin-top:8px; background:#fff; border:none; border-radius:9px; padding:6px 12px; font-weight:800; font-size:10px; color: var(--red); cursor:pointer; }
+
+  .modal-overlay{ position:absolute; inset:0; background: rgba(0,0,0,0.6); display:none; align-items:center; justify-content:center; z-index:30; padding:20px; }
+  .modal-overlay.open{ display:flex; }
+  .modal-card{ width:100%; background:#fff; border-radius:20px; padding:22px; color: var(--navy); display:flex; flex-direction:column; align-items:center; gap:10px; }
+  .modal-avatar{ width:56px; height:56px; border-radius:16px; background: var(--navy); color: var(--gold); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:18px; }
+  .modal-name{ font-weight:800; font-size:16px; }
+  .modal-doc{ font-size:12px; color: rgba(26,34,45,0.6); }
+  .modal-detail-card{ width:100%; background:#f9f6f0; border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:6px; margin-top:6px; }
+  .modal-detail-row{ display:flex; justify-content:space-between; font-size:11.5px; }
+  .modal-detail-row .label{ color: rgba(26,34,45,0.55); }
+  .modal-detail-row .value{ font-weight:700; }
+  .modal-warning{ font-size:11px; color:#a3762f; text-align:center; margin-top:4px; }
+  .modal-actions{ display:flex; gap:10px; width:100%; margin-top:10px; }
+  .modal-btn{ flex:1; height:44px; border-radius:14px; border:none; font-weight:800; font-size:11.5px; cursor:pointer; text-transform:uppercase; }
+  .btn-reject{ background:#fff; border:1px solid var(--red); color: var(--red); }
+  .btn-approve{ background: var(--green); color:#fff; }
+
+  .success-toast{
+    position:absolute; bottom:30px; left:20px; right:20px; background: var(--green); color:#fff;
+    border-radius:14px; padding:14px; text-align:center; font-weight:700; font-size:12px;
+    display:none; z-index:40;
+  }
+  .success-toast.visible{ display:block; }
+</style>
+<link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+
+<div class="phone" id="phoneRoot">
+  <div class="header">
+    <div>
+      <p class="header-title">CONTROL DE ACCESOS</p>
+      <p class="header-subtitle">Recepción &amp; Lobby</p>
+    </div>
+    <span class="role-badge">Recepción</span>
+  </div>
+
+  <div class="scanner-body">
+    <div class="alerts-list" id="alertsList"></div>
+
+    <p class="scanner-instructions">Encuadre el código QR del pase de visitante para autorizar el ingreso, o seleccione un pase pendiente de la lista.</p>
+
+    <div class="viewfinder" id="viewfinder">
+      <div class="cam-icon">📷</div>
+      <div class="corner tl"></div>
+      <div class="corner tr"></div>
+      <div class="corner bl"></div>
+      <div class="corner br"></div>
+      <div class="laser"></div>
+    </div>
+
+    <button class="scan-btn" id="scanBtn">📷 SIMULAR ESCANEO DE QR</button>
+
+    <div class="pending-list" id="pendingList">
+      <p class="pending-title">Pases pendientes de validar</p>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal">
+    <div class="modal-card" id="modalCard"></div>
+  </div>
+
+  <div class="success-toast" id="successToast">✅ Acceso autorizado. El huésped fue notificado.</div>
+</div>
+
+<script>
+  function loadAlerts() {
+    const alerts = JSON.parse(localStorage.getItem('hotelife_access_alerts') || '[]');
+    const container = document.getElementById('alertsList');
+    if (alerts.length === 0) { container.innerHTML = ''; return; }
+
+    container.innerHTML = alerts.map(a => {
+      const mins = Math.max(0, Math.round((Date.now() - new Date(a.createdAt)) / 60000));
+      return `
+        <div class="alert-row" data-id="${a.id}">
+          <div class="alert-icon">🚨</div>
+          <div style="flex:1;">
+            <p class="alert-text"><b>${a.guestName}</b> — acceso revocado por ${a.primaryGuest} (${a.roomType} ${a.room}). ${a.message}</p>
+            <p class="alert-time">Hace ${mins} min</p>
+            <button class="alert-dismiss" data-id="${a.id}">Acceso retirado ✓</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    document.querySelectorAll('.alert-dismiss').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const all = JSON.parse(localStorage.getItem('hotelife_access_alerts') || '[]');
+        const filtered = all.filter(a => a.id !== btn.dataset.id);
+        localStorage.setItem('hotelife_access_alerts', JSON.stringify(filtered));
+        loadAlerts();
+      });
+    });
+  }
+
+  function loadPending() {
+    const passes = JSON.parse(localStorage.getItem('hotelife_access_passes') || '[]');
+    const pending = passes.filter(p => p.status === 'pendiente');
+    const list = document.getElementById('pendingList');
+    const rows = pending.map(p => {
+      const initials = p.guestName.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+      return `<div class="pending-row" data-id="${p.id}">
+        <div class="pending-avatar">${initials}</div>
+        <div class="pending-info">
+          <p class="pending-name">${p.guestName}</p>
+          <p class="pending-sub">Invitado de ${p.primaryGuest} · ${p.roomType} ${p.room}</p>
+        </div>
+      </div>`;
+    }).join('');
+    list.innerHTML = '<p class="pending-title">Pases pendientes de validar</p>' + (rows || '<p style="font-size:11px; opacity:0.6;">No hay pases pendientes por ahora.</p>');
+
+    document.querySelectorAll('.pending-row').forEach(row => {
+      row.addEventListener('click', () => openModal(row.dataset.id));
+    });
+  }
+
+  function openModal(passId) {
+    const passes = JSON.parse(localStorage.getItem('hotelife_access_passes') || '[]');
+    const pass = passes.find(p => p.id === passId);
+    if (!pass) return;
+    const initials = pass.guestName.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+
+    document.getElementById('modalCard').innerHTML = `
+      <div class="modal-avatar">${initials}</div>
+      <p class="modal-name">${pass.guestName}</p>
+      <p class="modal-doc">${pass.docType} •••• ${pass.docNumber.slice(-4).padStart(4,'•')}</p>
+      <div class="modal-detail-card">
+        <div class="modal-detail-row"><span class="label">Anfitrión</span><span class="value">${pass.primaryGuest}</span></div>
+        <div class="modal-detail-row"><span class="label">Habitación</span><span class="value">${pass.roomType} · ${pass.room}</span></div>
+        <div class="modal-detail-row"><span class="label">Tipo de pase</span><span class="value">${pass.passType}</span></div>
+      </div>
+      <p class="modal-warning">⚠️ Verifique que el documento físico coincida antes de autorizar</p>
+      <div class="modal-actions">
+        <button class="modal-btn btn-reject" id="rejectBtn">Rechazar</button>
+        <button class="modal-btn btn-approve" id="approveBtn">Autorizar</button>
+      </div>
+    `;
+    document.getElementById('modal').classList.add('open');
+
+    document.getElementById('approveBtn').addEventListener('click', () => {
+      const all = JSON.parse(localStorage.getItem('hotelife_access_passes') || '[]');
+      const idx = all.findIndex(p => p.id === passId);
+      if (idx > -1) { all[idx].status = 'activo'; localStorage.setItem('hotelife_access_passes', JSON.stringify(all)); }
+      closeModalAndToast('✅ Acceso autorizado. El huésped fue notificado.');
+    });
+    document.getElementById('rejectBtn').addEventListener('click', () => {
+      const all = JSON.parse(localStorage.getItem('hotelife_access_passes') || '[]');
+      const filtered = all.filter(p => p.id !== passId);
+      localStorage.setItem('hotelife_access_passes', JSON.stringify(filtered));
+      closeModalAndToast('❌ Acceso rechazado.');
+    });
+  }
+
+  function closeModalAndToast(message) {
+    document.getElementById('modal').classList.remove('open');
+    const toast = document.getElementById('successToast');
+    toast.textContent = message;
+    toast.classList.add('visible');
+    setTimeout(() => toast.classList.remove('visible'), 2200);
+    loadPending();
+  }
+
+  document.getElementById('scanBtn').addEventListener('click', () => {
+    const passes = JSON.parse(localStorage.getItem('hotelife_access_passes') || '[]');
+    const pending = passes.filter(p => p.status === 'pendiente');
+    if (pending.length === 0) { alert('No hay pases pendientes para escanear en este momento.'); return; }
+    openModal(pending[0].id);
+  });
+  document.getElementById('viewfinder').addEventListener('click', () => document.getElementById('scanBtn').click());
+
+  loadAlerts();
+  loadPending();
+</script>
+
+</body>
+</html>

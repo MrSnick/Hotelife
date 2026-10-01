@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HOTELIFE — Coordinación</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Manrope:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy: #1a222d; --bg-outer: #f9f6f0; --gold: #d4b285; --border-light: #eae5dc;
+    --text-muted: rgba(26,34,45,0.6);
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{ font-family:"Manrope",-apple-system,sans-serif; background:#e5e2db; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; color:var(--navy); }
+  .phone{ background:var(--bg-outer); border:0.8px solid var(--gold); border-radius:44px; box-shadow:0 25px 50px -12px rgba(26,34,45,0.25); width:100%; max-width:390px; overflow:hidden; display:flex; flex-direction:column; height:844px; position:relative; }
+  .status-bar{ flex-shrink:0; display:flex; align-items:center; justify-content:space-between; height:44px; padding:0 24px; font-weight:600; font-size:14px; }
+  .status-icons{ display:flex; gap:6px; align-items:center; font-size:12px; }
+  .header{ flex-shrink:0; display:flex; align-items:center; gap:12px; height:64px; padding:0 20px; }
+  .back-btn{ width:40px; height:40px; border-radius:20px; background:#fff; border:1px solid var(--border-light); display:flex; align-items:center; justify-content:center; font-size:16px; cursor:pointer; flex-shrink:0; }
+  .header-title{ font-family:"Cormorant Garamond", serif; font-weight:700; font-size:18px; flex:1; }
+  .room-badge{ background: var(--navy); border-radius:12px; padding:4px 10px; font-weight:700; font-size:10px; color: var(--gold); white-space:nowrap; }
+
+  .scroll-content{ flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; padding: 8px 24px 24px; display:flex; flex-direction:column; gap:16px; }
+  .scroll-content::-webkit-scrollbar{ display:none; }
+
+  .icon-hero{ display:flex; flex-direction:column; align-items:center; gap:8px; padding: 4px 0; }
+  .icon-circle{ width:64px; height:64px; border-radius:20px; background: var(--navy); display:flex; align-items:center; justify-content:center; font-size:28px; }
+  .icon-desc{ font-size:12px; color: var(--text-muted); text-align:center; }
+
+  .coord-note{ background: rgba(212,178,133,0.12); border:1px solid var(--gold); border-radius:14px; padding:12px 14px; font-size:11.5px; line-height:1.5; }
+
+  .section-title{ font-weight:700; font-size:11px; text-transform:uppercase; color: var(--text-muted); }
+  .field-card{ background:#fff; border:1px solid var(--border-light); border-radius:16px; padding:16px; display:flex; flex-direction:column; gap:12px; }
+  .form-field label{ display:block; font-size:11px; font-weight:600; color: var(--text-muted); margin-bottom:6px; }
+  .form-field select, .form-field input{ width:100%; height:42px; border:1px solid var(--border-light); border-radius:10px; padding:0 12px; font-family:inherit; font-size:13px; outline:none; background:#fff; color:var(--navy); }
+  .form-field select:focus, .form-field input:focus{ border-color: var(--gold); }
+  .form-row{ display:flex; gap:10px; }
+  .form-row .form-field{ flex:1; }
+
+  .submit-btn{ width:100%; height:52px; border-radius:16px; background: var(--gold); border:none; font-weight:700; font-size:13px; text-transform:uppercase; color: var(--navy); cursor:pointer; }
+  .submit-btn:disabled{ opacity:0.5; cursor:not-allowed; }
+</style>
+<link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+<div class="phone">
+  <div class="status-bar"><span>12:40</span><span class="status-icons">📶 📡 🔋</span></div>
+  <div class="header">
+    <button class="back-btn" id="backBtn">←</button>
+    <p class="header-title" id="serviceTitle">Coordinar</p>
+    <span class="room-badge">Suite 405</span>
+  </div>
+  <div class="scroll-content" id="content"></div>
+</div>
+
+<script>
+  const SERVICES = {
+    traslados: { icon:'🚗', title:'Traslados', desc:'Coordina tu transporte desde o hacia el hotel.',
+      fields:[ {label:'Tipo de traslado', type:'select', options:['Al aeropuerto','Desde el aeropuerto','A un destino local']}, {label:'Fecha', type:'date'}, {label:'Hora', type:'select', options:['6:00 AM','7:00 AM','8:00 AM','12:00 PM','3:00 PM','6:00 PM']}, {label:'N° de pasajeros', type:'select', options:['1','2','3','4+']} ] },
+    vehiculos: { icon:'🚙', title:'Alquiler de vehículos', desc:'Coordina el alquiler de un vehículo durante tu estadía.',
+      fields:[ {label:'Tipo de vehículo', type:'select', options:['Sedán','SUV','Camioneta']}, {label:'Fecha de inicio', type:'date'}, {label:'Días de alquiler', type:'select', options:['1 día','2 días','3 días','Más de 3 días']} ] },
+    tours: { icon:'🗺️', title:'Tours y actividades', desc:'Descubre y reserva experiencias locales.',
+      fields:[ {label:'Tour de interés', type:'select', options:['Ciudad histórica','Naturaleza y senderismo','Gastronómico','Otro (especificar en notas)']}, {label:'Fecha preferida', type:'date'}, {label:'N° de personas', type:'select', options:['1','2','3','4+']} ] },
+    entradas: { icon:'🎟️', title:'Reserva de entradas', desc:'Te ayudamos a conseguir entradas para shows o eventos locales.',
+      fields:[ {label:'Evento o lugar', type:'text', placeholder:'Ej: Show nocturno, museo...'}, {label:'Fecha', type:'date'}, {label:'N° de entradas', type:'select', options:['1','2','3','4+']} ] },
+    ninera: { icon:'🧸', title:'Niñera / Kids club', desc:'Cuidado infantil profesional para que disfrutes tu estadía.',
+      fields:[ {label:'Servicio', type:'select', options:['Niñera en habitación','Kids club (grupal)']}, {label:'Fecha', type:'date'}, {label:'Horario', type:'select', options:['Mañana (9am-1pm)','Tarde (2pm-6pm)','Noche (7pm-11pm)']}, {label:'Edad del niño/a', type:'text', placeholder:'Ej: 5 años'} ] }
+  };
+
+  const params = new URLSearchParams(window.location.search);
+  const key = params.get('service') || 'traslados';
+  const svc = SERVICES[key] || SERVICES.traslados;
+  document.getElementById('serviceTitle').textContent = svc.title;
+
+  const fieldsHtml = svc.fields.map((f, i) => {
+    if (f.type === 'select') return `<div class="form-field"><label>${f.label}</label><select data-idx="${i}">${f.options.map(o => `<option>${o}</option>`).join('')}</select></div>`;
+    if (f.type === 'date') return `<div class="form-field"><label>${f.label}</label><input type="date" data-idx="${i}"></div>`;
+    return `<div class="form-field"><label>${f.label}</label><input type="text" data-idx="${i}" placeholder="${f.placeholder || ''}"></div>`;
+  }).join('');
+
+  document.getElementById('content').innerHTML = `
+    <div class="icon-hero">
+      <div class="icon-circle">${svc.icon}</div>
+      <p class="icon-desc">${svc.desc}</p>
+    </div>
+    <div class="coord-note">🧭 Un miembro de nuestro equipo de Conserjería coordinará los detalles finales contigo por chat una vez recibamos tu solicitud.</div>
+    <p class="section-title">DETALLES</p>
+    <div class="field-card">${fieldsHtml}</div>
+    <button class="submit-btn" id="submitBtn">Enviar solicitud</button>
+  `;
+
+  document.getElementById('submitBtn').addEventListener('click', () => {
+    const btn = document.getElementById('submitBtn');
+    btn.textContent = '✓ Solicitud enviada a Conserjería';
+    btn.disabled = true;
+
+    const fieldValues = {};
+    document.querySelectorAll('[data-idx]').forEach(el => {
+      const idx = el.dataset.idx;
+      fieldValues[svc.fields[idx].label] = el.value;
+    });
+
+    const request = {
+      id: 'REQ-' + Date.now(),
+      service: key,
+      title: svc.title,
+      dept: '🧭 Conserjería',
+      room: '405',
+      roomType: 'Suite Deluxe',
+      guestName: 'Sr Snick',
+      details: fieldValues,
+      status: 'pendiente',
+      createdAt: new Date().toISOString()
+    };
+    const existing = JSON.parse(localStorage.getItem('hotelife_service_requests') || '[]');
+    existing.unshift(request);
+    localStorage.setItem('hotelife_service_requests', JSON.stringify(existing));
+
+    console.log('Solicitud de coordinación guardada:', request);
+  });
+
+  document.getElementById('backBtn').addEventListener('click', () => { window.location.href = 'servicios.html'; });
+</script>
+
+<script src="js/nav.js"></script>
+</body>
+</html>

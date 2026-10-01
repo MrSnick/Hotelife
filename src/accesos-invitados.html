@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HOTELIFE — Accesos e Invitados</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Manrope:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy: #1a222d; --bg-outer: #f9f6f0; --gold: #d4b285; --border-light: #eae5dc;
+    --text-muted: rgba(26,34,45,0.6); --red: #b5573a; --green: #4c8c4a; --amber:#a3762f;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{ font-family:"Manrope",-apple-system,sans-serif; background:#e5e2db; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; color:var(--navy); }
+  .phone{ background:var(--bg-outer); border:0.8px solid var(--gold); border-radius:44px; box-shadow:0 25px 50px -12px rgba(26,34,45,0.25); width:100%; max-width:390px; overflow:hidden; display:flex; flex-direction:column; height:844px; position:relative; }
+  .status-bar{ flex-shrink:0; display:flex; align-items:center; justify-content:space-between; height:44px; padding:0 24px; font-weight:600; font-size:14px; }
+  .status-icons{ display:flex; gap:6px; align-items:center; font-size:12px; }
+  .header-bar{ flex-shrink:0; display:flex; align-items:center; gap:12px; height:64px; padding: 0 24px; }
+  .back-btn{ width:40px; height:40px; border-radius:20px; background:#fff; border:1px solid var(--border-light); display:flex; align-items:center; justify-content:center; font-size:16px; cursor:pointer; flex-shrink:0; }
+  .header-title{ font-family:"Cormorant Garamond", serif; font-weight:700; font-size:19px; flex:1; }
+  .room-badge{ background: var(--navy); border-radius:12px; padding:4px 10px; font-weight:700; font-size:10px; color: var(--gold); white-space:nowrap; }
+
+  .scroll-content{ flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; padding: 4px 24px 24px; display:flex; flex-direction:column; gap:18px; }
+  .scroll-content::-webkit-scrollbar{ display:none; }
+
+  .aforo-card{
+    background:#fff; border:1px solid var(--border-light); border-radius:16px; padding:16px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .aforo-label{ font-size:11px; color: var(--text-muted); font-weight:600; }
+  .aforo-value{ font-family:"Cormorant Garamond", serif; font-weight:700; font-size:22px; }
+  .aforo-hint{ font-size:10px; color: var(--text-muted); margin-top:2px; }
+
+  .security-note{
+    background: rgba(212,178,133,0.12); border:1px solid var(--gold); border-radius:14px;
+    padding:12px 14px; font-size:11.5px; line-height:1.5; color: var(--navy);
+  }
+  .security-note b{ color: var(--amber); }
+
+  .section-title{ font-weight:700; font-size:11px; text-transform:uppercase; color: var(--text-muted); }
+
+  .form-card{ background:#fff; border:1px solid var(--border-light); border-radius:16px; padding:16px; display:flex; flex-direction:column; gap:12px; }
+  .form-field label{ display:block; font-size:11px; font-weight:600; color: var(--text-muted); margin-bottom:6px; }
+  .form-field input, .form-field select{
+    width:100%; height:42px; border:1px solid var(--border-light); border-radius:10px;
+    padding:0 12px; font-family:inherit; font-size:13px; outline:none; background:#fff; color:var(--navy);
+  }
+  .form-field input:focus, .form-field select:focus{ border-color: var(--gold); }
+  .form-row{ display:flex; gap:10px; }
+  .form-row .form-field{ flex:1; }
+  .generate-btn{
+    width:100%; height:48px; border-radius:14px; background: var(--navy); border:none;
+    font-weight:700; font-size:12px; text-transform:uppercase; color: var(--gold); cursor:pointer;
+  }
+  .generate-btn:disabled{ opacity:0.5; cursor:not-allowed; }
+
+  .guest-row{ display:flex; align-items:center; gap:12px; background:#fff; border:1px solid var(--border-light); border-radius:14px; padding:12px 14px; }
+  .guest-avatar{ width:36px; height:36px; border-radius:10px; background: var(--bg-outer); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; flex-shrink:0; }
+  .guest-info{ flex:1; min-width:0; }
+  .guest-name{ font-weight:700; font-size:13px; }
+  .guest-doc{ font-size:11px; color: var(--text-muted); }
+  .guest-status{ font-size:10px; font-weight:700; text-transform:uppercase; padding:3px 8px; border-radius:7px; margin-top:4px; display:inline-block; }
+  .status-activo{ background: rgba(76,140,74,0.15); color: var(--green); }
+  .status-pendiente{ background: rgba(212,178,133,0.3); color: var(--amber); }
+  .guest-right{ display:flex; flex-direction:column; align-items:flex-end; gap:6px; }
+  .revoke-link{ font-size:11px; font-weight:700; color: var(--red); background:none; border:none; cursor:pointer; }
+
+  .bottom-nav{ flex-shrink:0; background: var(--navy); border-top: 1px solid var(--gold); height:70px; display:flex; align-items:center; justify-content:space-around; }
+  .nav-item{ display:flex; flex-direction:column; align-items:center; gap:4px; color:#fff; opacity:0.6; font-size:9px; cursor:pointer; background:none; border:none; }
+  .nav-item.active{ color: var(--gold); opacity:1; }
+  .nav-icon{ font-size:16px; }
+</style>
+<link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+<div class="phone">
+  <div class="status-bar"><span>12:40</span><span class="status-icons">📶 📡 🔋</span></div>
+
+  <div class="header-bar">
+    <button class="back-btn" id="backBtn">←</button>
+    <p class="header-title">Accesos e Invitados</p>
+    <span class="room-badge">Suite 405</span>
+  </div>
+
+  <div class="scroll-content">
+
+    <div class="aforo-card">
+      <div>
+        <p class="aforo-label">AFORO AUTORIZADO</p>
+        <p class="aforo-hint">Máximo de personas según tu reserva</p>
+      </div>
+      <p class="aforo-value" id="aforoValue">2 / 4</p>
+    </div>
+
+    <div class="security-note">
+      🔒 <b>Por tu seguridad, cada invitado debe presentarse en recepción con su documento de identidad.</b> El acceso solo se activa después de que el personal del hotel valide su identidad en persona — registrarlo aquí no le da acceso automático.
+    </div>
+
+    <div>
+      <p class="section-title" style="margin-bottom:10px;">Autorizar nuevo invitado</p>
+      <div class="form-card">
+        <div class="form-field">
+          <label>Nombre completo del invitado</label>
+          <input type="text" id="guestNameInput" placeholder="Ej: Laura Martínez">
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label>Tipo de documento</label>
+            <select id="docTypeInput">
+              <option value="CC">Cédula de ciudadanía</option>
+              <option value="CE">Cédula de extranjería</option>
+              <option value="PA">Pasaporte</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label>N° de documento</label>
+            <input type="text" id="docNumberInput" placeholder="1234567890">
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Tipo de pase</label>
+          <select id="passTypeInput">
+            <option value="dia">Pase por día</option>
+            <option value="estadia">Válido toda la estadía</option>
+          </select>
+        </div>
+        <button class="generate-btn" id="generateBtn">+ Generar pase de acceso</button>
+      </div>
+    </div>
+
+    <div>
+      <p class="section-title" style="margin-bottom:10px;">Invitados autorizados</p>
+      <div id="guestList" style="display:flex; flex-direction:column; gap:8px;"></div>
+    </div>
+
+  </div>
+
+  <nav class="bottom-nav">
+    <button class="nav-item" data-tab="inicio"><span class="nav-icon">🏠</span><span>Inicio</span></button>
+    <button class="nav-item" data-tab="servicios"><span class="nav-icon">🗂️</span><span>Servicios</span></button>
+    <button class="nav-item" data-tab="solicitudes"><span class="nav-icon">📋</span><span>Mis solicitudes</span></button>
+    <button class="nav-item" data-tab="cuenta"><span class="nav-icon">🧾</span><span>Mi cuenta</span></button>
+  </nav>
+</div>
+
+<script>
+  const STORAGE_KEY = 'hotelife_access_passes';
+  const ALERTS_KEY = 'hotelife_access_alerts';
+  const MAX_AFORO = 4;
+
+  function getPasses() {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  }
+  function savePasses(passes) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(passes));
+  }
+
+  // Sembrar datos de ejemplo la primera vez que se abre esta pantalla (si no hay nada guardado aún)
+  if (getPasses().length === 0) {
+    savePasses([
+      {
+        id: 'PASS-seed-1', guestName: 'Carlos Mendoza', docType: 'CC', docNumber: '1094556912',
+        passType: 'Pase por día', room: '405', roomType: 'Suite Deluxe', primaryGuest: 'Sr Snick',
+        status: 'activo', createdAt: new Date(Date.now() - 3600000).toISOString()
+      },
+      {
+        id: 'PASS-seed-2', guestName: 'Mariana Gómez', docType: 'CC', docNumber: '1032884321',
+        passType: 'Pase por día', room: '405', roomType: 'Suite Deluxe', primaryGuest: 'Sr Snick',
+        status: 'pendiente', createdAt: new Date(Date.now() - 900000).toISOString()
+      }
+    ]);
+  }
+
+  function renderGuestList() {
+    const passes = getPasses();
+    const list = document.getElementById('guestList');
+    list.innerHTML = passes.map(p => {
+      const initials = p.guestName.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+      const last4 = p.docNumber.slice(-4).padStart(4, '•');
+      const isActive = p.status === 'activo';
+      return `
+        <div class="guest-row" data-id="${p.id}" data-status="${p.status}">
+          <div class="guest-avatar">${initials}</div>
+          <div class="guest-info">
+            <p class="guest-name">${p.guestName}</p>
+            <p class="guest-doc">${p.docType} •••• ${last4} · ${p.passType}</p>
+            <span class="guest-status ${isActive ? 'status-activo' : 'status-pendiente'}">${isActive ? 'Activo · Dentro de la suite' : 'Pendiente · En recepción'}</span>
+          </div>
+          <div class="guest-right">
+            <button class="revoke-link" data-id="${p.id}">Revocar</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    document.querySelectorAll('.revoke-link').forEach(btn => {
+      btn.addEventListener('click', () => handleRevoke(btn.dataset.id));
+    });
+
+    updateAforo();
+  }
+
+  function updateAforo() {
+    const count = getPasses().length; // pendientes + activos cuentan cupo
+    document.getElementById('aforoValue').textContent = (1 + count) + ' / ' + MAX_AFORO;
+  }
+
+  function handleRevoke(passId) {
+    const passes = getPasses();
+    const pass = passes.find(p => p.id === passId);
+    if (!pass) return;
+
+    if (pass.status === 'activo') {
+      const confirmed = confirm(
+        `${pass.guestName} tiene acceso ACTIVO en este momento.\n\n` +
+        `Al revocarlo, se enviará una alerta inmediata a Recepción/Seguridad para retirar su acceso físico. ¿Continuar?`
+      );
+      if (!confirmed) return;
+
+      // Generar alerta real para el panel de Control de Accesos
+      const alerts = JSON.parse(localStorage.getItem(ALERTS_KEY) || '[]');
+      alerts.unshift({
+        id: 'ALERT-' + Date.now(),
+        guestName: pass.guestName,
+        room: pass.room,
+        roomType: pass.roomType,
+        primaryGuest: pass.primaryGuest,
+        message: 'Acceso revocado por el huésped titular. Retirar acceso físico de inmediato.',
+        createdAt: new Date().toISOString()
+      });
+      localStorage.setItem(ALERTS_KEY, JSON.stringify(alerts));
+    }
+
+    const filtered = passes.filter(p => p.id !== passId);
+    savePasses(filtered);
+    renderGuestList();
+  }
+
+  document.getElementById('backBtn').addEventListener('click', () => {
+    window.location.href = 'perfil.html';
+  });
+
+  document.getElementById('generateBtn').addEventListener('click', () => {
+    const name = document.getElementById('guestNameInput').value.trim();
+    const docType = document.getElementById('docTypeInput').value;
+    const docNumber = document.getElementById('docNumberInput').value.trim();
+    const passType = document.getElementById('passTypeInput').value;
+
+    if (!name || !docNumber) { alert('Completa el nombre y el número de documento.'); return; }
+    if (getPasses().length + 1 >= MAX_AFORO) { alert('Ya alcanzaste el aforo máximo autorizado para esta suite.'); return; }
+
+    const passLabel = passType === 'dia' ? 'Pase por día' : 'Válido toda la estadía';
+    const pass = {
+      id: 'PASS-' + Date.now(),
+      guestName: name, docType, docNumber, passType: passLabel,
+      room: '405', roomType: 'Suite Deluxe', primaryGuest: 'Sr Snick',
+      status: 'pendiente', createdAt: new Date().toISOString()
+    };
+    const passes = getPasses();
+    passes.unshift(pass);
+    savePasses(passes);
+    renderGuestList();
+
+    document.getElementById('guestNameInput').value = '';
+    document.getElementById('docNumberInput').value = '';
+    console.log('Pase generado y enviado a validar en recepción:', pass);
+  });
+
+  document.querySelectorAll('.nav-item').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  renderGuestList();
+</script>
+
+<script src="js/nav.js"></script>
+</body>
+</html>

@@ -72,6 +72,7 @@
   .nav-item.active{ color: var(--gold); opacity:1; }
   .nav-icon{ font-size:16px; }
 </style>
+<link rel="stylesheet" href="../css/responsive.css">
 </head>
 <body>
 
@@ -202,6 +203,53 @@
       btn.classList.add('active');
     });
   });
+
+  // Cargar solicitudes reales para Ama de Llaves (Housekeeping, Lavandería, Minibar, Amenities)
+  function loadRealRequests() {
+    const all = JSON.parse(localStorage.getItem('hotelife_service_requests') || '[]');
+    const mine = all.filter(r => r.dept && r.dept.includes('Ama de Llaves'));
+    const list = document.getElementById('ticketList');
+
+    mine.forEach(req => {
+      if (document.getElementById(req.id)) return;
+
+      const minutesAgo = Math.max(0, Math.round((Date.now() - new Date(req.createdAt)) / 60000));
+      let itemsHtml;
+      if (req.items) {
+        itemsHtml = req.items; // viene de Amenities/Minibar ya formateado
+      } else {
+        itemsHtml = Object.entries(req.details || {}).map(([k, v]) => `${k}: ${v}`).join(' · ');
+      }
+
+      const ticket = document.createElement('div');
+      ticket.className = 'ticket';
+      ticket.id = req.id;
+      ticket.dataset.status = 'pendiente';
+      ticket.dataset.urgency = req.urgent ? 'urgente' : 'normal';
+      ticket.innerHTML = `
+        <div class="ticket-top">
+          <div class="ticket-room"><span class="room-badge">${req.room}</span><span class="guest-name">${req.guestName}</span></div>
+          <span class="urgency-tag ${req.urgent ? 'urgente' : 'normal'}">${req.urgent ? 'Urgente' : 'Normal'}</span>
+        </div>
+        <p class="ticket-category">${req.title}</p>
+        <p class="ticket-items">${itemsHtml}</p>
+        <div class="ticket-meta"><span>Hace ${minutesAgo} min</span><span>${req.roomType}</span></div>
+        <div class="ticket-actions">
+          <button class="btn btn-outline" data-action="ver">Ver detalle</button>
+          <button class="btn btn-primary" data-action="aceptar">Asignar camarera</button>
+        </div>
+      `;
+      list.insertBefore(ticket, list.firstChild);
+
+      ticket.querySelector('[data-action="aceptar"]').addEventListener('click', () => {
+        ticket.dataset.status = 'proceso';
+        ticket.querySelector('.ticket-meta span').textContent = 'Asignado hace instantes';
+        ticket.querySelector('.ticket-actions').innerHTML = '<button class="btn btn-outline" data-action="ver">Ver detalle</button><button class="btn btn-success" data-action="completar">Marcar completada</button>';
+        attachCompleteHandler(ticket);
+      });
+    });
+  }
+  loadRealRequests();
 </script>
 
 </body>

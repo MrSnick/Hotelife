@@ -60,6 +60,7 @@
   .nav-item.active{ color:var(--gold); opacity:1; }
   .nav-icon{ font-size:16px; }
 </style>
+<link rel="stylesheet" href="../css/responsive.css">
 </head>
 <body>
 
@@ -248,8 +249,46 @@
     });
   });
 
+  // Leer también Bar, Desayuno y Restaurante desde el almacén genérico de solicitudes
+  function loadRealServiceRequests() {
+    const all = JSON.parse(localStorage.getItem('hotelife_service_requests') || '[]');
+    const mine = all.filter(r => r.dept && r.dept.includes('A&B'));
+    const list = document.getElementById('ticketList');
+
+    mine.forEach(req => {
+      if (document.getElementById(req.id)) return;
+
+      const minutesAgo = Math.max(0, Math.round((Date.now() - new Date(req.createdAt)) / 60000));
+      const isReservation = !!req.option; // viene de servicio-reserva.html (ej. Restaurante)
+      const bodyHtml = isReservation
+        ? `<p class="order-items">${req.option} · ${req.date} · ${req.time}</p>`
+        : `<p class="order-items">${req.items || ''}</p>${req.total ? `<p class="order-total">Total: ${req.total}</p>` : ''}`;
+
+      const ticket = document.createElement('div');
+      ticket.className = 'ticket';
+      ticket.id = req.id;
+      ticket.dataset.status = 'nuevo';
+      ticket.innerHTML = `
+        <div class="ticket-top">
+          <div class="ticket-room"><span class="room-badge">${req.room}</span><span class="guest-name">${req.guestName}</span></div>
+          <span class="stage-tag stage-nuevo">Nuevo</span>
+        </div>
+        <p class="order-source">${req.title}</p>
+        ${bodyHtml}
+        <div class="ticket-meta"><span>Hace ${minutesAgo} min</span><span>${req.roomType}</span></div>
+        <div class="ticket-actions">
+          <button class="btn btn-outline" data-action="ver">Ver pedido</button>
+          <button class="btn btn-primary" data-action="preparar">Aceptar y preparar</button>
+        </div>
+      `;
+      list.insertBefore(ticket, list.firstChild);
+      attachHandlers(ticket);
+    });
+  }
+
   // Ahora sí, cargar pedidos reales enviados por huéspedes (attachHandlers ya existe)
   loadRealOrders();
+  loadRealServiceRequests();
   updateSummaryCounts();
 </script>
 

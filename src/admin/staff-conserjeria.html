@@ -57,6 +57,7 @@
   .nav-item.active{ color:var(--gold); opacity:1; }
   .nav-icon{ font-size:16px; }
 </style>
+<link rel="stylesheet" href="../css/responsive.css">
 </head>
 <body>
 
@@ -185,6 +186,41 @@
       btn.classList.add('active');
     });
   });
+
+  // Cargar solicitudes reales (Traslados, Alquiler de vehículos, Tours, Entradas, Niñera)
+  function loadRealRequests() {
+    const all = JSON.parse(localStorage.getItem('hotelife_service_requests') || '[]');
+    const mine = all.filter(r => r.dept && r.dept.includes('Conserjería'));
+    const list = document.getElementById('ticketList');
+
+    mine.forEach(req => {
+      if (document.getElementById(req.id)) return;
+
+      const minutesAgo = Math.max(0, Math.round((Date.now() - new Date(req.createdAt)) / 60000));
+      const detailLine = Object.values(req.details || {}).join(' · ');
+
+      const ticket = document.createElement('div');
+      ticket.className = 'ticket';
+      ticket.id = req.id;
+      ticket.dataset.status = 'pendiente';
+      ticket.innerHTML = `
+        <div class="ticket-top">
+          <div class="ticket-room"><span class="room-badge">${req.room}</span><span class="guest-name">${req.guestName}</span></div>
+          <span class="stage-tag stage-pendiente">Pendiente</span>
+        </div>
+        <p class="request-type">${req.title}</p>
+        <p class="request-detail">${detailLine}</p>
+        <div class="ticket-meta"><span>Hace ${minutesAgo} min</span><span>${req.roomType}</span></div>
+        <div class="ticket-actions">
+          <button class="btn btn-outline" data-action="ver">Ver detalle</button>
+          <button class="btn btn-primary" data-action="coordinar">Coordinar</button>
+        </div>
+      `;
+      list.insertBefore(ticket, list.firstChild);
+      attachHandlers(ticket);
+    });
+  }
+  loadRealRequests();
 </script>
 
 </body>

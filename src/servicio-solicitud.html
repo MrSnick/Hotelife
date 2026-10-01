@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HOTELIFE — Solicitud</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Manrope:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy: #1a222d; --bg-outer: #f9f6f0; --gold: #d4b285; --border-light: #eae5dc;
+    --text-muted: rgba(26,34,45,0.6);
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{ font-family:"Manrope",-apple-system,sans-serif; background:#e5e2db; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; color:var(--navy); }
+  .phone{ background:var(--bg-outer); border:0.8px solid var(--gold); border-radius:44px; box-shadow:0 25px 50px -12px rgba(26,34,45,0.25); width:100%; max-width:390px; overflow:hidden; display:flex; flex-direction:column; height:844px; position:relative; }
+  .status-bar{ flex-shrink:0; display:flex; align-items:center; justify-content:space-between; height:44px; padding:0 24px; font-weight:600; font-size:14px; }
+  .status-icons{ display:flex; gap:6px; align-items:center; font-size:12px; }
+  .header{ flex-shrink:0; display:flex; align-items:center; gap:12px; height:64px; padding:0 20px; }
+  .back-btn{ width:40px; height:40px; border-radius:20px; background:#fff; border:1px solid var(--border-light); display:flex; align-items:center; justify-content:center; font-size:16px; cursor:pointer; flex-shrink:0; }
+  .header-text{ flex:1; min-width:0; }
+  .header-title{ font-family:"Cormorant Garamond", serif; font-weight:700; font-size:18px; }
+  .header-subtitle{ font-size:10px; color: var(--text-muted); }
+  .room-badge{ background: var(--navy); border-radius:12px; padding:4px 10px; font-weight:700; font-size:10px; color: var(--gold); white-space:nowrap; }
+
+  .scroll-content{ flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; padding: 8px 24px 24px; display:flex; flex-direction:column; gap:16px; }
+  .scroll-content::-webkit-scrollbar{ display:none; }
+
+  .icon-hero{ display:flex; flex-direction:column; align-items:center; gap:8px; padding: 10px 0 4px; }
+  .icon-circle{ width:64px; height:64px; border-radius:20px; background: var(--navy); display:flex; align-items:center; justify-content:center; font-size:28px; }
+  .icon-desc{ font-size:12px; color: var(--text-muted); text-align:center; }
+
+  .section-title{ font-weight:700; font-size:11px; text-transform:uppercase; color: var(--text-muted); }
+
+  .field-card{ background:#fff; border:1px solid var(--border-light); border-radius:16px; padding:16px; display:flex; flex-direction:column; gap:12px; }
+  .form-field label{ display:block; font-size:11px; font-weight:600; color: var(--text-muted); margin-bottom:6px; }
+  .form-field select, .form-field input, .form-field textarea{
+    width:100%; border:1px solid var(--border-light); border-radius:10px;
+    padding:0 12px; font-family:inherit; font-size:13px; outline:none; background:#fff; color:var(--navy);
+  }
+  .form-field select, .form-field input{ height:42px; }
+  .form-field textarea{ height:70px; padding:10px 12px; resize:none; }
+  .form-field select:focus, .form-field input:focus, .form-field textarea:focus{ border-color: var(--gold); }
+
+  .quantity-row{ display:flex; align-items:center; justify-content:space-between; background:#fff; border:1px solid var(--border-light); border-radius:14px; padding:12px 16px; }
+  .quantity-label{ font-weight:600; font-size:13px; }
+  .quantity-control{ display:flex; align-items:center; gap:12px; }
+  .qty-btn{ width:28px; height:28px; border-radius:9px; border:1px solid var(--border-light); background:#fff; font-weight:700; font-size:15px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .qty-value{ font-weight:700; font-size:14px; min-width:16px; text-align:center; }
+
+  .info-card{ background: rgba(212,178,133,0.12); border:1px solid var(--gold); border-radius:16px; padding:18px; display:flex; flex-direction:column; gap:10px; }
+  .info-row{ display:flex; justify-content:space-between; align-items:center; }
+  .info-label{ font-size:12px; color: var(--text-muted); }
+  .info-value{ font-weight:700; font-size:14px; }
+  .copy-btn{ font-size:11px; font-weight:700; color: var(--navy); background:#fff; border:1px solid var(--border-light); border-radius:8px; padding:5px 10px; cursor:pointer; }
+
+  .submit-btn{ width:100%; height:52px; border-radius:16px; background: var(--gold); border:none; font-weight:700; font-size:13px; text-transform:uppercase; color: var(--navy); cursor:pointer; }
+  .submit-btn:disabled{ opacity:0.5; cursor:not-allowed; }
+</style>
+<link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+<div class="phone">
+  <div class="status-bar"><span>12:40</span><span class="status-icons">📶 📡 🔋</span></div>
+
+  <div class="header">
+    <button class="back-btn" id="backBtn">←</button>
+    <div class="header-text">
+      <p class="header-title" id="serviceTitle">Servicio</p>
+      <p class="header-subtitle" id="serviceSubtitle"></p>
+    </div>
+    <span class="room-badge">Suite 405</span>
+  </div>
+
+  <div class="scroll-content" id="content"></div>
+</div>
+
+<script>
+  // Cada entrada define cómo se ve y qué campos pide el formulario para ese servicio
+  const SERVICES = {
+    housekeeping: { icon:'🧹', title:'Housekeeping', subtitle:'Limpieza de habitación', desc:'Solicita limpieza de tu habitación en el momento que prefieras.', dept:'🧺 Ama de Llaves',
+      fields:[ {label:'Tipo de limpieza', type:'select', options:['Rápida (10 min)','Completa (30 min)']}, {label:'Horario preferido', type:'select', options:['Ahora mismo','En 1 hora','Esta tarde','Mañana temprano']} ] },
+    'amenities-adicionales': { icon:'🧴', title:'Amenities adicionales', subtitle:'Reposición de artículos de aseo', desc:'Pide toallas, almohadas o kit de aseo extra para tu habitación.', dept:'🧺 Ama de Llaves',
+      fields:[ {label:'Artículo', type:'select', options:['Juego de toallas','Almohadas extra','Kit de aseo premium','Set de café & té']} ], quantity:true },
+    lavanderia: { icon:'👔', title:'Lavandería y planchado', subtitle:'Servicio de lavandería', desc:'Recogemos tus prendas y las devolvemos limpias el mismo día.', dept:'🧺 Ama de Llaves',
+      fields:[ {label:'Tipo de servicio', type:'select', options:['Lavado estándar','Lavado urgente (+50%)','Solo planchado']} ], quantity:true, quantityLabel:'Número de prendas' },
+    minibar: { icon:'🥤', title:'Minibar', subtitle:'Reposición del minibar', desc:'Indícanos qué se te acabó y lo reponemos.', dept:'🧺 Ama de Llaves',
+      fields:[ {label:'¿Qué necesitas reponer?', type:'textarea', placeholder:'Ej: agua, snacks, cerveza...'} ] },
+    'late-checkout': { icon:'🕒', title:'Late check-out / Early check-in', subtitle:'Ajustar horario de entrada o salida', desc:'Sujeto a disponibilidad del hotel.', dept:'🏨 Recepción',
+      fields:[ {label:'Tipo de solicitud', type:'select', options:['Late check-out','Early check-in']}, {label:'Hora deseada', type:'select', options:['12:00 PM','1:00 PM','2:00 PM','3:00 PM']} ] },
+    'caja-fuerte': { icon:'🔐', title:'Caja fuerte', subtitle:'Asistencia con la caja fuerte', desc:'¿Olvidaste tu código o tienes un problema con la caja fuerte de tu habitación?', dept:'🏨 Recepción',
+      fields:[ {label:'Motivo', type:'select', options:['Olvidé mi código','La caja no abre','Otro problema']} ] },
+    valet: { icon:'🅿️', title:'Estacionamiento / Valet', subtitle:'Servicio de valet parking', desc:'Nuestro equipo recogerá tu vehículo en la entrada principal.', dept:'🏨 Recepción',
+      fields:[ {label:'Placa del vehículo', type:'text', placeholder:'ABC123'}, {label:'Hora de llegada', type:'select', options:['Ahora mismo','En 15 min','En 30 min']} ] },
+    equipaje: { icon:'🧳', title:'Custodia de equipaje', subtitle:'Guardar maletas', desc:'Ideal si tu vuelo es más tarde y ya hiciste check-out.', dept:'🏨 Recepción',
+      fields:[ {label:'Hora de recogida', type:'select', options:['En 2 horas','En 4 horas','Esta noche','Mañana']} ], quantity:true, quantityLabel:'Número de maletas' },
+    mascotas: { icon:'🐾', title:'Servicio de mascotas', subtitle:'Cuidado y paseo', desc:'Servicios para que tu mascota también disfrute la estadía.', dept:'🏨 Recepción',
+      fields:[ {label:'Servicio', type:'select', options:['Paseo (30 min)','Cuidado en habitación','Kit de bienvenida para mascotas']} ] },
+    medico: { icon:'🩺', title:'Servicio médico', subtitle:'Asistencia médica', desc:'Un profesional de la salud se comunicará contigo lo antes posible.', dept:'🏨 Recepción', urgent:true,
+      fields:[ {label:'Motivo de la consulta', type:'textarea', placeholder:'Describe brevemente cómo te sientes...'} ] },
+    wifi: { icon:'📶', title:'WiFi de alta velocidad', subtitle:'Datos de conexión', desc:'', dept:null, info:true,
+      infoRows:[ {label:'Red', value:'HOTELIFE_Suite405'}, {label:'Contraseña', value:'HTL-405-Snick'} ] }
+  };
+
+  const params = new URLSearchParams(window.location.search);
+  const key = params.get('service') || 'housekeeping';
+  const svc = SERVICES[key] || SERVICES.housekeeping;
+
+  document.getElementById('serviceTitle').textContent = svc.title;
+  document.getElementById('serviceSubtitle').textContent = svc.subtitle;
+
+  const content = document.getElementById('content');
+
+  if (svc.info) {
+    content.innerHTML = `
+      <div class="icon-hero">
+        <div class="icon-circle">${svc.icon}</div>
+      </div>
+      <div class="info-card">
+        ${svc.infoRows.map(r => `
+          <div class="info-row">
+            <span class="info-label">${r.label}</span>
+            <span class="info-value">${r.value}</span>
+          </div>
+        `).join('')}
+        <button class="copy-btn" id="copyBtn" style="align-self:flex-start;">📋 Copiar contraseña</button>
+      </div>
+    `;
+    document.getElementById('copyBtn').addEventListener('click', () => {
+      navigator.clipboard?.writeText(svc.infoRows[1].value);
+      console.log('Contraseña copiada');
+    });
+  } else {
+    const fieldsHtml = svc.fields.map((f, i) => {
+      if (f.type === 'select') {
+        return `<div class="form-field"><label>${f.label}</label><select data-idx="${i}">${f.options.map(o => `<option>${o}</option>`).join('')}</select></div>`;
+      }
+      if (f.type === 'textarea') {
+        return `<div class="form-field"><label>${f.label}</label><textarea data-idx="${i}" placeholder="${f.placeholder || ''}"></textarea></div>`;
+      }
+      return `<div class="form-field"><label>${f.label}</label><input type="text" data-idx="${i}" placeholder="${f.placeholder || ''}"></div>`;
+    }).join('');
+
+    const quantityHtml = svc.quantity ? `
+      <div class="quantity-row">
+        <span class="quantity-label">${svc.quantityLabel || 'Cantidad'}</span>
+        <div class="quantity-control">
+          <button class="qty-btn" id="qtyMinus">−</button>
+          <span class="qty-value" id="qtyValue">1</span>
+          <button class="qty-btn" id="qtyPlus">+</button>
+        </div>
+      </div>
+    ` : '';
+
+    content.innerHTML = `
+      <div class="icon-hero">
+        <div class="icon-circle">${svc.icon}</div>
+        <p class="icon-desc">${svc.desc}</p>
+      </div>
+      <p class="section-title">DETALLES DE LA SOLICITUD</p>
+      <div class="field-card">${fieldsHtml}</div>
+      ${quantityHtml}
+      <button class="submit-btn" id="submitBtn">${svc.urgent ? '🚨 Enviar solicitud urgente' : 'Enviar solicitud'}</button>
+    `;
+
+    let qty = 1;
+    if (svc.quantity) {
+      document.getElementById('qtyMinus').addEventListener('click', () => { qty = Math.max(1, qty - 1); document.getElementById('qtyValue').textContent = qty; });
+      document.getElementById('qtyPlus').addEventListener('click', () => { qty += 1; document.getElementById('qtyValue').textContent = qty; });
+    }
+
+    document.getElementById('submitBtn').addEventListener('click', () => {
+      const btn = document.getElementById('submitBtn');
+      btn.textContent = '✓ Solicitud enviada';
+      btn.disabled = true;
+
+      // Recolectar valores de los campos del formulario
+      const fieldValues = {};
+      document.querySelectorAll('[data-idx]').forEach(el => {
+        const idx = el.dataset.idx;
+        fieldValues[svc.fields[idx].label] = el.value;
+      });
+
+      const request = {
+        id: 'REQ-' + Date.now(),
+        service: key,
+        title: svc.title,
+        dept: svc.dept,
+        room: '405',
+        roomType: 'Suite Deluxe',
+        guestName: 'Sr Snick',
+        details: fieldValues,
+        quantity: svc.quantity ? qty : null,
+        status: 'pendiente',
+        urgent: !!svc.urgent,
+        createdAt: new Date().toISOString()
+      };
+      const existing = JSON.parse(localStorage.getItem('hotelife_service_requests') || '[]');
+      existing.unshift(request);
+      localStorage.setItem('hotelife_service_requests', JSON.stringify(existing));
+
+      console.log('Solicitud guardada y disponible para', svc.dept, ':', request);
+    });
+  }
+
+  document.getElementById('backBtn').addEventListener('click', () => {
+    window.location.href = 'servicios.html';
+  });
+</script>
+
+<script src="js/nav.js"></script>
+</body>
+</html>

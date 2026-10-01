@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HOTELIFE Admin — Mensajes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy: #1a222d; --navy-light: #232d3a; --bg: #f4f2ed; --gold: #d4b285;
+    --border-light: #e5e1d8; --text-muted: rgba(26,34,45,0.6); --green: #4c8c4a; --red:#b5573a;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{ font-family:"Manrope",-apple-system,sans-serif; background:var(--bg); color:var(--navy); min-height:100vh; display:flex; }
+
+  .sidebar{ width:240px; flex-shrink:0; background:var(--navy); color:#fff; display:flex; flex-direction:column; padding:24px 0; height:100vh; position:sticky; top:0; }
+  .sidebar-logo{ font-family:"Cormorant Garamond", serif; font-weight:700; font-size:22px; letter-spacing:2px; color:var(--gold); padding:0 24px 28px; }
+  .sidebar-logo span{ display:block; font-family:"Manrope"; font-size:10px; letter-spacing:1px; color:rgba(255,255,255,0.5); font-weight:600; margin-top:2px; }
+  .nav-group{ display:flex; flex-direction:column; gap:2px; padding:0 12px; }
+  .nav-link{ display:flex; align-items:center; gap:12px; padding:11px 14px; border-radius:10px; color:rgba(255,255,255,0.65); text-decoration:none; font-size:13px; font-weight:600; cursor:pointer; background:none; border:none; width:100%; text-align:left; }
+  .nav-link .icon{ font-size:15px; width:18px; }
+  .nav-link.active{ background: rgba(212,178,133,0.12); color:var(--gold); }
+  .nav-link:hover:not(.active){ background: rgba(255,255,255,0.05); color:#fff; }
+
+  .main{ flex:1; display:flex; flex-direction:column; min-width:0; }
+  .topbar{ height:72px; flex-shrink:0; background:#fff; border-bottom:1px solid var(--border-light); display:flex; align-items:center; justify-content:space-between; padding:0 32px; }
+  .topbar-title{ font-family:"Cormorant Garamond", serif; font-weight:700; font-size:22px; }
+  .topbar-date{ font-size:12px; color:var(--text-muted); }
+
+  .content{ flex:1; display:flex; overflow:hidden; }
+
+  .thread-list{ width:320px; flex-shrink:0; background:#fff; border-right:1px solid var(--border-light); overflow-y:auto; }
+  .thread-item{ display:flex; gap:12px; padding:14px 20px; border-bottom:1px solid var(--border-light); cursor:pointer; }
+  .thread-item:hover, .thread-item.active{ background: var(--bg); }
+  .thread-avatar{ width:38px; height:38px; border-radius:11px; background:var(--navy); color:var(--gold); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; flex-shrink:0; }
+  .thread-info{ flex:1; min-width:0; }
+  .thread-top{ display:flex; justify-content:space-between; align-items:center; }
+  .thread-name{ font-weight:700; font-size:13px; }
+  .thread-room{ font-size:10px; color:var(--text-muted); background:var(--bg); padding:2px 7px; border-radius:6px; }
+  .thread-preview{ font-size:11.5px; color:var(--text-muted); margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .thread-badge{ background:var(--red); color:#fff; font-size:10px; font-weight:800; min-width:18px; height:18px; border-radius:9px; display:flex; align-items:center; justify-content:center; padding:0 5px; margin-left:8px; flex-shrink:0; }
+
+  .thread-view{ flex:1; display:flex; flex-direction:column; min-width:0; }
+  .thread-header{ background:#fff; border-bottom:1px solid var(--border-light); padding:16px 28px; display:flex; align-items:center; justify-content:space-between; }
+  .thread-header-info{ display:flex; align-items:center; gap:12px; }
+  .thread-header-name{ font-weight:700; font-size:15px; }
+  .thread-header-sub{ font-size:11.5px; color:var(--text-muted); }
+  .thread-header-actions{ display:flex; gap:8px; }
+  .header-action-btn{ font-size:11px; font-weight:700; background:var(--bg); border:none; border-radius:8px; padding:8px 12px; cursor:pointer; color:var(--navy); }
+
+  .messages-scroll{ flex:1; overflow-y:auto; padding:24px 28px; display:flex; flex-direction:column; gap:12px; }
+  .bubble{ max-width:60%; padding:10px 14px; border-radius:14px; font-size:13px; line-height:1.4; }
+  .bubble.guest{ align-self:flex-start; background:#fff; border:1px solid var(--border-light); }
+  .bubble.reception{ align-self:flex-end; background:var(--navy); color:#fff; }
+  .bubble-time{ display:block; font-size:10px; margin-top:4px; opacity:0.6; }
+
+  .reply-row{ background:#fff; border-top:1px solid var(--border-light); padding:16px 28px; display:flex; gap:10px; }
+  .reply-input{ flex:1; height:42px; border:1px solid var(--border-light); border-radius:12px; padding:0 14px; font-family:inherit; font-size:13px; outline:none; }
+  .reply-input:focus{ border-color:var(--gold); }
+  .reply-btn{ height:42px; padding:0 18px; border-radius:12px; background:var(--navy); color:var(--gold); border:none; font-weight:700; font-size:12px; cursor:pointer; }
+
+  .empty-state{ flex:1; display:flex; align-items:center; justify-content:center; color:var(--text-muted); font-size:13px; }
+</style>
+<link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">HOTELIFE<span>PANEL DE ADMINISTRACIÓN</span></div>
+  <nav class="nav-group">
+    <a class="nav-link" href="dashboard.html" style="text-decoration:none;"><span class="icon">📊</span>Dashboard</a>
+    <button class="nav-link active"><span class="icon">💬</span>Mensajes</button>
+    <button class="nav-link"><span class="icon">📋</span>Solicitudes</button>
+    <button class="nav-link"><span class="icon">🧳</span>Huéspedes</button>
+    <button class="nav-link"><span class="icon">🛏️</span>Habitaciones</button>
+    <button class="nav-link"><span class="icon">🔧</span>Mantenimiento</button>
+    <button class="nav-link"><span class="icon">📈</span>Reportes</button>
+  </nav>
+</aside>
+
+<div class="main">
+  <header class="topbar">
+    <div>
+      <p class="topbar-title">Mensajes</p>
+      <p class="topbar-date">Chat directo con huéspedes</p>
+    </div>
+  </header>
+
+  <div class="content">
+    <div class="thread-list" id="threadList"></div>
+    <div class="thread-view" id="threadView">
+      <div class="empty-state">Selecciona una conversación para ver los mensajes</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const THREADS_KEY = 'hotelife_chat_threads';
+  let activeRoom = null;
+
+  function loadThreads() {
+    return JSON.parse(localStorage.getItem(THREADS_KEY) || '{}');
+  }
+  function saveThreads(threads) {
+    localStorage.setItem(THREADS_KEY, JSON.stringify(threads));
+  }
+
+  function renderThreadList() {
+    const threads = loadThreads();
+    const rooms = Object.keys(threads);
+    const list = document.getElementById('threadList');
+
+    if (rooms.length === 0) {
+      list.innerHTML = '<div style="padding:20px; font-size:12px; color:var(--text-muted);">Aún no hay conversaciones. Aparecerán aquí cuando un huésped escriba desde la app.</div>';
+      return;
+    }
+
+    list.innerHTML = rooms.map(room => {
+      const t = threads[room];
+      const lastMsg = t.messages[t.messages.length - 1];
+      const initials = t.guestName.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+      const unread = t.unreadForReception || 0;
+      return `
+        <div class="thread-item ${room === activeRoom ? 'active' : ''}" data-room="${room}">
+          <div class="thread-avatar">${initials}</div>
+          <div class="thread-info">
+            <div class="thread-top">
+              <span class="thread-name">${t.guestName}</span>
+              <span class="thread-room">${room}</span>
+            </div>
+            <p class="thread-preview">${lastMsg ? (lastMsg.sender === 'reception' ? 'Tú: ' : '') + lastMsg.text : ''}</p>
+          </div>
+          ${unread > 0 ? `<span class="thread-badge">${unread}</span>` : ''}
+        </div>
+      `;
+    }).join('');
+
+    list.querySelectorAll('.thread-item').forEach(item => {
+      item.addEventListener('click', () => openThread(item.dataset.room));
+    });
+  }
+
+  function openThread(room) {
+    activeRoom = room;
+    const threads = loadThreads();
+    const t = threads[room];
+    if (!t) return;
+
+    // Marcar como leído
+    t.unreadForReception = 0;
+    saveThreads(threads);
+
+    const view = document.getElementById('threadView');
+    view.innerHTML = `
+      <div class="thread-header">
+        <div class="thread-header-info">
+          <div>
+            <p class="thread-header-name">${t.guestName}</p>
+            <p class="thread-header-sub">Habitación ${room} · ${t.roomType}</p>
+          </div>
+        </div>
+        <div class="thread-header-actions">
+          <button class="header-action-btn">📞 Llamar</button>
+          <button class="header-action-btn">Ver perfil →</button>
+        </div>
+      </div>
+      <div class="messages-scroll" id="messagesScroll"></div>
+      <div class="reply-row">
+        <input type="text" class="reply-input" id="replyInput" placeholder="Escribe una respuesta...">
+        <button class="reply-btn" id="replyBtn">Enviar</button>
+      </div>
+    `;
+
+    renderMessages();
+    document.getElementById('replyBtn').addEventListener('click', sendReply);
+    document.getElementById('replyInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') sendReply(); });
+
+    renderThreadList(); // para quitar el badge de no leído
+  }
+
+  function renderMessages() {
+    const threads = loadThreads();
+    const t = threads[activeRoom];
+    const scroll = document.getElementById('messagesScroll');
+    scroll.innerHTML = t.messages.map(m => `
+      <div class="bubble ${m.sender}">
+        <p>${m.text}</p>
+        <span class="bubble-time">${m.time}</span>
+      </div>
+    `).join('');
+    scroll.scrollTop = scroll.scrollHeight;
+  }
+
+  function sendReply() {
+    const input = document.getElementById('replyInput');
+    const text = input.value.trim();
+    if (!text || !activeRoom) return;
+    const threads = loadThreads();
+    const now = new Date();
+    const time = now.toLocaleTimeString('es-CO', { hour: 'numeric', minute: '2-digit' });
+    threads[activeRoom].messages.push({ sender: 'reception', text, time });
+    saveThreads(threads);
+    input.value = '';
+    renderMessages();
+    console.log('Respuesta enviada al huésped de la habitación', activeRoom);
+  }
+
+  renderThreadList();
+
+  // Refrescar cada pocos segundos para simular mensajes nuevos entrando en vivo
+  setInterval(() => {
+    renderThreadList();
+    if (activeRoom) renderMessages();
+  }, 3000);
+</script>
+
+</body>
+</html>

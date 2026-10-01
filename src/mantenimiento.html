@@ -193,6 +193,7 @@
     z-index:10;
   }
 </style>
+<link rel="stylesheet" href="css/responsive.css">
 </head>
 <body>
 
@@ -334,14 +335,33 @@
   // Envío de la solicitud
   document.getElementById('submitBtn').addEventListener('click', () => {
     const description = document.getElementById('descTextarea').value.trim();
-    const payload = {
-      category: selectedCategory,
-      description,
-      photoAttached,
-      urgency: selectedUrgency,
-      access: selectedAccess
+
+    const categoryLabels = {
+      ac: '🌡️ Aire acondicionado', plomeria: '🚿 Plomería', electrico: '💡 Eléctrico',
+      'tv-wifi': '📺 TV / WiFi', puerta: '🚪 Puerta / Cerradura', muebles: '🪑 Muebles / Otro'
     };
-    console.log('Solicitud de mantenimiento enviada:', payload);
+    const accessLabels = {
+      ahora: '🔑 Ahora mismo, está en la habitación', fuera: '🔑 Prefiere que entren cuando no esté', hora: '🔑 Hora específica'
+    };
+
+    const request = {
+      id: 'REQ-' + Date.now(),
+      service: 'mantenimiento',
+      title: categoryLabels[selectedCategory] || 'Mantenimiento',
+      dept: '🔧 Mantenimiento',
+      room: '405',
+      roomType: 'Suite Deluxe',
+      guestName: 'Sr Snick',
+      details: { Descripción: description || '(sin descripción)', 'Foto adjunta': photoAttached ? 'Sí' : 'No', Acceso: accessLabels[selectedAccess] || selectedAccess },
+      urgent: selectedUrgency === 'urgente',
+      status: 'pendiente',
+      createdAt: new Date().toISOString()
+    };
+    const existing = JSON.parse(localStorage.getItem('hotelife_service_requests') || '[]');
+    existing.unshift(request);
+    localStorage.setItem('hotelife_service_requests', JSON.stringify(existing));
+
+    console.log('Solicitud de mantenimiento guardada:', request);
     document.getElementById('submitBtn').textContent = '✓ Solicitud enviada';
     document.getElementById('submitBtn').disabled = true;
   });
@@ -359,5 +379,6 @@
   });
 </script>
 
+<script src="js/nav.js"></script>
 </body>
 </html>

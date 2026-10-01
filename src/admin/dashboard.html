@@ -152,6 +152,7 @@
   .occupancy-fill{ height:100%; border-radius:4px; background: var(--gold); }
   .occupancy-value{ font-size:12px; font-weight:700; width:36px; text-align:right; flex-shrink:0; }
 </style>
+<link rel="stylesheet" href="../css/responsive.css">
 </head>
 <body>
 
@@ -159,6 +160,7 @@
   <div class="sidebar-logo">HOTELIFE<span>PANEL DE ADMINISTRACIÓN</span></div>
   <nav class="nav-group">
     <button class="nav-link active" data-view="dashboard"><span class="icon">📊</span>Dashboard</button>
+    <a class="nav-link" href="mensajes.html" style="text-decoration:none;"><span class="icon">💬</span>Mensajes</a>
     <button class="nav-link" data-view="solicitudes"><span class="icon">📋</span>Solicitudes</button>
     <button class="nav-link" data-view="huespedes"><span class="icon">🧳</span>Huéspedes</button>
     <button class="nav-link" data-view="habitaciones"><span class="icon">🛏️</span>Habitaciones</button>
@@ -202,8 +204,8 @@
       </div>
       <div class="kpi-card">
         <p class="kpi-label">Solicitudes pendientes</p>
-        <p class="kpi-value">7</p>
-        <p class="kpi-sub down">2 urgentes</p>
+        <p class="kpi-value" id="kpiPendientes">7</p>
+        <p class="kpi-sub down" id="kpiUrgentes">2 urgentes</p>
       </div>
       <div class="kpi-card">
         <p class="kpi-label">Huéspedes activos</p>
@@ -371,6 +373,84 @@
   document.getElementById('settingsBtn').addEventListener('click', () => {
     console.log('Abrir configuración');
   });
+
+  // Recepción ve TODAS las solicitudes de todas las áreas (respaldo 24/7)
+  function loadRealRequests() {
+    const serviceRequests = JSON.parse(localStorage.getItem('hotelife_service_requests') || '[]');
+    const roomServiceOrders = JSON.parse(localStorage.getItem('hotelife_shared_orders') || '[]');
+
+    // Normalizar ambas fuentes a una misma forma
+    const normalized = [
+      ...serviceRequests.map(r => ({
+        id: r.id, guestName: r.guestName, room: r.room, title: r.title, dept: r.dept,
+        status: r.status, urgent: !!r.urgent, createdAt: r.createdAt
+      })),
+      ...roomServiceOrders.map(r => ({
+        id: r.id, guestName: r.guest, room: r.room, title: r.source + ' — ' + (r.items || '').split('\n')[0],
+        dept: '🍽️ A&B', status: r.stage, urgent: false, createdAt: r.createdAt
+      }))
+    ];
+
+    normalized.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    const statusMap = {
+      pendiente: { cls: 'status-pending', label: 'Pendiente' },
+      nuevo: { cls: 'status-pending', label: 'Nuevo' },
+      proceso: { cls: 'status-progress', label: 'En proceso' },
+      preparando: { cls: 'status-progress', label: 'Preparando' },
+      camino: { cls: 'status-progress', label: 'En camino' },
+      coordinando: { cls: 'status-progress', label: 'Coordinando' },
+      confirmada: { cls: 'status-done', label: 'Confirmado' },
+      confirmado: { cls: 'status-done', label: 'Confirmado' },
+      completada: { cls: 'status-done', label: 'Completada' },
+      entregado: { cls: 'status-done', label: 'Entregado' }
+    };
+
+    const tbody = document.getElementById('requestsTableBody');
+    normalized.forEach(req => {
+      if (document.getElementById(req.id)) return;
+
+      const minutesAgo = Math.max(0, Math.round((Date.now() - new Date(req.createdAt)) / 60000));
+      const statusInfo = statusMap[req.status] || { cls: 'status-pending', label: req.status };
+      const statusCellHtml = req.urgent
+        ? `<span class="status-pill status-urgent">Urgente</span>${minutesAgo > 15 ? `<div class="escalation-flag">⚠️ Sin respuesta ${minutesAgo} min</div>` : ''}`
+        : `<span class="status-pill ${statusInfo.cls}">${statusInfo.label}</span>`;
+
+      const row = document.createElement('tr');
+      row.id = req.id;
+      row.innerHTML = `
+        <td><div class="guest-cell">🧑 ${req.guestName}</div></td>
+        <td><span class="room-pill">${req.room}</span></td>
+        <td>${req.title}</td>
+        <td><span class="dept-pill">${req.dept}</span></td>
+        <td>${statusCellHtml}</td>
+        <td><button class="row-action">Atender</button></td>
+      `;
+      tbody.insertBefore(row, tbody.firstChild);
+
+      row.querySelector('.row-action').addEventListener('click', () => {
+        console.log('Acción sobre solicitud de:', req.guestName);
+      });
+    });
+
+    updatePendingKpi();
+  }
+
+  function updatePendingKpi() {
+    const rows = document.querySelectorAll('#requestsTableBody tr');
+    let pending = 0, urgent = 0;
+    rows.forEach(row => {
+      if (row.querySelector('.status-urgent')) { pending++; urgent++; }
+      else if (row.querySelector('.status-pending, .status-progress')) { pending++; }
+    });
+    document.getElementById('kpiPendientes').textContent = pending;
+    document.getElementById('kpiUrgentes').textContent = urgent + (urgent === 1 ? ' urgente' : ' urgentes');
+  }
+
+  loadRealRequests();
+
+  // Refrescar cada pocos segundos para simular llegada de solicitudes en vivo
+  setInterval(loadRealRequests, 4000);
 </script>
 
 </body>

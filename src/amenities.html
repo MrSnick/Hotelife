@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HOTELIFE — Amenities adicionales</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy: #1a222d; --bg-outer: #f9f6f0; --gold: #d4b285; --border-light: #eae5dc;
+    --text-muted: rgba(26,34,45,0.6); --gray-border:#e0e0e0;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{ font-family:"Manrope",-apple-system,sans-serif; background:#e5e2db; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; color:var(--navy); }
+  .phone{ background:var(--bg-outer); border:0.8px solid var(--gold); border-radius:44px; box-shadow:0 25px 50px -12px rgba(26,34,45,0.25); width:100%; max-width:390px; overflow:hidden; display:flex; flex-direction:column; height:844px; position:relative; }
+  .status-bar{ flex-shrink:0; display:flex; align-items:center; justify-content:space-between; height:44px; padding:0 24px; font-weight:600; font-size:14px; }
+  .status-icons{ display:flex; gap:6px; align-items:center; font-size:12px; }
+  .header{ flex-shrink:0; display:flex; align-items:center; gap:12px; height:64px; padding:0 20px; }
+  .back-btn{ width:40px; height:40px; border-radius:20px; background:#fff; border:1px solid var(--border-light); display:flex; align-items:center; justify-content:center; font-size:16px; cursor:pointer; flex-shrink:0; }
+  .header-text{ flex:1; min-width:0; }
+  .header-title{ font-family:"Cormorant Garamond", serif; font-weight:700; font-size:18px; }
+  .header-subtitle{ font-size:10px; color: var(--text-muted); }
+  .room-badge{ background: var(--navy); border-radius:12px; padding:4px 10px; font-weight:700; font-size:10px; color: var(--gold); white-space:nowrap; }
+
+  .scroll-content{ flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; padding: 4px 20px 110px; display:flex; flex-direction:column; gap:18px; }
+  .scroll-content::-webkit-scrollbar{ display:none; }
+
+  .section-title{ font-weight:700; font-size:11px; text-transform:uppercase; color: var(--text-muted); margin-bottom:10px; }
+  .item-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+  .item-card{ background:#fff; border:1px solid var(--gray-border); border-radius:16px; padding:14px; display:flex; flex-direction:column; gap:8px; position:relative; }
+  .item-top{ display:flex; align-items:center; justify-content:space-between; }
+  .item-emoji{ font-size:18px; }
+  .pedir-btn{ background:var(--bg-outer); border:none; border-radius:8px; padding:4px 10px; font-weight:700; font-size:10px; color:var(--navy); cursor:pointer; }
+  .pedir-btn.added{ background:var(--gold); color:var(--navy); }
+  .item-name{ font-weight:600; font-size:12px; line-height:1.3; }
+
+  /* Barra flotante de carrito */
+  .cart-bar{
+    position:absolute; left:20px; right:20px; bottom:24px;
+    background:var(--navy); border-radius:18px; padding:14px 18px;
+    display:none; align-items:center; justify-content:space-between;
+    box-shadow:0 12px 24px rgba(26,34,45,0.3); cursor:pointer; z-index:20;
+  }
+  .cart-bar.visible{ display:flex; }
+  .cart-info{ color:#fff; }
+  .cart-count{ font-size:11px; opacity:0.7; }
+  .cart-label{ font-family:"Cormorant Garamond", serif; font-weight:700; font-size:16px; }
+  .cart-cta{ background:var(--gold); color:var(--navy); font-weight:800; font-size:12px; text-transform:uppercase; padding:10px 16px; border-radius:12px; border:none; cursor:pointer; }
+
+  /* Overlay de cantidad por item */
+  .overlay{ position:absolute; inset:0; background:rgba(26,34,45,0.5); display:none; align-items:flex-end; z-index:30; }
+  .overlay.open{ display:flex; }
+  .qty-panel{ width:100%; background:#fff; border-radius:24px 24px 0 0; padding:24px 24px 28px; display:flex; flex-direction:column; align-items:center; gap:14px; }
+  .qty-icon{ width:56px; height:56px; border-radius:18px; background:var(--bg-outer); display:flex; align-items:center; justify-content:center; font-size:26px; }
+  .qty-name{ font-weight:700; font-size:15px; }
+  .qty-control{ display:flex; align-items:center; gap:20px; }
+  .qty-btn{ width:38px; height:38px; border-radius:12px; border:1px solid var(--border-light); background:#fff; font-weight:700; font-size:18px; cursor:pointer; }
+  .qty-value{ font-weight:700; font-size:20px; min-width:24px; text-align:center; }
+  .qty-note{ width:100%; height:38px; border:1px solid var(--border-light); border-radius:10px; padding:0 12px; font-family:inherit; font-size:12px; outline:none; }
+  .qty-note:focus{ border-color:var(--gold); }
+  .qty-confirm{ width:100%; height:48px; border-radius:16px; background:var(--gold); border:none; font-weight:700; font-size:12.5px; text-transform:uppercase; color:var(--navy); cursor:pointer; }
+  .qty-cancel{ font-size:12px; color:var(--text-muted); background:none; border:none; cursor:pointer; }
+
+  /* Overlay resumen final */
+  .summary-panel{ width:100%; background:#fff; border-radius:24px 24px 0 0; padding:20px 24px 28px; display:flex; flex-direction:column; gap:14px; max-height:70%; }
+  .summary-header{ display:flex; align-items:center; justify-content:space-between; }
+  .summary-title{ font-weight:700; font-size:15px; }
+  .summary-close{ background:none; border:none; font-size:16px; color:var(--text-muted); cursor:pointer; }
+  .summary-list{ display:flex; flex-direction:column; gap:10px; overflow-y:auto; }
+  .summary-row{ display:flex; align-items:center; justify-content:space-between; font-size:13px; }
+  .summary-row-name{ font-weight:600; }
+  .summary-row-qty{ color:var(--text-muted); font-size:12px; }
+  .summary-remove{ font-size:11px; font-weight:700; color:#b5573a; background:none; border:none; cursor:pointer; }
+  .summary-send{ width:100%; height:50px; border-radius:16px; background:var(--gold); border:none; font-weight:700; font-size:13px; text-transform:uppercase; color:var(--navy); cursor:pointer; }
+
+  .success-screen{ position:absolute; inset:0; background:var(--bg-outer); display:none; flex-direction:column; align-items:center; justify-content:center; gap:14px; padding:40px; text-align:center; z-index:40; }
+  .success-screen.visible{ display:flex; }
+  .success-icon{ width:64px; height:64px; border-radius:32px; background:var(--navy); border:1.6px solid var(--gold); display:flex; align-items:center; justify-content:center; font-size:28px; color:var(--gold); }
+  .success-title{ font-family:"Cormorant Garamond", serif; font-weight:700; font-size:20px; }
+  .success-btn{ margin-top:10px; height:46px; padding:0 24px; border-radius:16px; background:var(--navy); border:none; font-weight:700; font-size:12px; color:var(--gold); cursor:pointer; }
+</style>
+<link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+<div class="phone">
+  <div class="status-bar"><span>12:40</span><span class="status-icons">📶 📡 🔋</span></div>
+
+  <div class="header">
+    <button class="back-btn" id="backBtn">←</button>
+    <div class="header-text">
+      <p class="header-title">Amenities adicionales</p>
+      <p class="header-subtitle">Atención a Suite • Housekeeping</p>
+    </div>
+    <span class="room-badge">Suite 405</span>
+  </div>
+
+  <div class="scroll-content" id="scrollContent"></div>
+
+  <div class="cart-bar" id="cartBar">
+    <div class="cart-info"><p class="cart-count" id="cartCount">0 items</p><p class="cart-label">Mi solicitud</p></div>
+    <button class="cart-cta" id="reviewCartBtn">Confirmar solicitud</button>
+  </div>
+
+  <div class="overlay" id="qtyOverlay">
+    <div class="qty-panel" id="qtyPanel"></div>
+  </div>
+
+  <div class="overlay" id="summaryOverlay">
+    <div class="summary-panel">
+      <div class="summary-header">
+        <p class="summary-title">Tu solicitud</p>
+        <button class="summary-close" id="summaryCloseBtn">✕</button>
+      </div>
+      <div class="summary-list" id="summaryList"></div>
+      <button class="summary-send" id="sendRequestBtn">Enviar solicitud a Ama de Llaves</button>
+    </div>
+  </div>
+
+  <div class="success-screen" id="successScreen">
+    <div class="success-icon">✓</div>
+    <p class="success-title">¡Solicitud enviada!</p>
+    <p style="font-size:12.5px; color:var(--text-muted);">Tu solicitud llegó al equipo de Ama de Llaves.</p>
+    <button class="success-btn" id="successBackBtn">Volver a Servicios</button>
+  </div>
+</div>
+
+<script>
+  const CATEGORIES = {
+    'Baño': [
+      ['🧴','Kit de Aseo Premium'], ['🧺','Juego de Toallas'], ['🥋','Batas de baño'],
+      ['🥿','Pantuflas'], ['🪒','Kit de afeitar'], ['🦷','Kit dental'], ['💨','Secador de pelo']
+    ],
+    'Habitación': [
+      ['🛏️','Almohadas Extra'], ['☕','Set de Café & Té'], ['🧣','Cobijas extra'],
+      ['👔','Perchas adicionales'], ['🔌','Plancha y tabla'], ['🔋','Cargador universal']
+    ]
+  };
+
+  const cart = {}; // { name: { icon, qty, note } }
+  let activeItem = null;
+
+  // Render de las categorías
+  const scrollContent = document.getElementById('scrollContent');
+  Object.entries(CATEGORIES).forEach(([cat, items]) => {
+    const section = document.createElement('div');
+    const title = document.createElement('p');
+    title.className = 'section-title';
+    title.textContent = cat;
+    section.appendChild(title);
+
+    const grid = document.createElement('div');
+    grid.className = 'item-grid';
+    items.forEach(([icon, name]) => {
+      const card = document.createElement('div');
+      card.className = 'item-card';
+      card.innerHTML = `
+        <div class="item-top">
+          <span class="item-emoji">${icon}</span>
+          <button class="pedir-btn" data-name="${name}" data-icon="${icon}">+ Pedir</button>
+        </div>
+        <p class="item-name">${name}</p>
+      `;
+      grid.appendChild(card);
+    });
+    section.appendChild(grid);
+    scrollContent.appendChild(section);
+  });
+
+  function updateButtons() {
+    document.querySelectorAll('.pedir-btn').forEach(btn => {
+      const inCart = !!cart[btn.dataset.name];
+      btn.textContent = inCart ? `✓ ${cart[btn.dataset.name].qty}` : '+ Pedir';
+      btn.classList.toggle('added', inCart);
+    });
+  }
+
+  // Abrir overlay de cantidad al tocar "+Pedir"
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.pedir-btn');
+    if (!btn) return;
+    activeItem = { name: btn.dataset.name, icon: btn.dataset.icon };
+    openQtyOverlay();
+  });
+
+  function openQtyOverlay() {
+    const existing = cart[activeItem.name];
+    let qty = existing ? existing.qty : 1;
+    document.getElementById('qtyPanel').innerHTML = `
+      <div class="qty-icon">${activeItem.icon}</div>
+      <p class="qty-name">${activeItem.name}</p>
+      <div class="qty-control">
+        <button class="qty-btn" id="qtyMinus">−</button>
+        <span class="qty-value" id="qtyValue">${qty}</span>
+        <button class="qty-btn" id="qtyPlus">+</button>
+      </div>
+      <input type="text" class="qty-note" id="qtyNote" placeholder="Nota opcional (ej: sin fragancia)" value="${existing?.note || ''}">
+      <button class="qty-confirm" id="qtyConfirmBtn">Agregar a mi solicitud</button>
+      <button class="qty-cancel" id="qtyCancelBtn">Cancelar</button>
+    `;
+    document.getElementById('qtyMinus').addEventListener('click', () => { qty = Math.max(1, qty - 1); document.getElementById('qtyValue').textContent = qty; });
+    document.getElementById('qtyPlus').addEventListener('click', () => { qty += 1; document.getElementById('qtyValue').textContent = qty; });
+    document.getElementById('qtyCancelBtn').addEventListener('click', closeQtyOverlay);
+    document.getElementById('qtyConfirmBtn').addEventListener('click', () => {
+      const note = document.getElementById('qtyNote').value.trim();
+      cart[activeItem.name] = { icon: activeItem.icon, qty, note };
+      closeQtyOverlay();
+      updateButtons();
+      updateCartBar();
+    });
+    document.getElementById('qtyOverlay').classList.add('open');
+  }
+  function closeQtyOverlay() { document.getElementById('qtyOverlay').classList.remove('open'); }
+  document.getElementById('qtyOverlay').addEventListener('click', (e) => { if (e.target.id === 'qtyOverlay') closeQtyOverlay(); });
+
+  function updateCartBar() {
+    const items = Object.keys(cart);
+    const totalQty = items.reduce((s, k) => s + cart[k].qty, 0);
+    document.getElementById('cartCount').textContent = totalQty + (totalQty === 1 ? ' item' : ' items');
+    document.getElementById('cartBar').classList.toggle('visible', items.length > 0);
+  }
+
+  // Overlay de resumen final
+  document.getElementById('reviewCartBtn').addEventListener('click', () => {
+    const list = document.getElementById('summaryList');
+    list.innerHTML = Object.entries(cart).map(([name, data]) => `
+      <div class="summary-row" data-name="${name}">
+        <div>
+          <p class="summary-row-name">${data.icon} ${name}</p>
+          <p class="summary-row-qty">Cantidad: ${data.qty}${data.note ? ' · ' + data.note : ''}</p>
+        </div>
+        <button class="summary-remove" data-remove="${name}">Quitar</button>
+      </div>
+    `).join('');
+    document.querySelectorAll('[data-remove]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        delete cart[btn.dataset.remove];
+        updateButtons();
+        updateCartBar();
+        document.getElementById('reviewCartBtn').click(); // re-render resumen
+        if (Object.keys(cart).length === 0) document.getElementById('summaryOverlay').classList.remove('open');
+      });
+    });
+    document.getElementById('summaryOverlay').classList.add('open');
+  });
+  document.getElementById('summaryCloseBtn').addEventListener('click', () => document.getElementById('summaryOverlay').classList.remove('open'));
+
+  // Envío final: UNA sola solicitud combinada
+  document.getElementById('sendRequestBtn').addEventListener('click', () => {
+    const items = Object.entries(cart);
+    if (items.length === 0) return;
+
+    const request = {
+      id: 'REQ-' + Date.now(),
+      service: 'amenities-adicionales',
+      title: 'Amenities adicionales',
+      dept: '🧺 Ama de Llaves',
+      room: '405',
+      roomType: 'Suite Deluxe',
+      guestName: 'Sr Snick',
+      items: items.map(([name, d]) => `${d.qty}x ${name}${d.note ? ' (' + d.note + ')' : ''}`).join(', '),
+      status: 'pendiente',
+      createdAt: new Date().toISOString()
+    };
+    const existing = JSON.parse(localStorage.getItem('hotelife_service_requests') || '[]');
+    existing.unshift(request);
+    localStorage.setItem('hotelife_service_requests', JSON.stringify(existing));
+
+    document.getElementById('summaryOverlay').classList.remove('open');
+    document.getElementById('successScreen').classList.add('visible');
+    console.log('Solicitud combinada guardada:', request);
+  });
+
+  document.getElementById('successBackBtn').addEventListener('click', () => { window.location.href = 'servicios.html'; });
+  document.getElementById('backBtn').addEventListener('click', () => { window.location.href = 'servicios.html'; });
+</script>
+
+<script src="js/nav.js"></script>
+</body>
+</html>

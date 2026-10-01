@@ -332,6 +332,7 @@
     cursor:pointer;
   }
 </style>
+<link rel="stylesheet" href="css/responsive.css">
 </head>
 <body>
 
@@ -344,7 +345,7 @@
   <div class="header-bar">
     <button class="icon-btn" aria-label="Notificaciones">🔔</button>
     <p class="logo-mini">HOTELIFE</p>
-    <button class="profile-btn">Perfil 👤</button>
+    <a class="profile-btn" href="perfil.html" style="text-decoration:none;">Perfil 👤</a>
   </div>
 
   <div class="scroll-content">
@@ -401,7 +402,7 @@
   <div class="services-section">
     <p class="services-title">Servicios rápidos</p>
     <div class="services-scroll">
-      <a class="service-card" href="#" data-service="room-service">
+      <a class="service-card" href="room-service.html" data-service="room-service">
         <div class="card-header">
           <span class="card-emoji">🍽️</span>
         </div>
@@ -529,16 +530,7 @@
           <button class="chat-close" id="chatClose" aria-label="Cerrar chat">✕</button>
         </div>
       </div>
-      <div class="chat-messages">
-        <div class="chat-msg received">
-          <p>¡Bienvenido, Sr Snick! Soy Concierge HOTELIFE, ¿en qué puedo ayudarte hoy?</p>
-          <span class="chat-time">10:14 AM</span>
-        </div>
-        <div class="chat-msg received">
-          <p>Tu reserva de spa quedó confirmada para las 5:00 PM.</p>
-          <span class="chat-time">10:17 AM</span>
-        </div>
-      </div>
+      <div class="chat-messages" id="chatMessages"></div>
       <div class="chat-input-row">
         <input type="text" placeholder="Escribe un mensaje..." class="chat-input" id="chatInput">
         <button class="chat-send" id="chatSend" aria-label="Enviar mensaje">➤</button>
@@ -568,29 +560,72 @@
 
   document.querySelectorAll('.service-card').forEach(card => {
     card.addEventListener('click', (e) => {
-      e.preventDefault();
       if (card.dataset.service === 'mas-servicios') {
+        e.preventDefault();
         document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
         document.querySelector('[data-tab="servicios"]').classList.add('active');
         console.log('Navegando al catálogo completo de servicios');
         return;
       }
+      if (card.dataset.service === 'room-service') {
+        return; // navegación real vía href, no se bloquea
+      }
+      e.preventDefault();
       console.log('Servicio seleccionado:', card.dataset.service);
     });
   });
 
-  // Chat flotante: abrir/cerrar overlay
+  // Chat flotante: abrir/cerrar overlay, conectado al hilo compartido con Recepción
   const chatFab = document.getElementById('chatFab');
   const chatOverlay = document.getElementById('chatOverlay');
   const chatClose = document.getElementById('chatClose');
   const chatBadge = document.getElementById('chatBadge');
-  const chatMessages = document.querySelector('.chat-messages');
+  const chatMessages = document.getElementById('chatMessages');
   const chatInput = document.getElementById('chatInput');
   const chatSend = document.getElementById('chatSend');
+
+  const ROOM_ID = '405';
+  const THREADS_KEY = 'hotelife_chat_threads';
+
+  function loadThreads() {
+    return JSON.parse(localStorage.getItem(THREADS_KEY) || '{}');
+  }
+  function saveThreads(threads) {
+    localStorage.setItem(THREADS_KEY, JSON.stringify(threads));
+  }
+  function ensureThread() {
+    const threads = loadThreads();
+    if (!threads[ROOM_ID]) {
+      threads[ROOM_ID] = {
+        guestName: 'Sr Snick',
+        roomType: 'Suite Deluxe',
+        unreadForReception: 0,
+        messages: [
+          { sender: 'reception', text: '¡Bienvenido, Sr Snick! Soy Concierge HOTELIFE, ¿en qué puedo ayudarte hoy?', time: '10:14 AM' },
+          { sender: 'reception', text: 'Tu reserva de spa quedó confirmada para las 5:00 PM.', time: '10:17 AM' }
+        ]
+      };
+      saveThreads(threads);
+    }
+    return threads;
+  }
+
+  function renderMessages() {
+    const threads = ensureThread();
+    const thread = threads[ROOM_ID];
+    chatMessages.innerHTML = thread.messages.map(m => `
+      <div class="chat-msg ${m.sender === 'reception' ? 'received' : 'sent'}">
+        <p>${m.text}</p>
+        <span class="chat-time">${m.time}</span>
+      </div>
+    `).join('');
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
 
   function openChat(){
     chatOverlay.classList.add('open');
     chatBadge.classList.add('hidden'); // se limpia el indicador al abrir el chat
+    renderMessages();
   }
   function closeChat(){
     chatOverlay.classList.remove('open');
@@ -605,11 +640,13 @@
   function sendMessage(){
     const text = chatInput.value.trim();
     if (!text) return;
-    const msg = document.createElement('div');
-    msg.className = 'chat-msg sent';
-    msg.innerHTML = `<p>${text}</p><span class="chat-time">Ahora</span>`;
-    chatMessages.appendChild(msg);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+    const threads = ensureThread();
+    const now = new Date();
+    const time = now.toLocaleTimeString('es-CO', { hour: 'numeric', minute: '2-digit' });
+    threads[ROOM_ID].messages.push({ sender: 'guest', text, time });
+    threads[ROOM_ID].unreadForReception = (threads[ROOM_ID].unreadForReception || 0) + 1;
+    saveThreads(threads);
+    renderMessages();
     chatInput.value = '';
   }
   chatSend.addEventListener('click', sendMessage);
@@ -638,7 +675,10 @@
   document.getElementById('aboutBtn').addEventListener('click', () => {
     console.log('Navegando a Sobre nosotros');
   });
+
+  ensureThread(); // crea el hilo de chat compartido con recepción desde que carga la página
 </script>
 
+<script src="js/nav.js"></script>
 </body>
 </html>
