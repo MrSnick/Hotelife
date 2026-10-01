@@ -122,7 +122,7 @@ Como regla general del proyecto, **la interactividad real vive en el código**, 
 - Integración con el PMS del hotel (Opera, Cloudbeds, etc.) o actualización manual por el staff
 
 **Técnicas:**
-- Modo Privacidad ("No Molestar"): el estado se guarda en `localStorage` (`hotelife_privacy`), pero el Dashboard de recepción todavía no lo muestra
+- Modo Privacidad ("No Molestar"): se guarda en `localStorage` (`hotelife_privacy`) y el Dashboard de recepción lo muestra; las apps de staff (Ama de Llaves, Mantenimiento) todavía no lo muestran
 - El "adjuntar foto" en Mantenimiento es solo un estado visual simulado, sin `<input type="file">` real
 - El QR de pago (`pago-qr.html`) es un patrón visual, no un código real escaneable
 - La tarifa de habitación NO se paga dentro de la app (removido intencionalmente) — falta definir dónde se paga

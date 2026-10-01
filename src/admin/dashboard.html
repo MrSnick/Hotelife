@@ -145,6 +145,16 @@
   .activity-text b{ font-weight:700; }
   .activity-time{ font-size:11px; color: var(--text-muted); margin-top:2px; }
 
+  /* Modo Privacidad / No Molestar (lo activa el huésped desde Inicio o Perfil) */
+  .dnd-count{ font-size:11px; font-weight:700; color: var(--red); background: rgba(181,87,58,0.12); padding:4px 9px; border-radius:8px; }
+  .dnd-count.zero{ color: var(--text-muted); background: var(--bg); }
+  .dnd-item{ display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid var(--border-light); }
+  .dnd-item:last-child{ border-bottom:none; padding-bottom:0; }
+  .dnd-icon{ width:32px; height:32px; border-radius:10px; background: rgba(181,87,58,0.12); display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; }
+  .dnd-empty{ font-size:12.5px; color: var(--text-muted); }
+  .dnd-flag{ display:inline-block; margin-left:6px; font-size:10px; font-weight:700; color: var(--red); white-space:nowrap; }
+  .panel.dnd-alert{ border-color: var(--red); }
+
   .occupancy-bar-wrap{ display:flex; flex-direction:column; gap:10px; }
   .occupancy-row{ display:flex; align-items:center; gap:10px; }
   .occupancy-label{ font-size:12px; font-weight:600; width:90px; flex-shrink:0; }
@@ -287,6 +297,14 @@
       </div>
 
       <div>
+        <div class="panel" id="dndPanel">
+          <div class="panel-header">
+            <p class="panel-title">🔕 No Molestar</p>
+            <span class="dnd-count zero" id="dndCount">0 habitaciones</span>
+          </div>
+          <div id="dndList"><p class="dnd-empty">Ninguna habitación tiene activo el modo No Molestar.</p></div>
+        </div>
+
         <div class="panel">
           <div class="panel-header">
             <p class="panel-title">Actividad en vivo</p>
@@ -447,10 +465,63 @@
     document.getElementById('kpiUrgentes').textContent = urgent + (urgent === 1 ? ' urgente' : ' urgentes');
   }
 
-  loadRealRequests();
+  // Modo Privacidad: habitaciones que activaron "No Molestar" desde la app del huésped
+  function loadDoNotDisturb() {
+    let privacy = {};
+    try { privacy = JSON.parse(localStorage.getItem('hotelife_privacy') || '{}'); } catch (e) {}
+    const rooms = Object.entries(privacy)
+      .filter(([, p]) => p && p.on)
+      .sort((a, b) => new Date(b[1].updatedAt) - new Date(a[1].updatedAt));
 
-  // Refrescar cada pocos segundos para simular llegada de solicitudes en vivo
-  setInterval(loadRealRequests, 4000);
+    const count = document.getElementById('dndCount');
+    count.textContent = rooms.length + (rooms.length === 1 ? ' habitación' : ' habitaciones');
+    count.classList.toggle('zero', rooms.length === 0);
+    document.getElementById('dndPanel').classList.toggle('dnd-alert', rooms.length > 0);
+
+    document.getElementById('dndList').innerHTML = rooms.length === 0
+      ? '<p class="dnd-empty">Ninguna habitación tiene activo el modo No Molestar.</p>'
+      : rooms.map(([room, p]) => {
+          const since = new Date(p.updatedAt).toLocaleTimeString('es-CO', { hour: 'numeric', minute: '2-digit' });
+          return `
+            <div class="dnd-item">
+              <div class="dnd-icon">🔕</div>
+              <div>
+                <p class="activity-text"><b>${p.guestName || 'Huésped'}</b> · Habitación ${room}</p>
+                <p class="activity-time">Desde las ${since} · No ingresar ni llamar</p>
+              </div>
+            </div>`;
+        }).join('');
+
+    // Marca la habitación en la tabla de solicitudes para que el staff no entre
+    const dndRooms = new Set(rooms.map(([room]) => room));
+    document.querySelectorAll('#requestsTableBody tr').forEach(row => {
+      const pill = row.querySelector('.room-pill');
+      if (!pill) return;
+      let flag = row.querySelector('.dnd-flag');
+      if (dndRooms.has(pill.textContent.trim())) {
+        if (!flag) {
+          flag = document.createElement('span');
+          flag.className = 'dnd-flag';
+          flag.textContent = '🔕 No molestar';
+          pill.after(flag);
+        }
+      } else if (flag) {
+        flag.remove();
+      }
+    });
+  }
+
+  function refresh() {
+    loadRealRequests();
+    loadDoNotDisturb();
+  }
+
+  refresh();
+
+  // Refrescar cada pocos segundos para simular llegada de solicitudes en vivo;
+  // el evento "storage" lo actualiza al instante si el huésped está en otra pestaña
+  setInterval(refresh, 4000);
+  window.addEventListener('storage', refresh);
 </script>
 
 </body>
