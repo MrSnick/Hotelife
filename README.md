@@ -52,6 +52,7 @@ src/
   formulario-documento.html    -> prototipo temprano, duplicado de login.html (candidato a eliminar)
 
 src/admin/
+  login.html                   -> login del staff: correo, contraseña y área; redirige al panel de esa área (sesión simulada en localStorage, sin validar contraseña)
   dashboard.html               -> panel de recepción (escritorio): KPIs, TODAS las solicitudes en vivo
   mensajes.html                -> bandeja de chat con huéspedes, conectada en vivo al chat del huésped
   control-accesos.html         -> escáner de recepción para validar pases de invitados

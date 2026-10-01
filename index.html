@@ -42,6 +42,9 @@
     font-weight:700; font-size:13px; letter-spacing:1px; text-transform:uppercase;
     padding: 16px 28px; border-radius:28px; text-decoration:none;
   }
+  .cta-row{ display:flex; flex-wrap:wrap; justify-content:center; gap:12px; margin-top:28px; }
+  .cta-row .cta{ margin-top:0; }
+  .cta-outline{ background:transparent; color: var(--gold); border:1px solid var(--gold); }
   main{ max-width:1040px; margin:0 auto; padding: 40px 16px 64px; }
   h2{
     font-family:"Cormorant Garamond", serif;
@@ -78,7 +81,10 @@
   <p class="logo">HOTELIFE</p>
   <p class="tagline">Todo a través de un clic</p>
   <p class="intro">Prototipo interactivo: el huésped accede a todos los servicios del hotel desde su celular, y recepción y cada jefe de área atienden esas solicitudes en vivo.</p>
-  <a class="cta" href="src/login.html">Entrar como huésped →</a>
+  <div class="cta-row">
+    <a class="cta" href="src/login.html">Entrar como huésped →</a>
+    <a class="cta cta-outline" href="src/admin/login.html">Entrar como staff</a>
+  </div>
 </header>
 
 <main>
@@ -101,6 +107,7 @@
     <h2>Recepción y staff</h2>
     <p class="section-sub">Paneles que reciben en vivo lo que pide el huésped.</p>
     <div class="grid">
+      <a class="card" href="src/admin/login.html"><span class="card-emoji">🔐</span><div><p class="card-title">Ingreso del staff</p><p class="card-desc">Login por área: lleva al panel de cada jefe</p></div></a>
       <a class="card" href="src/admin/dashboard.html"><span class="card-emoji">📊</span><div><p class="card-title">Dashboard de recepción</p><p class="card-desc">KPIs y todas las solicitudes</p></div></a>
       <a class="card" href="src/admin/mensajes.html"><span class="card-emoji">💬</span><div><p class="card-title">Mensajes</p><p class="card-desc">Chat con huéspedes</p></div></a>
       <a class="card" href="src/admin/control-accesos.html"><span class="card-emoji">🛂</span><div><p class="card-title">Control de accesos</p><p class="card-desc">Validar pases de invitados</p></div></a>

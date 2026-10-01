@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HOTELIFE Admin — Iniciar sesión</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy: #1a222d; --navy-light: #232d3a; --gold: #d4b285; --bg: #f4f2ed;
+    --border-light: #e5e1d8; --text-muted: rgba(26,34,45,0.6); --red: #b5573a;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{
+    font-family: "Manrope", -apple-system, sans-serif;
+    min-height: 100vh; display:flex; align-items:center; justify-content:center;
+    background: linear-gradient(160deg, var(--navy) 0%, #0d1218 100%);
+    padding: 24px; color: var(--navy);
+  }
+
+  .card{
+    width:100%; max-width: 420px; background:#fff; border-radius: 24px;
+    padding: 40px 36px; box-shadow: 0 30px 60px -15px rgba(0,0,0,0.4);
+  }
+
+  .logo{ text-align:center; margin-bottom: 8px; }
+  .logo-text{ font-family:"Cormorant Garamond", serif; font-weight:700; font-size: 28px; letter-spacing: 2px; color: var(--navy); }
+  .logo-sub{ font-size: 10px; font-weight:700; letter-spacing: 1.5px; color: var(--gold); margin-top: 2px; text-transform: uppercase; }
+
+  .subtitle{ text-align:center; font-size:13px; color: var(--text-muted); margin: 14px 0 28px; }
+
+  .form-field{ margin-bottom: 16px; }
+  .form-field label{ display:block; font-size: 11px; font-weight:700; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.3px; }
+  .form-field input, .form-field select{
+    width:100%; height: 46px; border: 1px solid var(--border-light); border-radius: 12px;
+    padding: 0 14px; font-family: inherit; font-size: 14px; outline:none; color: var(--navy); background:#fff;
+  }
+  .form-field input:focus, .form-field select:focus{ border-color: var(--gold); }
+  .form-field select{ cursor:pointer; }
+
+  .row-between{ display:flex; align-items:center; justify-content:space-between; margin: -4px 0 20px; }
+  .remember{ display:flex; align-items:center; gap:7px; font-size:12px; color: var(--text-muted); }
+  .remember input{ accent-color: var(--navy); }
+  .forgot-link{ font-size:12px; font-weight:700; color: var(--navy); text-decoration:none; }
+
+  .login-btn{
+    width:100%; height: 50px; border-radius: 14px; background: var(--navy); border:none;
+    font-weight:700; font-size: 13px; text-transform:uppercase; letter-spacing: 0.5px;
+    color: var(--gold); cursor:pointer; margin-bottom: 10px;
+  }
+  .login-btn:active{ filter:brightness(1.15); }
+
+  .error-msg{
+    display:none; background: rgba(181,87,58,0.1); border:1px solid var(--red); color: var(--red);
+    font-size: 12px; font-weight:600; padding: 10px 12px; border-radius: 10px; margin-bottom: 16px; text-align:center;
+  }
+  .error-msg.visible{ display:block; }
+
+  .footer-note{ text-align:center; font-size: 11px; color: var(--text-muted); margin-top: 20px; }
+
+  /* Celulares pequeños: menos relleno para que el formulario respire */
+  @media (max-width: 420px){
+    body{ padding: 16px; }
+    .card{ padding: 32px 22px; }
+    .row-between{ flex-wrap:wrap; gap:8px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="logo">
+    <p class="logo-text">HOTELIFE</p>
+    <p class="logo-sub">Panel de administración</p>
+  </div>
+  <p class="subtitle">Inicia sesión con tu cuenta de staff</p>
+
+  <div class="error-msg" id="errorMsg">Completa tu correo, contraseña y selecciona tu área.</div>
+
+  <form id="loginForm">
+    <div class="form-field">
+      <label>Correo corporativo</label>
+      <input type="email" id="emailInput" placeholder="nombre@hotelife.com">
+    </div>
+    <div class="form-field">
+      <label>Contraseña</label>
+      <input type="password" id="passwordInput" placeholder="••••••••">
+    </div>
+    <div class="form-field">
+      <label>Tu área</label>
+      <select id="roleSelect">
+        <option value="" disabled selected>Selecciona tu área</option>
+        <option value="recepcion">🏨 Recepción</option>
+        <option value="mantenimiento">🔧 Mantenimiento</option>
+        <option value="amadellaves">🧺 Ama de Llaves</option>
+        <option value="ayb">🍽️ Alimentos y Bebidas</option>
+        <option value="spa">🧖‍♀️ Spa &amp; Wellness</option>
+        <option value="conserjeria">🧭 Conserjería</option>
+      </select>
+    </div>
+
+    <div class="row-between">
+      <label class="remember"><input type="checkbox"> Recordarme</label>
+      <a href="#" class="forgot-link" id="forgotLink">¿Olvidaste tu contraseña?</a>
+    </div>
+
+    <button type="submit" class="login-btn">Iniciar sesión</button>
+  </form>
+
+  <p class="footer-note">Acceso exclusivo para personal autorizado de HOTELIFE</p>
+</div>
+
+<script>
+  const ROUTES = {
+    recepcion: 'dashboard.html',
+    mantenimiento: 'staff-mantenimiento.html',
+    amadellaves: 'staff-amadellaves.html',
+    ayb: 'staff-ayb.html',
+    spa: 'staff-spa.html',
+    conserjeria: 'staff-conserjeria.html'
+  };
+
+  const ROLE_LABELS = {
+    recepcion: 'Recepción', mantenimiento: 'Jefe de Mantenimiento', amadellaves: 'Jefa de Ama de Llaves',
+    ayb: 'Jefe de Alimentos y Bebidas', spa: 'Jefe de Spa & Wellness', conserjeria: 'Jefe de Conserjería'
+  };
+
+  document.getElementById('loginForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = document.getElementById('emailInput').value.trim();
+    const password = document.getElementById('passwordInput').value.trim();
+    const role = document.getElementById('roleSelect').value;
+    const errorMsg = document.getElementById('errorMsg');
+
+    if (!email || !password || !role) {
+      errorMsg.classList.add('visible');
+      return;
+    }
+    errorMsg.classList.remove('visible');
+
+    // Guardar la sesión simulada para que los paneles puedan saber quién inició sesión
+    // (prototipo: no se valida la contraseña ni se guarda en ningún lado)
+    localStorage.setItem('hotelife_staff_session', JSON.stringify({
+      email, role, roleLabel: ROLE_LABELS[role], loginAt: new Date().toISOString()
+    }));
+
+    console.log('Sesión iniciada como', ROLE_LABELS[role]);
+    window.location.href = ROUTES[role];
+  });
+
+  document.getElementById('forgotLink').addEventListener('click', (e) => {
+    e.preventDefault();
+    console.log('Flujo de recuperación de contraseña (no implementado)');
+  });
+</script>
+
+</body>
+</html>
