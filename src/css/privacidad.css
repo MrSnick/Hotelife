@@ -1,0 +1,24 @@
+/* HOTELIFE — tarjeta "Modo Privacidad" (Inicio y Perfil) */
+.privacy-card{
+  background:#1a222d;
+  border:1px solid #d4b285;
+  border-radius:18px;
+  padding:14px 16px;
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  color:#fff;
+}
+.privacy-title{ font-weight:700; font-size:13px; }
+.privacy-sub{ font-size:10.5px; font-weight:700; color:#d4b285; margin-top:2px; }
+.privacy-toggle{
+  width:44px; height:26px; border-radius:13px; flex-shrink:0;
+  border:1.5px solid #d4b285; background:transparent;
+  position:relative; cursor:pointer; padding:0;
+  transition:background .2s;
+}
+.privacy-toggle::after{
+  content:""; position:absolute; top:3px; left:3px;
+  width:17px; height:17px; border-radius:50%;
+  background:#d4b285; transition:left .2s;
+}
+.privacy-toggle.on{ background:#d4b285; }
+.privacy-toggle.on::after{ left:21px; background:#1a222d; }

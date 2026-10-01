@@ -119,11 +119,13 @@
     localStorage.setItem('hotelife_service_requests', JSON.stringify(existing));
 
     console.log('Solicitud de coordinación guardada:', request);
+    HotelifeConfirm.show();
   });
 
   document.getElementById('backBtn').addEventListener('click', () => { window.location.href = 'servicios.html'; });
 </script>
 
+<script src="js/confirmacion.js"></script>
 <script src="js/nav.js"></script>
 </body>
 </html>

@@ -74,11 +74,6 @@
   .summary-remove{ font-size:11px; font-weight:700; color:#b5573a; background:none; border:none; cursor:pointer; }
   .summary-send{ width:100%; height:50px; border-radius:16px; background:var(--gold); border:none; font-weight:700; font-size:13px; text-transform:uppercase; color:var(--navy); cursor:pointer; }
 
-  .success-screen{ position:absolute; inset:0; background:var(--bg-outer); display:none; flex-direction:column; align-items:center; justify-content:center; gap:14px; padding:40px; text-align:center; z-index:40; }
-  .success-screen.visible{ display:flex; }
-  .success-icon{ width:64px; height:64px; border-radius:32px; background:var(--navy); border:1.6px solid var(--gold); display:flex; align-items:center; justify-content:center; font-size:28px; color:var(--gold); }
-  .success-title{ font-family:"Cormorant Garamond", serif; font-weight:700; font-size:20px; }
-  .success-btn{ margin-top:10px; height:46px; padding:0 24px; border-radius:16px; background:var(--navy); border:none; font-weight:700; font-size:12px; color:var(--gold); cursor:pointer; }
 </style>
 <link rel="stylesheet" href="css/responsive.css">
 </head>
@@ -90,8 +85,8 @@
   <div class="header">
     <button class="back-btn" id="backBtn">←</button>
     <div class="header-text">
-      <p class="header-title">Amenities adicionales</p>
-      <p class="header-subtitle">Atención a Suite • Housekeeping</p>
+      <p class="header-title" id="headerTitle">Amenities adicionales</p>
+      <p class="header-subtitle" id="headerSubtitle">Atención a Suite • Housekeeping</p>
     </div>
     <span class="room-badge">Suite 405</span>
   </div>
@@ -99,7 +94,7 @@
   <div class="scroll-content" id="scrollContent"></div>
 
   <div class="cart-bar" id="cartBar">
-    <div class="cart-info"><p class="cart-count" id="cartCount">0 items</p><p class="cart-label">Mi solicitud</p></div>
+    <div class="cart-info"><p class="cart-count" id="cartCount">0 items</p><p class="cart-label" id="cartLabel">Mi solicitud</p></div>
     <button class="cart-cta" id="reviewCartBtn">Confirmar solicitud</button>
   </div>
 
@@ -114,29 +109,58 @@
         <button class="summary-close" id="summaryCloseBtn">✕</button>
       </div>
       <div class="summary-list" id="summaryList"></div>
-      <button class="summary-send" id="sendRequestBtn">Enviar solicitud a Ama de Llaves</button>
+      <button class="summary-send" id="sendRequestBtn">Enviar solicitud</button>
     </div>
-  </div>
-
-  <div class="success-screen" id="successScreen">
-    <div class="success-icon">✓</div>
-    <p class="success-title">¡Solicitud enviada!</p>
-    <p style="font-size:12.5px; color:var(--text-muted);">Tu solicitud llegó al equipo de Ama de Llaves.</p>
-    <button class="success-btn" id="successBackBtn">Volver a Servicios</button>
   </div>
 </div>
 
 <script>
-  const CATEGORIES = {
-    'Baño': [
-      ['🧴','Kit de Aseo Premium'], ['🧺','Juego de Toallas'], ['🥋','Batas de baño'],
-      ['🥿','Pantuflas'], ['🪒','Kit de afeitar'], ['🦷','Kit dental'], ['💨','Secador de pelo']
-    ],
-    'Habitación': [
-      ['🛏️','Almohadas Extra'], ['☕','Set de Café & Té'], ['🧣','Cobijas extra'],
-      ['👔','Perchas adicionales'], ['🔌','Plancha y tabla'], ['🔋','Cargador universal']
-    ]
+  // Misma pantalla para dos catálogos: Amenities (por defecto) y Minibar (?catalog=minibar),
+  // igual que en Figma, donde Minibar usa el mismo patrón de catálogo + carrito.
+  const CATALOGS = {
+    amenities: {
+      service: 'amenities-adicionales',
+      title: 'Amenities adicionales',
+      subtitle: 'Atención a Suite • Housekeeping',
+      cartLabel: 'Mi solicitud',
+      cartCta: 'Confirmar solicitud',
+      categories: {
+        'Baño': [
+          ['🧴','Kit de Aseo Premium'], ['🧺','Juego de Toallas'], ['🥋','Batas de baño'],
+          ['🥿','Pantuflas'], ['🪒','Kit de afeitar'], ['🦷','Kit dental'], ['💨','Secador de pelo']
+        ],
+        'Habitación': [
+          ['🛏️','Almohadas Extra'], ['☕','Set de Café & Té'], ['🧣','Cobijas extra'],
+          ['👔','Perchas adicionales'], ['🔌','Plancha y tabla'], ['🔋','Cargador universal']
+        ]
+      }
+    },
+    minibar: {
+      service: 'minibar',
+      title: 'Minibar',
+      subtitle: 'Reposición del minibar',
+      cartLabel: 'Mi pedido',
+      cartCta: 'Confirmar pedido',
+      categories: {
+        'Bebidas': [
+          ['💧','Agua embotellada'], ['🥤','Gaseosa'], ['🍺','Cerveza'],
+          ['🍷','Vino (botella pequeña)'], ['🥃','Licor miniatura'], ['🍊','Jugo natural']
+        ],
+        'Snacks': [
+          ['🍟','Papas fritas'], ['🥜','Maní / frutos secos'], ['🍫','Chocolate'], ['🍪','Galletas']
+        ]
+      }
+    }
   };
+  const catalogKey = new URLSearchParams(location.search).get('catalog');
+  const CATALOG = CATALOGS[catalogKey] || CATALOGS.amenities;
+  const CATEGORIES = CATALOG.categories;
+
+  document.title = 'HOTELIFE — ' + CATALOG.title;
+  document.getElementById('headerTitle').textContent = CATALOG.title;
+  document.getElementById('headerSubtitle').textContent = CATALOG.subtitle;
+  document.getElementById('cartLabel').textContent = CATALOG.cartLabel;
+  document.getElementById('reviewCartBtn').textContent = CATALOG.cartCta;
 
   const cart = {}; // { name: { icon, qty, note } }
   let activeItem = null;
@@ -253,8 +277,8 @@
 
     const request = {
       id: 'REQ-' + Date.now(),
-      service: 'amenities-adicionales',
-      title: 'Amenities adicionales',
+      service: CATALOG.service,
+      title: CATALOG.title,
       dept: '🧺 Ama de Llaves',
       room: '405',
       roomType: 'Suite Deluxe',
@@ -268,14 +292,14 @@
     localStorage.setItem('hotelife_service_requests', JSON.stringify(existing));
 
     document.getElementById('summaryOverlay').classList.remove('open');
-    document.getElementById('successScreen').classList.add('visible');
+    HotelifeConfirm.show();
     console.log('Solicitud combinada guardada:', request);
   });
 
-  document.getElementById('successBackBtn').addEventListener('click', () => { window.location.href = 'servicios.html'; });
   document.getElementById('backBtn').addEventListener('click', () => { window.location.href = 'servicios.html'; });
 </script>
 
+<script src="js/confirmacion.js"></script>
 <script src="js/nav.js"></script>
 </body>
 </html>

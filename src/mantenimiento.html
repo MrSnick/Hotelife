@@ -364,6 +364,7 @@
     console.log('Solicitud de mantenimiento guardada:', request);
     document.getElementById('submitBtn').textContent = '✓ Solicitud enviada';
     document.getElementById('submitBtn').disabled = true;
+    HotelifeConfirm.show();
   });
 
   document.querySelectorAll('.nav-item').forEach(btn => {
@@ -379,6 +380,7 @@
   });
 </script>
 
+<script src="js/confirmacion.js"></script>
 <script src="js/nav.js"></script>
 </body>
 </html>

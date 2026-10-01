@@ -96,6 +96,7 @@
   .nav-item.active{ color: var(--gold); opacity:1; }
   .nav-icon{ font-size:16px; }
 </style>
+<link rel="stylesheet" href="css/privacidad.css">
 <link rel="stylesheet" href="css/responsive.css">
 </head>
 <body>
@@ -115,6 +116,14 @@
       <p class="profile-name">Sr Snick</p>
       <p class="profile-room">Habitación 405 · Suite Deluxe</p>
       <span class="profile-tier">✦ HUÉSPED GOLD</span>
+    </div>
+
+    <div class="privacy-card" data-privacy-card>
+      <div>
+        <p class="privacy-title">Modo Privacidad</p>
+        <p class="privacy-sub">Activar "No Molestar" en recepción</p>
+      </div>
+      <button class="privacy-toggle" role="switch" aria-checked="false" aria-label="Modo Privacidad"></button>
     </div>
 
     <div>
@@ -233,5 +242,6 @@
 </script>
 
 <script src="js/nav.js"></script>
+<script src="js/privacidad.js"></script>
 </body>
 </html>

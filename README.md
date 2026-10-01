@@ -42,6 +42,7 @@ src/
   mantenimiento.html           -> reporte de problema técnico (categoría, foto, urgencia, acceso)
   room-service.html            -> menú de Room Service con carrito y pedido real
   amenities.html                -> catálogo de amenities (Baño/Habitación) con carrito y pedido real
+  (amenities.html?catalog=minibar -> mismo patrón para Minibar)
   accesos-invitados.html       -> el huésped autoriza invitados (aforo, formulario, lista con estados)
   mi-pase-acceso.html          -> pase QR del invitado (bloqueado hasta que recepción lo valide)
   servicio-solicitud.html      -> PLANTILLA genérica (?service=xxx) — 11 servicios tipo formulario simple
@@ -68,12 +69,12 @@ En vez de 27 archivos distintos para los 27 servicios restantes del catálogo (m
 
 | Plantilla | Ejemplo de uso | Sirve a |
 |---|---|---|
-| `servicio-solicitud.html?service=lavanderia` | Formulario corto (1-2 campos) + enviar | Housekeeping, Lavandería, Minibar(*), Late check-out, Caja fuerte, Valet, Equipaje, Mascotas, Médico, WiFi |
+| `servicio-solicitud.html?service=lavanderia` | Formulario corto (1-2 campos) + enviar | Housekeeping(*), Lavandería, Late check-out, Caja fuerte, Valet, Equipaje, Mascotas, Médico, WiFi |
 | `servicio-menu.html?service=bar` | Catálogo con carrito, como Room Service | Bar, Desayuno, Tienda del hotel |
 | `servicio-reserva.html?service=spa` | Selección de opción + fecha + hora | Spa, Gimnasio, Piscina, Sauna, Clases, Restaurante, Salones, Centro de negocios |
 | `servicio-coordinacion.html?service=traslados` | Formulario + aviso de que Conserjería coordina por chat | Traslados, Alquiler de vehículos, Tours, Entradas, Niñera |
 
-`(*) Minibar en código sigue usando la plantilla de formulario simple (un textarea libre). En Figma, Minibar ya se rediseñó con catálogo de productos + carrito, igual que Amenities — ese rediseño todavía NO se trasladó al código. Ver pendientes.`
+`(*) Housekeeping además tiene el bloque "Programar Limpieza de Suite" con selector de hora, como en Figma. Minibar ya no usa esta plantilla: usa el mismo catálogo + carrito de Amenities (`amenities.html?catalog=minibar`).`
 
 Cada fila del catálogo (`servicios.html`) ya tiene su `href` apuntando a la plantilla + parámetro correcto.
 
@@ -121,7 +122,7 @@ Como regla general del proyecto, **la interactividad real vive en el código**, 
 - Integración con el PMS del hotel (Opera, Cloudbeds, etc.) o actualización manual por el staff
 
 **Técnicas:**
-- Minibar en código sigue con el formulario genérico viejo; en Figma ya tiene el catálogo de productos + carrito nuevo — falta trasladar ese rediseño al código (ver tabla de plantillas arriba)
+- Modo Privacidad ("No Molestar"): el estado se guarda en `localStorage` (`hotelife_privacy`), pero el Dashboard de recepción todavía no lo muestra
 - El "adjuntar foto" en Mantenimiento es solo un estado visual simulado, sin `<input type="file">` real
 - El QR de pago (`pago-qr.html`) es un patrón visual, no un código real escaneable
 - La tarifa de habitación NO se paga dentro de la app (removido intencionalmente) — falta definir dónde se paga
