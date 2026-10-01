@@ -196,7 +196,7 @@
       ticket.querySelector('.ticket-actions').innerHTML = '<button class="btn btn-outline" data-action="ver" style="flex:1;">Ver detalle</button>';
     });
   }
-  document.querySelectorAll('[data-action="completar"]').forEach(attachCompleteHandler);
+  document.querySelectorAll('[data-action="completar"]').forEach(btn => attachCompleteHandler(btn.closest('.ticket')));
   document.querySelectorAll('.nav-item').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
@@ -252,5 +252,6 @@
   loadRealRequests();
 </script>
 
+<script src="../js/no-molestar-staff.js"></script>
 </body>
 </html>

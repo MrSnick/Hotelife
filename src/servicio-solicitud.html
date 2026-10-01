@@ -91,7 +91,7 @@
   const SERVICES = {
     housekeeping: { icon:'🧹', title:'Housekeeping', subtitle:'Limpieza de habitación', desc:'Solicita limpieza de tu habitación en el momento que prefieras.', dept:'🧺 Ama de Llaves',
       schedule:{ title:'🧹 Programar Limpieza de Suite', times:['Ahora','9:00 AM','10:00 AM','11:00 AM','12:00 PM','1:00 PM','2:00 PM','3:00 PM','4:00 PM','5:00 PM'] },
-      fields:[ {label:'Tipo de limpieza', type:'select', options:['Rápida (10 min)','Completa (30 min)']}, {label:'Horario preferido', type:'select', options:['Ahora mismo','En 1 hora','Esta tarde','Mañana temprano']} ] },
+      fields:[ {label:'Tipo de limpieza', type:'select', options:['Rápida (10 min)','Completa (30 min)'], value:'Completa (30 min)'}, {label:'Horario preferido', type:'select', options:['Ahora mismo','En 1 hora','Esta tarde','Mañana temprano'], value:'Esta tarde'} ] },
     'amenities-adicionales': { icon:'🧴', title:'Amenities adicionales', subtitle:'Reposición de artículos de aseo', desc:'Pide toallas, almohadas o kit de aseo extra para tu habitación.', dept:'🧺 Ama de Llaves',
       fields:[ {label:'Artículo', type:'select', options:['Juego de toallas','Almohadas extra','Kit de aseo premium','Set de café & té']} ], quantity:true },
     lavanderia: { icon:'👔', title:'Lavandería y planchado', subtitle:'Servicio de lavandería', desc:'Recogemos tus prendas y las devolvemos limpias el mismo día.', dept:'🧺 Ama de Llaves',
@@ -145,7 +145,7 @@
   } else {
     const fieldsHtml = svc.fields.map((f, i) => {
       if (f.type === 'select') {
-        return `<div class="form-field"><label>${f.label}</label><select data-idx="${i}">${f.options.map(o => `<option>${o}</option>`).join('')}</select></div>`;
+        return `<div class="form-field"><label>${f.label}</label><select data-idx="${i}">${f.options.map(o => `<option${o === f.value ? ' selected' : ''}>${o}</option>`).join('')}</select></div>`;
       }
       if (f.type === 'textarea') {
         return `<div class="form-field"><label>${f.label}</label><textarea data-idx="${i}" placeholder="${f.placeholder || ''}"></textarea></div>`;

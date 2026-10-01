@@ -332,7 +332,7 @@
       console.log('Solicitud marcada como completada');
     });
   }
-  document.querySelectorAll('[data-action="completar"]').forEach(attachCompleteHandler);
+  document.querySelectorAll('[data-action="completar"]').forEach(btn => attachCompleteHandler(btn.closest('.ticket')));
 
   document.querySelectorAll('.nav-item').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -391,5 +391,6 @@
   });
 </script>
 
+<script src="../js/no-molestar-staff.js"></script>
 </body>
 </html>
