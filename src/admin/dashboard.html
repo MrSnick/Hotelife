@@ -253,6 +253,18 @@
   .stat-tile .big{ font-family:"Cormorant Garamond", serif; font-size:30px; font-weight:700; }
   .stat-tile .lbl{ font-size:11px; color: var(--text-muted); text-transform:uppercase; font-weight:700; }
 
+  /* Agenda */
+  .agenda-datebar{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px; flex-wrap:wrap; }
+  .agenda-date-display{ display:flex; align-items:center; gap:10px; font-weight:700; font-size:14px; }
+  .agenda-slot{ background:#fff; border:1px solid var(--border-light); border-radius:14px; padding:14px 16px; display:flex; align-items:center; gap:16px; margin-bottom:10px; }
+  .agenda-slot.free{ border-style:dashed; }
+  .agenda-time{ font-family:"Cormorant Garamond", serif; font-weight:700; font-size:16px; width:110px; flex-shrink:0; }
+  .agenda-slot-body{ flex:1; min-width:0; }
+  .agenda-slot-title{ font-weight:700; font-size:13px; }
+  .agenda-slot-sub{ font-size:11.5px; color: var(--text-muted); margin-top:2px; }
+  .form-textarea{ width:100%; min-height:60px; border:1px solid var(--border-light); border-radius:10px; padding:10px 12px; font-family:inherit; font-size:13px; outline:none; resize:vertical; }
+  .form-input:focus, .form-select:focus, .form-textarea:focus{ border-color: var(--gold); }
+
   /* Perfil de huésped */
   .guest-profile-header{ display:flex; align-items:center; gap:18px; background: var(--navy); border-radius:16px; padding:24px; margin-bottom:20px; color:#fff; }
   .guest-profile-avatar{ width:64px; height:64px; border-radius:18px; background: var(--gold); color: var(--navy); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:22px; flex-shrink:0; }
@@ -309,6 +321,7 @@
     <button class="nav-link" data-view="spa"><span class="icon">🧖‍♀️</span>Spa &amp; Wellness</button>
     <button class="nav-link" data-view="conserjeria"><span class="icon">🧭</span>Conserjería</button>
     <a class="nav-link" href="control-accesos.html" style="text-decoration:none;"><span class="icon">🛂</span>Control de accesos</a>
+    <button class="nav-link" data-view="agenda"><span class="icon">🗓️</span>Agenda</button>
     <button class="nav-link" data-view="reportes"><span class="icon">📈</span>Reportes</button>
     <button class="nav-link" data-view="configuracion"><span class="icon">⚙️</span>Configuración</button>
   </nav>
@@ -576,6 +589,27 @@
       <div id="deptList-conserjeria"></div>
     </section>
 
+    <!-- ========== AGENDA ========== -->
+    <section class="view" id="view-agenda">
+      <div class="view-head">
+        <div class="view-head-text">
+          <p class="topbar-title" style="font-size:19px;">Agenda</p>
+          <p class="subtitle" id="agendaHoursNote">Reservas de huéspedes por recurso, horarios disponibles y ocupados</p>
+        </div>
+        <button class="panel-link" id="agendaNewBtn">+ Nueva reserva</button>
+      </div>
+      <div class="chips-row" id="agendaResourceTabs"></div>
+      <div class="agenda-datebar">
+        <button class="btn btn-outline" id="agendaPrevDay">← Día anterior</button>
+        <div class="agenda-date-display">
+          <span id="agendaDateLabel">Hoy</span>
+          <input type="date" class="form-input" id="agendaDateInput" style="width:auto; height:34px;">
+        </div>
+        <button class="btn btn-outline" id="agendaNextDay">Día siguiente →</button>
+      </div>
+      <div id="agendaList"></div>
+    </section>
+
     <!-- ========== REPORTES ========== -->
     <section class="view" id="view-reportes">
       <div class="view-head">
@@ -766,7 +800,7 @@
   function minutesAgo(iso){ return Math.max(0, Math.round((Date.now() - new Date(iso)) / 60000)); }
 
   /* ============ NAVEGACIÓN ENTRE VISTAS ============ */
-  const VIEW_TITLES = { dashboard:'Dashboard', solicitudes:'Solicitudes', huespedes:'Huéspedes', habitaciones:'Habitaciones', mantenimiento:'Mantenimiento', amadellaves:'Ama de Llaves', ayb:'Alimentos y Bebidas', spa:'Spa & Wellness', conserjeria:'Conserjería', reportes:'Reportes', configuracion:'Configuración' };
+  const VIEW_TITLES = { dashboard:'Dashboard', solicitudes:'Solicitudes', huespedes:'Huéspedes', habitaciones:'Habitaciones', mantenimiento:'Mantenimiento', amadellaves:'Ama de Llaves', ayb:'Alimentos y Bebidas', spa:'Spa & Wellness', conserjeria:'Conserjería', agenda:'Agenda', reportes:'Reportes', configuracion:'Configuración' };
   let currentView = 'dashboard';
   function goToView(view){
     currentView = view;
@@ -1335,6 +1369,186 @@
   }
   const DEPT_LABELS = { amadellaves:'Ama de Llaves', ayb:'Alimentos y Bebidas', spa:'Spa & Wellness', conserjeria:'Conserjería' };
 
+  /* ============ AGENDA ============ */
+  // Reservas de recursos del hotel (no habitaciones): a qué hora está ocupado o libre
+  // cada recurso reservable. También recibe en vivo lo que el huésped reserva desde
+  // servicio-reserva.html (Spa, Salón de Eventos, Centro de Negocios).
+  function isoDate(d){ return d.toISOString().slice(0, 10); }
+  function todayISO(){ return isoDate(new Date()); }
+  function formatAgendaDate(iso){
+    const d = new Date(iso + 'T00:00:00');
+    const label = d.toLocaleDateString('es-CO', { weekday:'long', day:'numeric', month:'long' });
+    return label.charAt(0).toUpperCase() + label.slice(1);
+  }
+
+  const AGENDA_RESOURCES = {
+    spa: { label:'🧖‍♀️ Spa — Masajes y tratamientos', hours:'09:00 – 20:00', services:['spa','gimnasio','piscina','sauna','clases'] },
+    salones: { label:'🏛️ Salón de Eventos', hours:'08:00 – 22:00', services:['salones'] },
+    negocios: { label:'🖨️ Centro de Negocios', hours:'07:00 – 21:00', services:['negocios'] },
+  };
+
+  let agendaSeq = 0;
+  const agendaBookings = [
+    { id:'ag'+(++agendaSeq), resource:'spa', date:todayISO(), start:'07:00', end:'07:45', title:'Yoga matutino', guest:'Sra. Vélez', room:'512', source:'local' },
+    { id:'ag'+(++agendaSeq), resource:'spa', date:todayISO(), start:'10:00', end:'11:00', title:'Masaje relajante', guest:'Sra. Pardo', room:'509', source:'local' },
+    { id:'ag'+(++agendaSeq), resource:'salones', date:todayISO(), start:'15:00', end:'17:00', title:'Salón pequeño — Reunión corporativa', guest:'Sr. Osorio', room:'406', source:'local' },
+    { id:'ag'+(++agendaSeq), resource:'negocios', date:todayISO(), start:'09:00', end:'10:00', title:'Sala de juntas', guest:'Sr Snick', room:'405', source:'local' },
+  ];
+  let agendaResource = 'spa';
+  let agendaDate = todayISO();
+
+  function renderAgendaTabs(){
+    const el = document.getElementById('agendaResourceTabs');
+    if (el.children.length) return; // ya se construyó una vez
+    el.innerHTML = Object.keys(AGENDA_RESOURCES).map(key => `<button class="filter-chip ${key === agendaResource ? 'active' : ''}" data-resource="${key}">${AGENDA_RESOURCES[key].label}</button>`).join('');
+    el.addEventListener('click', (e) => {
+      const chip = e.target.closest('.filter-chip');
+      if (!chip) return;
+      el.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      agendaResource = chip.dataset.resource;
+      renderAgenda();
+    });
+  }
+
+  function renderAgenda(){
+    renderAgendaTabs();
+    const res = AGENDA_RESOURCES[agendaResource];
+    document.getElementById('agendaHoursNote').textContent = 'Horario: ' + res.hours + ' · Reservas de huéspedes por recurso, en vivo';
+    document.getElementById('agendaDateLabel').textContent = formatAgendaDate(agendaDate);
+    document.getElementById('agendaDateInput').value = agendaDate;
+
+    const list = agendaBookings
+      .filter(b => b.resource === agendaResource && b.date === agendaDate)
+      .sort((a, b) => a.start.localeCompare(b.start));
+
+    document.getElementById('agendaList').innerHTML = list.length ? list.map(b => `
+      <div class="agenda-slot">
+        <div class="agenda-time">${b.start}–${b.end}</div>
+        <div class="agenda-slot-body">
+          <p class="agenda-slot-title">${b.title}</p>
+          <p class="agenda-slot-sub">🧑 ${b.guest}${b.room ? ' · Hab. ' + b.room : ''}</p>
+        </div>
+        ${b.source === 'local' ? `<button class="row-action" data-agenda-cancel="${b.id}">Cancelar</button>` : '<span class="dept-pill">Reservado por huésped</span>'}
+      </div>
+    `).join('') : '<p class="empty-note">Sin reservas para este día — todo el horario está disponible.</p>';
+
+    document.querySelectorAll('[data-agenda-cancel]').forEach(btn => {
+      btn.addEventListener('click', () => cancelAgendaBooking(btn.dataset.agendaCancel));
+    });
+  }
+
+  function cancelAgendaBooking(id){
+    const idx = agendaBookings.findIndex(b => b.id === id);
+    if (idx === -1) return;
+    const b = agendaBookings[idx];
+    agendaBookings.splice(idx, 1);
+    renderAgenda();
+    showToast('Reserva de ' + b.guest + ' cancelada');
+  }
+
+  function shiftAgendaDate(days){
+    const d = new Date(agendaDate + 'T00:00:00');
+    d.setDate(d.getDate() + days);
+    agendaDate = isoDate(d);
+    renderAgenda();
+  }
+  document.getElementById('agendaPrevDay').addEventListener('click', () => shiftAgendaDate(-1));
+  document.getElementById('agendaNextDay').addEventListener('click', () => shiftAgendaDate(1));
+  document.getElementById('agendaDateInput').addEventListener('change', (e) => {
+    if (e.target.value) { agendaDate = e.target.value; renderAgenda(); }
+  });
+
+  document.getElementById('agendaNewBtn').addEventListener('click', openNewAgendaModal);
+  function openNewAgendaModal(){
+    document.getElementById('modalTitle').textContent = 'Nueva reserva';
+    document.getElementById('modalBody').innerHTML = `
+      <div class="form-row" style="max-width:none;">
+        <label class="form-label">Recurso</label>
+        <select class="form-select" id="agFormResource">
+          ${Object.keys(AGENDA_RESOURCES).map(k => `<option value="${k}" ${k === agendaResource ? 'selected' : ''}>${AGENDA_RESOURCES[k].label}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-row" style="max-width:none;">
+        <label class="form-label">Huésped</label>
+        <input class="form-input" id="agFormGuest" placeholder="Ej: Sra. Pardo">
+      </div>
+      <div class="form-row" style="max-width:none;">
+        <label class="form-label">Habitación (opcional)</label>
+        <input class="form-input" id="agFormRoom" placeholder="Ej: 509">
+      </div>
+      <div class="form-row" style="max-width:none;">
+        <label class="form-label">Servicio / motivo</label>
+        <input class="form-input" id="agFormTitle" placeholder="Ej: Masaje relajante">
+      </div>
+      <div style="display:flex; gap:10px;">
+        <div class="form-row" style="max-width:none; flex:1;">
+          <label class="form-label">Hora inicio</label>
+          <input type="time" class="form-input" id="agFormStart" value="10:00">
+        </div>
+        <div class="form-row" style="max-width:none; flex:1;">
+          <label class="form-label">Hora fin</label>
+          <input type="time" class="form-input" id="agFormEnd" value="11:00">
+        </div>
+      </div>
+    `;
+    const footer = document.getElementById('modalFooter');
+    footer.innerHTML = '';
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'btn btn-primary';
+    saveBtn.style.flex = '1';
+    saveBtn.textContent = 'Guardar reserva';
+    saveBtn.addEventListener('click', submitNewAgendaBooking);
+    footer.appendChild(saveBtn);
+    const cancelBtn = document.createElement('button');
+    cancelBtn.className = 'btn btn-outline';
+    cancelBtn.textContent = 'Cancelar';
+    cancelBtn.addEventListener('click', closeModal);
+    footer.appendChild(cancelBtn);
+    openModal();
+  }
+  function submitNewAgendaBooking(){
+    const resource = document.getElementById('agFormResource').value;
+    const guest = document.getElementById('agFormGuest').value.trim();
+    const room = document.getElementById('agFormRoom').value.trim();
+    const title = document.getElementById('agFormTitle').value.trim();
+    const start = document.getElementById('agFormStart').value;
+    const end = document.getElementById('agFormEnd').value;
+    if (!guest || !title || !start || !end) { showToast('Completa huésped, servicio y horario'); return; }
+    if (end <= start) { showToast('La hora de fin debe ser después del inicio'); return; }
+    agendaBookings.push({ id:'ag-local-'+Date.now(), resource, date:agendaDate, start, end, title, guest, room, source:'local' });
+    agendaResource = resource;
+    closeModal();
+    renderAgenda();
+    showToast('Reserva agregada');
+  }
+
+  // Convierte lo que guarda servicio-reserva.html ("Hoy 17" / "3:00 PM") al formato de la agenda
+  function parseServicioReservaDate(label){
+    const parts = String(label).trim().split(' ');
+    const dayNum = parseInt(parts[parts.length - 1], 10);
+    const base = new Date();
+    for (let i = 0; i < 7; i++){
+      const d = new Date(base); d.setDate(base.getDate() + i);
+      if (d.getDate() === dayNum) return d;
+    }
+    return base;
+  }
+  function to24h(t){
+    const m = String(t).match(/(\d+):(\d+)\s*([AP]M)/i);
+    if (!m) return '12:00';
+    let h = parseInt(m[1], 10);
+    const min = m[2];
+    const ap = m[3].toUpperCase();
+    if (ap === 'PM' && h !== 12) h += 12;
+    if (ap === 'AM' && h === 12) h = 0;
+    return String(h).padStart(2, '0') + ':' + min;
+  }
+  function addOneHour(hhmm){
+    const [h, m] = hhmm.split(':').map(Number);
+    return String((h + 1) % 24).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+  }
+
   /* ============ REPORTES ============ */
   function renderReportes(){
     const deptCounts = {};
@@ -1518,6 +1732,19 @@
       added = true;
     });
 
+    // Reservas de recursos (Spa, Salón de Eventos, Centro de Negocios) van a la Agenda
+    serviceRequests.filter(r => r.option && r.date && r.time).forEach(r => {
+      if (agendaBookings.some(b => b.id === r.id)) return;
+      const resourceKey = Object.keys(AGENDA_RESOURCES).find(k => AGENDA_RESOURCES[k].services.includes(r.service));
+      if (!resourceKey) return;
+      const start = to24h(r.time);
+      agendaBookings.push({
+        id:r.id, resource:resourceKey, date:isoDate(parseServicioReservaDate(r.date)),
+        start, end:addOneHour(start), title:r.option, guest:r.guestName, room:r.room, source:'shared'
+      });
+      added = true;
+    });
+
     requests.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     return added;
   }
@@ -1528,6 +1755,7 @@
     renderSolicitudes();
     renderMaint();
     Object.keys(DEPT_FLOWS).forEach(renderDeptView);
+    renderAgenda();
     renderReportes();
     if (added) renderDnd();
   }
