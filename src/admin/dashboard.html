@@ -296,6 +296,10 @@
     <button class="nav-link" data-view="huespedes"><span class="icon">🧳</span>Huéspedes</button>
     <button class="nav-link" data-view="habitaciones"><span class="icon">🛏️</span>Habitaciones</button>
     <button class="nav-link" data-view="mantenimiento"><span class="icon">🔧</span>Mantenimiento</button>
+    <a class="nav-link" href="staff-amadellaves.html" style="text-decoration:none;"><span class="icon">🧺</span>Ama de Llaves</a>
+    <a class="nav-link" href="staff-ayb.html" style="text-decoration:none;"><span class="icon">🍽️</span>Alimentos y Bebidas</a>
+    <a class="nav-link" href="staff-spa.html" style="text-decoration:none;"><span class="icon">🧖‍♀️</span>Spa &amp; Wellness</a>
+    <a class="nav-link" href="staff-conserjeria.html" style="text-decoration:none;"><span class="icon">🧭</span>Conserjería</a>
     <a class="nav-link" href="control-accesos.html" style="text-decoration:none;"><span class="icon">🛂</span>Control de accesos</a>
     <button class="nav-link" data-view="reportes"><span class="icon">📈</span>Reportes</button>
     <button class="nav-link" data-view="configuracion"><span class="icon">⚙️</span>Configuración</button>
@@ -490,7 +494,7 @@
       <div class="view-head">
         <div class="view-head-text">
           <p class="topbar-title" style="font-size:19px;">Habitaciones</p>
-          <p class="subtitle">Haz clic en una habitación para cambiar su estado</p>
+          <p class="subtitle">Haz clic en una habitación para ver su detalle completo</p>
         </div>
       </div>
       <div class="chips-row" id="roomFilters">
@@ -915,7 +919,7 @@
       </div>
     `).join('');
     document.querySelectorAll('#roomGrid .room-card').forEach(card => {
-      card.addEventListener('click', () => cycleRoomStatus(card.dataset.room));
+      card.addEventListener('click', () => openRoomModal(card.dataset.room));
     });
   }
   document.getElementById('roomFilters').addEventListener('click', (e) => {
@@ -934,6 +938,70 @@
     if (r.status !== 'ocupada') r.guest = null;
     renderRooms();
     showToast('Habitación ' + number + ' → ' + (r.status === 'ocupada' ? 'Ocupada' : r.status === 'libre' ? 'Libre' : 'Mantenimiento'));
+  }
+
+  const ROOM_STATUS_LABEL = { ocupada:'Ocupada', libre:'Libre', mantenimiento:'Mantenimiento' };
+  function openRoomModal(number){
+    const r = rooms.find(x => x.number === number);
+    if (!r) return;
+
+    // Cruzar con la ficha de huésped (si existe) para check-in/out, documento, teléfono
+    const guestRecord = r.guest ? guests.find(g => g.room === number) : null;
+    const isDnd = dndRoomSet().has(number);
+
+    const roomRequests = requests.filter(req => req.room === number);
+    const enProceso = roomRequests.filter(req => req.urgent || statusBucket(req.status) !== 'status-done');
+    const completadas = roomRequests.filter(req => !req.urgent && statusBucket(req.status) === 'status-done');
+
+    function reqLine(req){
+      const statusHtml = req.urgent
+        ? '<span class="status-pill status-urgent">Urgente</span>'
+        : `<span class="status-pill ${statusBucket(req.status)}">${statusLabel(req.status)}</span>`;
+      return `<div class="activity-item"><div class="activity-icon">${req.dept.split(' ')[0]}</div><div><p class="activity-text"><b>${req.title}</b></p><p class="activity-time">${req.dept.replace(/^\S+\s/, '')}</p></div>${statusHtml}</div>`;
+    }
+
+    document.getElementById('modalTitle').textContent = 'Habitación ' + number;
+    document.getElementById('modalBody').innerHTML = `
+      <div class="modal-field"><span>Tipo</span><b>${r.subtype || r.type}</b></div>
+      <div class="modal-field"><span>Piso</span><b>${r.floor}</b></div>
+      <div class="modal-field"><span>Estado</span><span class="status-pill ${r.status === 'ocupada' ? 'status-done' : r.status === 'libre' ? 'status-pending' : 'status-urgent'}">${ROOM_STATUS_LABEL[r.status]}</span></div>
+      ${isDnd ? '<div class="modal-field"><span>Privacidad</span><b>🔕 No Molestar activo</b></div>' : ''}
+      ${r.guest ? `
+        <div class="modal-section-title">Huésped</div>
+        <div class="modal-field"><span>Nombre</span><b>${r.guest}</b></div>
+        ${guestRecord ? `
+          <div class="modal-field"><span>Check-in</span><b>${guestRecord.checkin}</b></div>
+          <div class="modal-field"><span>Check-out</span><b>${guestRecord.checkout}</b></div>
+          <div class="modal-field"><span>Documento</span><b>${guestRecord.doc}</b></div>
+          <div class="modal-field"><span>Teléfono</span><b>${guestRecord.phone}</b></div>
+        ` : ''}
+      ` : '<p class="modal-note">Esta habitación no tiene huésped asignado actualmente.</p>'}
+      <div class="modal-section-title">Solicitudes en proceso (${enProceso.length})</div>
+      ${enProceso.length ? enProceso.map(reqLine).join('') : '<p style="font-size:12.5px; color:var(--text-muted);">Ninguna en este momento.</p>'}
+      <div class="modal-section-title">Solicitudes completadas (${completadas.length})</div>
+      ${completadas.length ? completadas.map(reqLine).join('') : '<p style="font-size:12.5px; color:var(--text-muted);">Aún no hay historial para esta habitación.</p>'}
+    `;
+    const footer = document.getElementById('modalFooter');
+    footer.innerHTML = '';
+    if (guestRecord){
+      const msgBtn = document.createElement('button');
+      msgBtn.className = 'btn btn-primary';
+      msgBtn.textContent = '🧑 Ver ficha completa';
+      msgBtn.addEventListener('click', () => { closeModal(); openGuestModalByName(guestRecord.name); });
+      footer.appendChild(msgBtn);
+    }
+    const cycleBtn = document.createElement('button');
+    cycleBtn.className = 'btn btn-outline';
+    cycleBtn.style.flex = '1';
+    cycleBtn.textContent = 'Cambiar estado';
+    cycleBtn.addEventListener('click', () => { cycleRoomStatus(number); closeModal(); });
+    footer.appendChild(cycleBtn);
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'btn btn-outline';
+    closeBtn.textContent = 'Cerrar';
+    closeBtn.addEventListener('click', closeModal);
+    footer.appendChild(closeBtn);
+    openModal();
   }
 
   /* ============ MANTENIMIENTO (vista admin) ============ */
