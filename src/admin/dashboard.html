@@ -296,10 +296,10 @@
     <button class="nav-link" data-view="huespedes"><span class="icon">🧳</span>Huéspedes</button>
     <button class="nav-link" data-view="habitaciones"><span class="icon">🛏️</span>Habitaciones</button>
     <button class="nav-link" data-view="mantenimiento"><span class="icon">🔧</span>Mantenimiento</button>
-    <a class="nav-link" href="staff-amadellaves.html" style="text-decoration:none;"><span class="icon">🧺</span>Ama de Llaves</a>
-    <a class="nav-link" href="staff-ayb.html" style="text-decoration:none;"><span class="icon">🍽️</span>Alimentos y Bebidas</a>
-    <a class="nav-link" href="staff-spa.html" style="text-decoration:none;"><span class="icon">🧖‍♀️</span>Spa &amp; Wellness</a>
-    <a class="nav-link" href="staff-conserjeria.html" style="text-decoration:none;"><span class="icon">🧭</span>Conserjería</a>
+    <button class="nav-link" data-view="amadellaves"><span class="icon">🧺</span>Ama de Llaves</button>
+    <button class="nav-link" data-view="ayb"><span class="icon">🍽️</span>Alimentos y Bebidas</button>
+    <button class="nav-link" data-view="spa"><span class="icon">🧖‍♀️</span>Spa &amp; Wellness</button>
+    <button class="nav-link" data-view="conserjeria"><span class="icon">🧭</span>Conserjería</button>
     <a class="nav-link" href="control-accesos.html" style="text-decoration:none;"><span class="icon">🛂</span>Control de accesos</a>
     <button class="nav-link" data-view="reportes"><span class="icon">📈</span>Reportes</button>
     <button class="nav-link" data-view="configuracion"><span class="icon">⚙️</span>Configuración</button>
@@ -523,6 +523,51 @@
       <div id="maintList"></div>
     </section>
 
+    <!-- ========== AMA DE LLAVES / A&B / SPA / CONSERJERÍA ========== -->
+    <section class="view" id="view-amadellaves">
+      <div class="view-head">
+        <div class="view-head-text">
+          <p class="topbar-title" style="font-size:19px;">🧺 Ama de Llaves</p>
+          <p class="subtitle">Todos los tickets, de respaldo cuando la jefa de área no responde</p>
+        </div>
+      </div>
+      <div class="chips-row" id="deptFilters-amadellaves"></div>
+      <div id="deptList-amadellaves"></div>
+    </section>
+
+    <section class="view" id="view-ayb">
+      <div class="view-head">
+        <div class="view-head-text">
+          <p class="topbar-title" style="font-size:19px;">🍽️ Alimentos y Bebidas</p>
+          <p class="subtitle">Todos los pedidos, de respaldo cuando el jefe de área no responde</p>
+        </div>
+      </div>
+      <div class="chips-row" id="deptFilters-ayb"></div>
+      <div id="deptList-ayb"></div>
+    </section>
+
+    <section class="view" id="view-spa">
+      <div class="view-head">
+        <div class="view-head-text">
+          <p class="topbar-title" style="font-size:19px;">🧖‍♀️ Spa & Wellness</p>
+          <p class="subtitle">Todas las reservas, de respaldo cuando el jefe de área no responde</p>
+        </div>
+      </div>
+      <div class="chips-row" id="deptFilters-spa"></div>
+      <div id="deptList-spa"></div>
+    </section>
+
+    <section class="view" id="view-conserjeria">
+      <div class="view-head">
+        <div class="view-head-text">
+          <p class="topbar-title" style="font-size:19px;">🧭 Conserjería</p>
+          <p class="subtitle">Todas las coordinaciones, de respaldo cuando el jefe de área no responde</p>
+        </div>
+      </div>
+      <div class="chips-row" id="deptFilters-conserjeria"></div>
+      <div id="deptList-conserjeria"></div>
+    </section>
+
     <!-- ========== REPORTES ========== -->
     <section class="view" id="view-reportes">
       <div class="view-head">
@@ -688,7 +733,7 @@
   function minutesAgo(iso){ return Math.max(0, Math.round((Date.now() - new Date(iso)) / 60000)); }
 
   /* ============ NAVEGACIÓN ENTRE VISTAS ============ */
-  const VIEW_TITLES = { dashboard:'Dashboard', solicitudes:'Solicitudes', huespedes:'Huéspedes', habitaciones:'Habitaciones', mantenimiento:'Mantenimiento', reportes:'Reportes', configuracion:'Configuración' };
+  const VIEW_TITLES = { dashboard:'Dashboard', solicitudes:'Solicitudes', huespedes:'Huéspedes', habitaciones:'Habitaciones', mantenimiento:'Mantenimiento', amadellaves:'Ama de Llaves', ayb:'Alimentos y Bebidas', spa:'Spa & Wellness', conserjeria:'Conserjería', reportes:'Reportes', configuracion:'Configuración' };
   function goToView(view){
     document.querySelectorAll('.nav-link[data-view]').forEach(l => l.classList.toggle('active', l.dataset.view === view));
     document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + view));
@@ -897,7 +942,7 @@
 
   /* ============ HABITACIONES ============ */
   let roomFilter = 'todas';
-  const ROOM_STATUS_CYCLE = ['ocupada', 'libre', 'mantenimiento'];
+  const ROOM_STATUS_OPTIONS = ['ocupada', 'libre', 'mantenimiento'];
   function dndRoomSet(){
     let privacy = {};
     try { privacy = JSON.parse(localStorage.getItem('hotelife_privacy') || '{}'); } catch (e) {}
@@ -930,15 +975,6 @@
     roomFilter = chip.dataset.filter;
     renderRooms();
   });
-  function cycleRoomStatus(number){
-    const r = rooms.find(x => x.number === number);
-    if (!r) return;
-    const idx = ROOM_STATUS_CYCLE.indexOf(r.status);
-    r.status = ROOM_STATUS_CYCLE[(idx + 1) % ROOM_STATUS_CYCLE.length];
-    if (r.status !== 'ocupada') r.guest = null;
-    renderRooms();
-    showToast('Habitación ' + number + ' → ' + (r.status === 'ocupada' ? 'Ocupada' : r.status === 'libre' ? 'Libre' : 'Mantenimiento'));
-  }
 
   const ROOM_STATUS_LABEL = { ocupada:'Ocupada', libre:'Libre', mantenimiento:'Mantenimiento' };
   function openRoomModal(number){
@@ -966,6 +1002,10 @@
       <div class="modal-field"><span>Piso</span><b>${r.floor}</b></div>
       <div class="modal-field"><span>Estado</span><span class="status-pill ${r.status === 'ocupada' ? 'status-done' : r.status === 'libre' ? 'status-pending' : 'status-urgent'}">${ROOM_STATUS_LABEL[r.status]}</span></div>
       ${isDnd ? '<div class="modal-field"><span>Privacidad</span><b>🔕 No Molestar activo</b></div>' : ''}
+      <div class="modal-section-title">Cambiar estado</div>
+      <div class="chips-row" id="roomStatusChoice" style="margin-bottom:0;">
+        ${ROOM_STATUS_OPTIONS.map(s => `<button type="button" class="filter-chip ${s === r.status ? 'active' : ''}" data-set-room-status="${s}">${ROOM_STATUS_LABEL[s]}</button>`).join('')}
+      </div>
       ${r.guest ? `
         <div class="modal-section-title">Huésped</div>
         <div class="modal-field"><span>Nombre</span><b>${r.guest}</b></div>
@@ -981,27 +1021,38 @@
       <div class="modal-section-title">Solicitudes completadas (${completadas.length})</div>
       ${completadas.length ? completadas.map(reqLine).join('') : '<p style="font-size:12.5px; color:var(--text-muted);">Aún no hay historial para esta habitación.</p>'}
     `;
+    document.querySelectorAll('[data-set-room-status]').forEach(chip => {
+      chip.addEventListener('click', () => setRoomStatus(number, chip.dataset.setRoomStatus));
+    });
+
     const footer = document.getElementById('modalFooter');
     footer.innerHTML = '';
     if (guestRecord){
       const msgBtn = document.createElement('button');
       msgBtn.className = 'btn btn-primary';
+      msgBtn.style.flex = '1';
       msgBtn.textContent = '🧑 Ver ficha completa';
       msgBtn.addEventListener('click', () => { closeModal(); openGuestModalByName(guestRecord.name); });
       footer.appendChild(msgBtn);
     }
-    const cycleBtn = document.createElement('button');
-    cycleBtn.className = 'btn btn-outline';
-    cycleBtn.style.flex = '1';
-    cycleBtn.textContent = 'Cambiar estado';
-    cycleBtn.addEventListener('click', () => { cycleRoomStatus(number); closeModal(); });
-    footer.appendChild(cycleBtn);
     const closeBtn = document.createElement('button');
     closeBtn.className = 'btn btn-outline';
+    closeBtn.style.flex = guestRecord ? '0 0 auto' : '1';
     closeBtn.textContent = 'Cerrar';
     closeBtn.addEventListener('click', closeModal);
     footer.appendChild(closeBtn);
     openModal();
+  }
+
+  function setRoomStatus(number, status){
+    const r = rooms.find(x => x.number === number);
+    if (!r || r.status === status) { closeModal(); return; }
+    r.status = status;
+    if (status !== 'ocupada') r.guest = null;
+    renderRooms();
+    renderDashboard();
+    closeModal();
+    showToast('Habitación ' + number + ' → ' + ROOM_STATUS_LABEL[status]);
   }
 
   /* ============ MANTENIMIENTO (vista admin) ============ */
@@ -1077,6 +1128,133 @@
     footer.appendChild(closeBtn);
     openModal();
   }
+
+  /* ============ AMA DE LLAVES / A&B / SPA / CONSERJERÍA (vistas admin) ============ */
+  // Cada área sigue su propio flujo de estados (igual al que documenta el README de admin),
+  // pero todas se manejan igual que Mantenimiento: tarjetas con un botón para avanzar al
+  // siguiente estado, sin salir del panel.
+  const DEPT_FLOWS = {
+    amadellaves: { stages:['pendiente','proceso','completada'], labels:{ pendiente:'Pendiente', proceso:'En proceso', completada:'Completada' } },
+    ayb: { stages:['nuevo','preparando','camino','entregado'], labels:{ nuevo:'Nuevo', preparando:'Preparando', camino:'En camino', entregado:'Entregado' } },
+    spa: { stages:['por-confirmar','confirmada','completada'], labels:{ 'por-confirmar':'Por confirmar', confirmada:'Confirmada', completada:'Completada' } },
+    conserjeria: { stages:['pendiente','coordinando','confirmado'], labels:{ pendiente:'Pendiente', coordinando:'Coordinando', confirmado:'Confirmado' } },
+  };
+
+  let deptTicketSeq = 0;
+  const deptTickets = {
+    amadellaves: [
+      { id:'dt'+(++deptTicketSeq), room:'104', guest:'Sr. Duarte', roomType:'Habitación Estándar', title:'Toallas extra', desc:'Solicita 2 toallas adicionales.', status:'pendiente', source:'local' },
+      { id:'dt'+(++deptTicketSeq), room:'212', guest:'Sra. Londoño', roomType:'Habitación Estándar', title:'Limpieza completa', desc:'Limpieza general de la habitación.', status:'proceso', source:'local' },
+      { id:'dt'+(++deptTicketSeq), room:'509', guest:'Sra. Pardo', roomType:'Suite Presidencial', title:'Reposición de minibar', desc:'Minibar vacío, requiere reposición completa.', status:'completada', source:'local' },
+    ],
+    ayb: [
+      { id:'dt'+(++deptTicketSeq), room:'212', guest:'Sra. Londoño', roomType:'Habitación Estándar', title:'🍽️ Room Service', desc:'1x Club Sandwich, 1x Jugo natural de naranja.', status:'camino', source:'local' },
+      { id:'dt'+(++deptTicketSeq), room:'318', guest:'Sr. Gómez', roomType:'Suite Junior', title:'🍸 Bar / Lounge', desc:'2x Mojito clásico.', status:'entregado', source:'local' },
+    ],
+    spa: [
+      { id:'dt'+(++deptTicketSeq), room:'509', guest:'Sra. Pardo', roomType:'Suite Presidencial', title:'Masaje relajante 50 min', desc:'Reservado para las 5:00 PM.', status:'confirmada', source:'local' },
+      { id:'dt'+(++deptTicketSeq), room:'512', guest:'Sra. Vélez', roomType:'Suite Ejecutiva', title:'Clase de yoga', desc:'Clase grupal de 7:00 AM.', status:'por-confirmar', source:'local' },
+    ],
+    conserjeria: [
+      { id:'dt'+(++deptTicketSeq), room:'318', guest:'Sr. Gómez', roomType:'Suite Junior', title:'Traslado al aeropuerto', desc:'Vuelo a las 6:40 PM, necesita salir del hotel a las 4:30 PM.', status:'pendiente', source:'local' },
+      { id:'dt'+(++deptTicketSeq), room:'406', guest:'Sr. Osorio', roomType:'Deluxe', title:'Reserva de tour a la ciudad', desc:'Tour de medio día, grupo de 2 personas.', status:'coordinando', source:'local' },
+    ],
+  };
+  const deptFilterState = { amadellaves:'todas', ayb:'todas', spa:'todas', conserjeria:'todas' };
+
+  function deptStagePillClass(dept, status){
+    const idx = DEPT_FLOWS[dept].stages.indexOf(status);
+    if (idx <= 0) return 'status-pending';
+    if (idx === DEPT_FLOWS[dept].stages.length - 1) return 'status-done';
+    return 'status-progress';
+  }
+
+  function renderDeptFilters(dept){
+    const flow = DEPT_FLOWS[dept];
+    const el = document.getElementById('deptFilters-' + dept);
+    if (!el || el.children.length) return; // ya se construyó una vez
+    const chips = [{ key:'todas', label:'Todas' }].concat(flow.stages.map(s => ({ key:s, label:flow.labels[s] })));
+    el.innerHTML = chips.map(c => `<button class="filter-chip ${c.key === 'todas' ? 'active' : ''}" data-filter="${c.key}">${c.label}</button>`).join('');
+    el.addEventListener('click', (e) => {
+      const chip = e.target.closest('.filter-chip');
+      if (!chip) return;
+      el.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      deptFilterState[dept] = chip.dataset.filter;
+      renderDeptView(dept);
+    });
+  }
+
+  function renderDeptView(dept){
+    renderDeptFilters(dept);
+    const flow = DEPT_FLOWS[dept];
+    const filter = deptFilterState[dept];
+    let list = deptTickets[dept].slice();
+    if (filter !== 'todas') list = list.filter(t => t.status === filter);
+
+    document.getElementById('deptList-' + dept).innerHTML = list.map(t => {
+      const idx = flow.stages.indexOf(t.status);
+      const nextStage = idx >= 0 && idx < flow.stages.length - 1 ? flow.stages[idx + 1] : null;
+      return `
+        <div class="ticket-card">
+          <div class="ticket-top-row">
+            <div><span class="room-pill">${t.room}</span> <b style="font-size:13px;">${t.guest}</b></div>
+            <span class="status-pill ${deptStagePillClass(dept, t.status)}">${flow.labels[t.status]}</span>
+          </div>
+          <p style="font-weight:700; font-size:13px;">${t.title}</p>
+          <p class="ticket-desc">${t.desc}</p>
+          <div class="ticket-actions">
+            ${t.source === 'local' && nextStage ? `<button class="btn btn-primary" data-dept-advance="${dept}|${t.id}">→ ${flow.labels[nextStage]}</button>` : ''}
+            <button class="btn btn-outline" data-dept-view="${dept}|${t.id}">Ver detalle</button>
+          </div>
+        </div>
+      `;
+    }).join('') || '<p style="color:var(--text-muted); font-size:13px;">No hay tickets con ese filtro.</p>';
+
+    document.querySelectorAll('#deptList-' + dept + ' [data-dept-advance]').forEach(b => b.addEventListener('click', () => {
+      const [, id] = b.dataset.deptAdvance.split('|');
+      advanceDeptTicket(dept, id);
+    }));
+    document.querySelectorAll('#deptList-' + dept + ' [data-dept-view]').forEach(b => b.addEventListener('click', () => {
+      const [, id] = b.dataset.deptView.split('|');
+      openDeptTicketModal(dept, id);
+    }));
+  }
+
+  function advanceDeptTicket(dept, id){
+    const t = deptTickets[dept].find(x => x.id === id);
+    if (!t) return;
+    const flow = DEPT_FLOWS[dept];
+    const idx = flow.stages.indexOf(t.status);
+    if (idx < flow.stages.length - 1) t.status = flow.stages[idx + 1];
+    renderDeptView(dept);
+    showToast('Ticket de ' + t.room + ' → ' + flow.labels[t.status]);
+  }
+
+  function openDeptTicketModal(dept, id){
+    const t = deptTickets[dept].find(x => x.id === id);
+    if (!t) return;
+    const flow = DEPT_FLOWS[dept];
+    document.getElementById('modalTitle').textContent = t.title;
+    document.getElementById('modalBody').innerHTML = `
+      <div class="modal-field"><span>Huésped</span><b>${t.guest}</b></div>
+      <div class="modal-field"><span>Habitación</span><b>${t.room} · ${t.roomType || ''}</b></div>
+      <div class="modal-field"><span>Estado</span><span class="status-pill ${deptStagePillClass(dept, t.status)}">${flow.labels[t.status]}</span></div>
+      <div class="modal-section-title">Detalle</div>
+      <p style="font-size:13px; color:var(--text-muted); line-height:1.5;">${t.desc}</p>
+      ${t.source === 'shared' ? `<p class="modal-note">Esto lo gestiona el jefe de ${DEPT_LABELS[dept]} desde su propia app; aquí recepción solo lo está viendo como respaldo.</p>` : ''}
+    `;
+    const footer = document.getElementById('modalFooter');
+    footer.innerHTML = '';
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'btn btn-outline';
+    closeBtn.style.flex = '1';
+    closeBtn.textContent = 'Cerrar';
+    closeBtn.addEventListener('click', closeModal);
+    footer.appendChild(closeBtn);
+    openModal();
+  }
+  const DEPT_LABELS = { amadellaves:'Ama de Llaves', ayb:'Alimentos y Bebidas', spa:'Spa & Wellness', conserjeria:'Conserjería' };
 
   /* ============ REPORTES ============ */
   function renderReportes(){
@@ -1225,6 +1403,42 @@
       added = true;
     });
 
+    // Lo mismo para Ama de Llaves, Spa y Conserjería, cada una a su propia lista
+    const DEPT_KEYWORDS = { amadellaves:'Ama de Llaves', spa:'Spa', conserjeria:'Conserjería' };
+    Object.keys(DEPT_KEYWORDS).forEach(dept => {
+      const flow = DEPT_FLOWS[dept];
+      serviceRequests.filter(r => r.dept && r.dept.includes(DEPT_KEYWORDS[dept])).forEach(r => {
+        if (deptTickets[dept].some(x => x.id === r.id)) return;
+        deptTickets[dept].unshift({
+          id:r.id, room:r.room, guest:r.guestName, roomType:r.roomType, title:r.title,
+          desc: r.details ? Object.entries(r.details).map(([k,v]) => `${k}: ${v}`).join(' · ') : r.title,
+          status: flow.stages.includes(r.status) ? r.status : flow.stages[0], source:'shared'
+        });
+        added = true;
+      });
+    });
+
+    // A&B: tanto solicitudes genéricas (reserva de restaurante, bar, desayuno) como los
+    // pedidos de room-service.html van a la misma lista dedicada
+    serviceRequests.filter(r => r.dept && r.dept.includes('A&B')).forEach(r => {
+      if (deptTickets.ayb.some(x => x.id === r.id)) return;
+      deptTickets.ayb.unshift({
+        id:r.id, room:r.room, guest:r.guestName, roomType:r.roomType, title:r.title,
+        desc: r.details ? Object.entries(r.details).map(([k,v]) => `${k}: ${v}`).join(' · ') : r.title,
+        status: DEPT_FLOWS.ayb.stages.includes(r.status) ? r.status : 'nuevo', source:'shared'
+      });
+      added = true;
+    });
+    roomServiceOrders.forEach(o => {
+      if (deptTickets.ayb.some(x => x.id === o.id)) return;
+      const plain = (o.items || '').replace(/<[^>]+>/g, '').replace(/\n/g, ', ');
+      deptTickets.ayb.unshift({
+        id:o.id, room:o.room, guest:o.guest, roomType:o.roomType, title:o.source || '🍽️ Room Service',
+        desc:plain, status: DEPT_FLOWS.ayb.stages.includes(o.stage) ? o.stage : 'nuevo', source:'shared'
+      });
+      added = true;
+    });
+
     requests.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     return added;
   }
@@ -1234,6 +1448,7 @@
     renderDashboard();
     renderSolicitudes();
     renderMaint();
+    Object.keys(DEPT_FLOWS).forEach(renderDeptView);
     renderReportes();
     if (added) renderDnd();
   }
