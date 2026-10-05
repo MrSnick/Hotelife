@@ -75,10 +75,12 @@
     background:#fff; border-bottom:1px solid var(--border-light);
     display:flex; align-items:center; justify-content:space-between;
     padding: 0 32px;
+    position:relative;
+    z-index:5;
   }
   .topbar-title{ font-family:"Cormorant Garamond", serif; font-weight:700; font-size:22px; }
   .topbar-date{ font-size:12px; color: var(--text-muted); }
-  .topbar-actions{ display:flex; align-items:center; gap:14px; }
+  .topbar-actions{ display:flex; align-items:center; gap:14px; position:relative; }
   .icon-btn{
     width:38px; height:38px; border-radius:10px;
     border:1px solid var(--border-light); background:#fff;
@@ -89,8 +91,38 @@
     position:absolute; top:6px; right:6px; width:7px; height:7px;
     border-radius:4px; background: var(--red);
   }
+  .notif-pop{
+    position:absolute; top:50px; right:0; width:300px;
+    background:#fff; border:1px solid var(--border-light); border-radius:14px;
+    box-shadow:0 18px 40px -12px rgba(26,34,45,0.25);
+    padding:8px; display:none; z-index:30;
+  }
+  .notif-pop.open{ display:block; }
+  .notif-pop-title{ font-size:11px; font-weight:700; text-transform:uppercase; color:var(--text-muted); padding:8px 10px 6px; }
+  .notif-row{ display:flex; gap:10px; padding:9px 10px; border-radius:10px; cursor:pointer; }
+  .notif-row:hover{ background: var(--bg); }
+  .notif-row .dotmark{ width:7px; height:7px; border-radius:4px; background:var(--gold); margin-top:5px; flex-shrink:0; }
+  .notif-row p{ font-size:12px; line-height:1.4; }
+  .notif-row .t{ font-size:10px; color:var(--text-muted); margin-top:2px; }
 
   .content{ flex:1; overflow-y:auto; padding: 28px 32px 40px; }
+  .view{ display:none; }
+  .view.active{ display:block; }
+
+  .view-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; gap:16px; flex-wrap:wrap; }
+  .view-head-text p.subtitle{ font-size:12.5px; color:var(--text-muted); margin-top:2px; }
+  .search-input{
+    height:38px; border:1px solid var(--border-light); border-radius:10px;
+    padding:0 14px; font-family:inherit; font-size:12.5px; outline:none; min-width:220px;
+  }
+  .search-input:focus{ border-color: var(--gold); }
+  .chips-row{ display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
+  .filter-chip{
+    padding:7px 13px; border-radius:14px;
+    border:1px solid var(--border-light); background:#fff;
+    font-size:11.5px; font-weight:700; color: var(--text-muted); cursor:pointer;
+  }
+  .filter-chip.active{ background: var(--navy); border-color: var(--navy); color:#fff; }
 
   .kpi-grid{ display:grid; grid-template-columns: repeat(4, 1fr); gap:18px; margin-bottom:26px; }
   .kpi-card{
@@ -110,15 +142,16 @@
     background:#fff; border:1px solid var(--border-light); border-radius:16px;
     padding:22px; margin-bottom:20px;
   }
-  .panel-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
+  .panel-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; gap:10px; flex-wrap:wrap; }
   .panel-title{ font-weight:700; font-size:15px; }
   .panel-link{ font-size:12px; font-weight:700; color: var(--gold); background:none; border:none; cursor:pointer; }
 
   table{ width:100%; border-collapse:collapse; }
-  th{ text-align:left; font-size:10px; text-transform:uppercase; color: var(--text-muted); font-weight:700; padding-bottom:10px; border-bottom:1px solid var(--border-light); }
-  td{ padding:12px 0; border-bottom:1px solid var(--border-light); font-size:13px; }
+  th{ text-align:left; font-size:10px; text-transform:uppercase; color: var(--text-muted); font-weight:700; padding:0 10px 10px 0; border-bottom:1px solid var(--border-light); }
+  td{ padding:12px 10px 12px 0; border-bottom:1px solid var(--border-light); font-size:13px; }
   tr:last-child td{ border-bottom:none; }
-  .guest-cell{ display:flex; align-items:center; gap:10px; }
+  .guest-cell{ display:flex; align-items:center; gap:10px; cursor:pointer; }
+  .guest-cell:hover{ color: var(--gold); }
   .room-pill{ font-weight:700; font-size:11px; background: var(--bg); padding:3px 8px; border-radius:6px; }
   .status-pill{ font-size:10px; font-weight:700; text-transform:uppercase; padding:4px 9px; border-radius:8px; display:inline-block; }
   .status-pending{ background: rgba(180,180,180,0.25); color:#6b6459; }
@@ -126,6 +159,7 @@
   .status-urgent{ background: rgba(181,87,58,0.15); color: var(--red); }
   .status-done{ background: rgba(76,140,74,0.15); color: var(--green); }
   .row-action{ font-size:11px; font-weight:700; color: var(--navy); background: var(--bg); border:none; padding:6px 10px; border-radius:8px; cursor:pointer; }
+  .row-action.primary{ background: var(--gold); }
   .dept-pill{
     font-size:11px; font-weight:600; background: var(--bg);
     padding:4px 9px; border-radius:8px; white-space:nowrap;
@@ -154,13 +188,100 @@
   .dnd-empty{ font-size:12.5px; color: var(--text-muted); }
   .dnd-flag{ display:inline-block; margin-left:6px; font-size:10px; font-weight:700; color: var(--red); white-space:nowrap; }
   .panel.dnd-alert{ border-color: var(--red); }
+  .room-dnd-flag{ font-size:13px; }
 
   .occupancy-bar-wrap{ display:flex; flex-direction:column; gap:10px; }
   .occupancy-row{ display:flex; align-items:center; gap:10px; }
-  .occupancy-label{ font-size:12px; font-weight:600; width:90px; flex-shrink:0; }
+  .occupancy-label{ font-size:12px; font-weight:600; width:110px; flex-shrink:0; }
   .occupancy-track{ flex:1; height:8px; border-radius:4px; background: var(--bg); overflow:hidden; }
-  .occupancy-fill{ height:100%; border-radius:4px; background: var(--gold); }
+  .occupancy-fill{ height:100%; border-radius:4px; background: var(--gold); transition:width .3s ease; }
   .occupancy-value{ font-size:12px; font-weight:700; width:36px; text-align:right; flex-shrink:0; }
+
+  /* Habitaciones */
+  .room-grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap:14px; }
+  .room-card{
+    background:#fff; border:1px solid var(--border-light); border-radius:14px;
+    padding:14px; cursor:pointer; display:flex; flex-direction:column; gap:8px;
+    border-top:3px solid var(--border-light);
+  }
+  .room-card[data-status="ocupada"]{ border-top-color: var(--navy); }
+  .room-card[data-status="libre"]{ border-top-color: var(--green); }
+  .room-card[data-status="mantenimiento"]{ border-top-color: var(--red); }
+  .room-card-number-row{ display:flex; align-items:center; justify-content:space-between; }
+  .room-card-number{ font-family:"Cormorant Garamond", serif; font-size:24px; font-weight:700; }
+  .room-card-type{ font-size:11px; color: var(--text-muted); }
+  .room-card-guest{ font-size:11.5px; font-weight:600; }
+  .room-status-chip{ font-size:9.5px; font-weight:800; text-transform:uppercase; padding:3px 8px; border-radius:7px; width:fit-content; }
+  .room-status-chip.ocupada{ background: rgba(26,34,45,0.1); color: var(--navy); }
+  .room-status-chip.libre{ background: rgba(76,140,74,0.15); color: var(--green); }
+  .room-status-chip.mantenimiento{ background: rgba(181,87,58,0.15); color: var(--red); }
+
+  /* Tickets (mantenimiento admin) */
+  .ticket-card{ background:#fff; border:1px solid var(--border-light); border-radius:14px; padding:16px; display:flex; flex-direction:column; gap:8px; margin-bottom:12px; }
+  .ticket-card.urgent{ border-color: var(--red); }
+  .ticket-top-row{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+  .ticket-desc{ font-size:12.5px; color: var(--text-muted); line-height:1.5; }
+  .ticket-actions{ display:flex; gap:8px; margin-top:4px; }
+  .btn{ height:36px; padding:0 16px; border-radius:10px; border:none; font-weight:700; font-size:11.5px; text-transform:uppercase; cursor:pointer; }
+  .btn-primary{ background: var(--gold); color: var(--navy); }
+  .btn-outline{ background:#fff; border:1px solid var(--border-light); color: var(--navy); }
+  .btn-success{ background: var(--green); color:#fff; }
+
+  /* Config */
+  .form-row{ margin-bottom:18px; max-width:420px; }
+  .form-label{ font-size:11.5px; font-weight:700; color: var(--text-muted); text-transform:uppercase; margin-bottom:8px; display:block; }
+  .form-input, .form-select{
+    width:100%; height:40px; border:1px solid var(--border-light); border-radius:10px;
+    padding:0 12px; font-family:inherit; font-size:13px; outline:none; background:#fff;
+  }
+  .form-input:focus, .form-select:focus{ border-color: var(--gold); }
+  .toggle-row{ display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-bottom:1px solid var(--border-light); max-width:420px; }
+  .toggle-row:last-child{ border-bottom:none; }
+  .toggle-row-label{ font-size:13px; font-weight:600; }
+  .toggle-row-sub{ font-size:11px; color: var(--text-muted); margin-top:2px; }
+  .switch{ position:relative; width:42px; height:24px; flex-shrink:0; }
+  .switch input{ opacity:0; width:0; height:0; }
+  .switch-track{ position:absolute; inset:0; background: var(--border-light); border-radius:12px; cursor:pointer; transition: background .2s; }
+  .switch-track::before{ content:''; position:absolute; width:18px; height:18px; left:3px; top:3px; background:#fff; border-radius:50%; transition: transform .2s; box-shadow:0 1px 3px rgba(0,0,0,0.3); }
+  .switch input:checked + .switch-track{ background: var(--gold); }
+  .switch input:checked + .switch-track::before{ transform: translateX(18px); }
+  .save-btn{ height:44px; padding:0 22px; border-radius:12px; background: var(--navy); color: var(--gold); border:none; font-weight:700; font-size:12.5px; text-transform:uppercase; cursor:pointer; margin-top:6px; }
+
+  /* Reportes */
+  .report-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:20px; }
+  .stat-tile{ display:flex; flex-direction:column; gap:4px; }
+  .stat-tile .big{ font-family:"Cormorant Garamond", serif; font-size:30px; font-weight:700; }
+  .stat-tile .lbl{ font-size:11px; color: var(--text-muted); text-transform:uppercase; font-weight:700; }
+
+  /* Modal */
+  .modal-overlay{
+    position:fixed; inset:0; background: rgba(26,34,45,0.45);
+    display:none; align-items:center; justify-content:center; z-index:50; padding:24px;
+  }
+  .modal-overlay.open{ display:flex; }
+  .modal-panel{
+    background:#fff; border-radius:18px; width:100%; max-width:460px; max-height:85vh;
+    display:flex; flex-direction:column; overflow:hidden;
+  }
+  .modal-header{ display:flex; align-items:center; justify-content:space-between; padding:18px 22px; border-bottom:1px solid var(--border-light); }
+  .modal-title{ font-family:"Cormorant Garamond", serif; font-weight:700; font-size:19px; }
+  .modal-close{ background:none; border:none; font-size:16px; color:var(--text-muted); cursor:pointer; }
+  .modal-body{ padding:18px 22px; overflow-y:auto; display:flex; flex-direction:column; gap:14px; }
+  .modal-footer{ padding:16px 22px; border-top:1px solid var(--border-light); display:flex; gap:10px; }
+  .modal-field{ display:flex; justify-content:space-between; font-size:12.5px; padding:6px 0; border-bottom:1px solid var(--border-light); gap:12px; }
+  .modal-field span:first-child{ flex-shrink:0; color:var(--text-muted); }
+  .modal-field b{ font-weight:700; text-align:right; }
+  .modal-section-title{ font-size:11px; font-weight:700; text-transform:uppercase; color:var(--text-muted); margin-top:4px; }
+  .modal-note{ font-size:12px; color: var(--text-muted); background: var(--bg); border-radius:10px; padding:10px 12px; }
+
+  /* Toast */
+  .toast{
+    position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(20px);
+    background: var(--navy); color:#fff; padding:12px 20px; border-radius:12px;
+    font-size:12.5px; font-weight:600; box-shadow:0 14px 30px -10px rgba(26,34,45,0.4);
+    opacity:0; pointer-events:none; transition: all .25s ease; z-index:60;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
 </style>
 <link rel="stylesheet" href="../css/responsive.css">
 </head>
@@ -175,6 +296,7 @@
     <button class="nav-link" data-view="huespedes"><span class="icon">🧳</span>Huéspedes</button>
     <button class="nav-link" data-view="habitaciones"><span class="icon">🛏️</span>Habitaciones</button>
     <button class="nav-link" data-view="mantenimiento"><span class="icon">🔧</span>Mantenimiento</button>
+    <a class="nav-link" href="control-accesos.html" style="text-decoration:none;"><span class="icon">🛂</span>Control de accesos</a>
     <button class="nav-link" data-view="reportes"><span class="icon">📈</span>Reportes</button>
     <button class="nav-link" data-view="configuracion"><span class="icon">⚙️</span>Configuración</button>
   </nav>
@@ -190,297 +312,791 @@
 <div class="main">
   <header class="topbar">
     <div>
-      <p class="topbar-title">Dashboard</p>
+      <p class="topbar-title" id="topbarTitle">Dashboard</p>
       <p class="topbar-date">Jueves, 17 de septiembre · 12:40 PM</p>
     </div>
     <div class="topbar-actions">
-      <button class="icon-btn" id="notifBtn">🔔<span class="dot"></span></button>
+      <button class="icon-btn" id="notifBtn">🔔<span class="dot"></span>
+        <div class="notif-pop" id="notifPop">
+          <p class="notif-pop-title">Avisos activos</p>
+          <div class="notif-row"><span class="dotmark"></span><div><p><b>Suite 405</b> — mantenimiento urgente sin atender hace 22 min</p><p class="t">Hace 22 min</p></div></div>
+          <div class="notif-row"><span class="dotmark"></span><div><p><b>Habitación 220</b> — checkout con pago pendiente</p><p class="t">Hace 40 min</p></div></div>
+          <div class="notif-row"><span class="dotmark"></span><div><p>Nuevo pedido de Room Service recibido</p><p class="t">Hace instantes</p></div></div>
+        </div>
+      </button>
       <button class="icon-btn" id="settingsBtn">⚙️</button>
     </div>
   </header>
 
   <div class="content">
 
-    <div class="kpi-grid">
-      <div class="kpi-card">
-        <p class="kpi-label">Ocupación</p>
-        <p class="kpi-value">87%</p>
-        <p class="kpi-sub up">▲ 4% vs. ayer</p>
+    <!-- ========== DASHBOARD ========== -->
+    <section class="view active" id="view-dashboard">
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <p class="kpi-label">Ocupación</p>
+          <p class="kpi-value" id="kpiOcupacion">—</p>
+          <p class="kpi-sub up">▲ 4% vs. ayer</p>
+        </div>
+        <div class="kpi-card">
+          <p class="kpi-label">Ingresos de hoy</p>
+          <p class="kpi-value">$18.4M</p>
+          <p class="kpi-sub up">▲ 12% vs. ayer</p>
+        </div>
+        <div class="kpi-card">
+          <p class="kpi-label">Solicitudes pendientes</p>
+          <p class="kpi-value" id="kpiPendientes">7</p>
+          <p class="kpi-sub down" id="kpiUrgentes">2 urgentes</p>
+        </div>
+        <div class="kpi-card">
+          <p class="kpi-label">Huéspedes activos</p>
+          <p class="kpi-value" id="kpiHuespedes">—</p>
+          <p class="kpi-sub neutral" id="kpiHuespedesSub">—</p>
+        </div>
       </div>
-      <div class="kpi-card">
-        <p class="kpi-label">Ingresos de hoy</p>
-        <p class="kpi-value">$18.4M</p>
-        <p class="kpi-sub up">▲ 12% vs. ayer</p>
-      </div>
-      <div class="kpi-card">
-        <p class="kpi-label">Solicitudes pendientes</p>
-        <p class="kpi-value" id="kpiPendientes">7</p>
-        <p class="kpi-sub down" id="kpiUrgentes">2 urgentes</p>
-      </div>
-      <div class="kpi-card">
-        <p class="kpi-label">Huéspedes activos</p>
-        <p class="kpi-value">142</p>
-        <p class="kpi-sub neutral">38 habitaciones</p>
-      </div>
-    </div>
 
-    <div class="grid-2col">
-      <div>
+      <div class="grid-2col">
+        <div>
+          <div class="panel">
+            <div class="panel-header">
+              <p class="panel-title">Solicitudes recientes</p>
+              <button class="panel-link" id="viewAllRequests">Ver todas →</button>
+            </div>
+            <table>
+              <thead>
+                <tr><th>Huésped</th><th>Habitación</th><th>Solicitud</th><th>Área</th><th>Estado</th><th></th></tr>
+              </thead>
+              <tbody id="dashRequestsBody"></tbody>
+            </table>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <p class="panel-title">Ocupación por tipo de habitación</p>
+            </div>
+            <div class="occupancy-bar-wrap" id="occupancyByType"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="panel" id="dndPanel">
+            <div class="panel-header">
+              <p class="panel-title">🔕 No Molestar</p>
+              <span class="dnd-count zero" id="dndCount">0 habitaciones</span>
+            </div>
+            <div id="dndList"><p class="dnd-empty">Ninguna habitación tiene activo el modo No Molestar.</p></div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <p class="panel-title">Actividad en vivo</p>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon">🔧</div>
+              <div>
+                <p class="activity-text"><b>Sr Snick</b> reportó un problema de mantenimiento (A/C)</p>
+                <p class="activity-time">Hace 3 min · Suite 405</p>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon">💳</div>
+              <div>
+                <p class="activity-text"><b>Sra. Ibarra</b> completó el pago de check-out</p>
+                <p class="activity-time">Hace 11 min · Suite 220</p>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon">🔑</div>
+              <div>
+                <p class="activity-text"><b>Sr. Gómez</b> hizo check-in</p>
+                <p class="activity-time">Hace 24 min · Habitación 318</p>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon">🍽️</div>
+              <div>
+                <p class="activity-text"><b>Sra. Londoño</b> pidió Room Service</p>
+                <p class="activity-time">Hace 32 min · Habitación 212</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <p class="panel-title">Check-ins / Check-outs de hoy</p>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon">🟢</div>
+              <div>
+                <p class="activity-text">12 check-ins programados</p>
+                <p class="activity-time">8 ya completados</p>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon">🔴</div>
+              <div>
+                <p class="activity-text">9 check-outs programados</p>
+                <p class="activity-time">3 pendientes de pago</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== SOLICITUDES ========== -->
+    <section class="view" id="view-solicitudes">
+      <div class="view-head">
+        <div class="view-head-text">
+          <p class="topbar-title" style="font-size:19px;">Todas las solicitudes</p>
+          <p class="subtitle">De todas las áreas del hotel, en tiempo real</p>
+        </div>
+        <input class="search-input" id="reqSearch" placeholder="Buscar por huésped o habitación...">
+      </div>
+      <div class="chips-row" id="reqFilters">
+        <button class="filter-chip active" data-filter="todas">Todas</button>
+        <button class="filter-chip" data-filter="pendiente">Pendientes</button>
+        <button class="filter-chip" data-filter="urgente">Urgentes</button>
+        <button class="filter-chip" data-filter="en-camino">En camino</button>
+        <button class="filter-chip" data-filter="confirmado">Resueltas</button>
+      </div>
+      <div class="panel">
+        <table>
+          <thead><tr><th>Huésped</th><th>Habitación</th><th>Solicitud</th><th>Área</th><th>Estado</th><th></th></tr></thead>
+          <tbody id="fullRequestsBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ========== HUÉSPEDES ========== -->
+    <section class="view" id="view-huespedes">
+      <div class="view-head">
+        <div class="view-head-text">
+          <p class="topbar-title" style="font-size:19px;">Huéspedes</p>
+          <p class="subtitle">Huéspedes activos y próximas llegadas</p>
+        </div>
+        <input class="search-input" id="guestSearch" placeholder="Buscar por nombre o habitación...">
+      </div>
+      <div class="panel">
+        <table>
+          <thead><tr><th>Huésped</th><th>Habitación</th><th>Tipo</th><th>Check-in</th><th>Check-out</th><th>Estado</th><th></th></tr></thead>
+          <tbody id="guestsBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ========== HABITACIONES ========== -->
+    <section class="view" id="view-habitaciones">
+      <div class="view-head">
+        <div class="view-head-text">
+          <p class="topbar-title" style="font-size:19px;">Habitaciones</p>
+          <p class="subtitle">Haz clic en una habitación para cambiar su estado</p>
+        </div>
+      </div>
+      <div class="chips-row" id="roomFilters">
+        <button class="filter-chip active" data-filter="todas">Todas</button>
+        <button class="filter-chip" data-filter="ocupada">Ocupadas</button>
+        <button class="filter-chip" data-filter="libre">Libres</button>
+        <button class="filter-chip" data-filter="mantenimiento">Mantenimiento</button>
+      </div>
+      <div class="room-grid" id="roomGrid"></div>
+    </section>
+
+    <!-- ========== MANTENIMIENTO ========== -->
+    <section class="view" id="view-mantenimiento">
+      <div class="view-head">
+        <div class="view-head-text">
+          <p class="topbar-title" style="font-size:19px;">Mantenimiento</p>
+          <p class="subtitle">Todos los tickets, de respaldo cuando el jefe de área no responde</p>
+        </div>
+      </div>
+      <div class="chips-row" id="maintFilters">
+        <button class="filter-chip active" data-filter="todas">Todas</button>
+        <button class="filter-chip" data-filter="pendiente">Pendientes</button>
+        <button class="filter-chip" data-filter="proceso">En proceso</button>
+        <button class="filter-chip" data-filter="completada">Completadas</button>
+      </div>
+      <div id="maintList"></div>
+    </section>
+
+    <!-- ========== REPORTES ========== -->
+    <section class="view" id="view-reportes">
+      <div class="view-head">
+        <div class="view-head-text">
+          <p class="topbar-title" style="font-size:19px;">Reportes</p>
+          <p class="subtitle">Resumen operativo del hotel</p>
+        </div>
+        <button class="panel-link" id="exportReportBtn">⬇ Exportar reporte</button>
+      </div>
+      <div class="report-grid">
         <div class="panel">
-          <div class="panel-header">
-            <p class="panel-title">Solicitudes recientes</p>
-            <button class="panel-link" id="viewAllRequests">Ver todas →</button>
-          </div>
-          <table>
-            <thead>
-              <tr><th>Huésped</th><th>Habitación</th><th>Solicitud</th><th>Área</th><th>Estado</th><th></th></tr>
-            </thead>
-            <tbody id="requestsTableBody">
-              <tr>
-                <td><div class="guest-cell">🧑 Sr Snick</div></td>
-                <td><span class="room-pill">405</span></td>
-                <td>Mantenimiento — A/C</td>
-                <td><span class="dept-pill">🔧 Mantenimiento</span></td>
-                <td>
-                  <span class="status-pill status-urgent">Urgente</span>
-                  <div class="escalation-flag">⚠️ Sin respuesta 22 min</div>
-                </td>
-                <td><button class="row-action">Atender</button></td>
-              </tr>
-              <tr>
-                <td><div class="guest-cell">🧑 Sra. Londoño</div></td>
-                <td><span class="room-pill">212</span></td>
-                <td>Room Service</td>
-                <td><span class="dept-pill">🍽️ A&amp;B</span></td>
-                <td><span class="status-pill status-progress">En camino</span></td>
-                <td><button class="row-action">Ver</button></td>
-              </tr>
-              <tr>
-                <td><div class="guest-cell">🧑 Sr. Gómez</div></td>
-                <td><span class="room-pill">318</span></td>
-                <td>Traslado al aeropuerto</td>
-                <td><span class="dept-pill">🧭 Conserjería</span></td>
-                <td><span class="status-pill status-pending">Pendiente</span></td>
-                <td><button class="row-action">Asignar</button></td>
-              </tr>
-              <tr>
-                <td><div class="guest-cell">🧑 Sra. Pardo</div></td>
-                <td><span class="room-pill">509</span></td>
-                <td>Spa & Wellness</td>
-                <td><span class="dept-pill">🧖‍♀️ Spa</span></td>
-                <td><span class="status-pill status-done">Confirmado</span></td>
-                <td><button class="row-action">Ver</button></td>
-              </tr>
-              <tr>
-                <td><div class="guest-cell">🧑 Sr. Duarte</div></td>
-                <td><span class="room-pill">104</span></td>
-                <td>Housekeeping — Toallas extra</td>
-                <td><span class="dept-pill">🧺 Ama de llaves</span></td>
-                <td><span class="status-pill status-progress">En camino</span></td>
-                <td><button class="row-action">Ver</button></td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="panel-header"><p class="panel-title">Solicitudes por área</p></div>
+          <div class="occupancy-bar-wrap" id="reportByDept"></div>
         </div>
-
         <div class="panel">
-          <div class="panel-header">
-            <p class="panel-title">Ocupación por tipo de habitación</p>
-          </div>
-          <div class="occupancy-bar-wrap">
-            <div class="occupancy-row"><span class="occupancy-label">Estándar</span><div class="occupancy-track"><div class="occupancy-fill" style="width:92%"></div></div><span class="occupancy-value">92%</span></div>
-            <div class="occupancy-row"><span class="occupancy-label">Deluxe</span><div class="occupancy-track"><div class="occupancy-fill" style="width:85%"></div></div><span class="occupancy-value">85%</span></div>
-            <div class="occupancy-row"><span class="occupancy-label">Suite</span><div class="occupancy-track"><div class="occupancy-fill" style="width:78%"></div></div><span class="occupancy-value">78%</span></div>
-            <div class="occupancy-row"><span class="occupancy-label">Presidencial</span><div class="occupancy-track"><div class="occupancy-fill" style="width:50%"></div></div><span class="occupancy-value">50%</span></div>
-          </div>
+          <div class="panel-header"><p class="panel-title">Ingresos — últimos 7 días</p></div>
+          <div class="occupancy-bar-wrap" id="reportRevenue"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><p class="panel-title">Tiempo de respuesta</p></div>
+          <div class="stat-tile"><p class="big">8 min</p><p class="lbl">Promedio general</p></div>
+          <div class="stat-tile" style="margin-top:14px;"><p class="big">22 min</p><p class="lbl">Promedio en urgentes</p></div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><p class="panel-title">Satisfacción (NPS)</p></div>
+          <div class="stat-tile"><p class="big">72</p><p class="lbl">Puntaje NPS · 12 encuestas este mes</p></div>
         </div>
       </div>
+    </section>
 
-      <div>
-        <div class="panel" id="dndPanel">
-          <div class="panel-header">
-            <p class="panel-title">🔕 No Molestar</p>
-            <span class="dnd-count zero" id="dndCount">0 habitaciones</span>
-          </div>
-          <div id="dndList"><p class="dnd-empty">Ninguna habitación tiene activo el modo No Molestar.</p></div>
-        </div>
-
-        <div class="panel">
-          <div class="panel-header">
-            <p class="panel-title">Actividad en vivo</p>
-          </div>
-          <div class="activity-item">
-            <div class="activity-icon">🔧</div>
-            <div>
-              <p class="activity-text"><b>Sr Snick</b> reportó un problema de mantenimiento (A/C)</p>
-              <p class="activity-time">Hace 3 min · Suite 405</p>
-            </div>
-          </div>
-          <div class="activity-item">
-            <div class="activity-icon">💳</div>
-            <div>
-              <p class="activity-text"><b>Sra. Ibarra</b> completó el pago de check-out</p>
-              <p class="activity-time">Hace 11 min · Suite 220</p>
-            </div>
-          </div>
-          <div class="activity-item">
-            <div class="activity-icon">🔑</div>
-            <div>
-              <p class="activity-text"><b>Sr. Gómez</b> hizo check-in</p>
-              <p class="activity-time">Hace 24 min · Habitación 318</p>
-            </div>
-          </div>
-          <div class="activity-item">
-            <div class="activity-icon">🍽️</div>
-            <div>
-              <p class="activity-text"><b>Sra. Londoño</b> pidió Room Service</p>
-              <p class="activity-time">Hace 32 min · Habitación 212</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="panel">
-          <div class="panel-header">
-            <p class="panel-title">Check-ins / Check-outs de hoy</p>
-          </div>
-          <div class="activity-item">
-            <div class="activity-icon">🟢</div>
-            <div>
-              <p class="activity-text">12 check-ins programados</p>
-              <p class="activity-time">8 ya completados</p>
-            </div>
-          </div>
-          <div class="activity-item">
-            <div class="activity-icon">🔴</div>
-            <div>
-              <p class="activity-text">9 check-outs programados</p>
-              <p class="activity-time">3 pendientes de pago</p>
-            </div>
-          </div>
+    <!-- ========== CONFIGURACIÓN ========== -->
+    <section class="view" id="view-configuracion">
+      <div class="view-head">
+        <div class="view-head-text">
+          <p class="topbar-title" style="font-size:19px;">Configuración</p>
+          <p class="subtitle">Datos del hotel y preferencias del panel</p>
         </div>
       </div>
-    </div>
+      <div class="panel" style="max-width:560px;">
+        <div class="form-row">
+          <label class="form-label">Nombre del hotel</label>
+          <input class="form-input" id="cfgHotelName" value="HOTELIFE">
+        </div>
+        <div class="form-row">
+          <label class="form-label">Zona horaria</label>
+          <select class="form-select" id="cfgTimezone">
+            <option value="America/Bogota">América/Bogotá (UTC-5)</option>
+            <option value="America/Mexico_City">América/Ciudad de México (UTC-6)</option>
+            <option value="America/Santiago">América/Santiago (UTC-4)</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Departamentos activos</label>
+          <div id="cfgDepartments"></div>
+        </div>
+      </div>
+      <div class="panel" style="max-width:560px;">
+        <div class="panel-header"><p class="panel-title">Notificaciones</p></div>
+        <div id="cfgNotifications"></div>
+        <button class="save-btn" id="cfgSaveBtn">Guardar cambios</button>
+      </div>
+    </section>
 
   </div>
 </div>
 
+<!-- Modal compartido -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-panel">
+    <div class="modal-header">
+      <p class="modal-title" id="modalTitle">Detalle</p>
+      <button class="modal-close" id="modalClose">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer" id="modalFooter"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
 <script>
-  document.querySelectorAll('.nav-link').forEach(link => {
-    link.addEventListener('click', () => {
-      document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-      link.classList.add('active');
-      console.log('Navegando a vista:', link.dataset.view);
+  /* ============ DATOS DE EJEMPLO ============ */
+  const DEPARTMENTS = [
+    { id:'mantenimiento', label:'Mantenimiento', icon:'🔧' },
+    { id:'amadellaves', label:'Ama de llaves', icon:'🧺' },
+    { id:'ayb', label:'Alimentos y Bebidas', icon:'🍽️' },
+    { id:'spa', label:'Spa & Wellness', icon:'🧖‍♀️' },
+    { id:'conserjeria', label:'Conserjería', icon:'🧭' },
+    { id:'recepcion', label:'Recepción', icon:'🏨' },
+  ];
+
+  const rooms = [
+    { number:'101', floor:1, type:'Estándar', status:'ocupada', guest:null },
+    { number:'104', floor:1, type:'Estándar', status:'ocupada', guest:'Sr. Duarte' },
+    { number:'107', floor:1, type:'Estándar', status:'libre', guest:null },
+    { number:'201', floor:2, type:'Estándar', status:'ocupada', guest:null },
+    { number:'212', floor:2, type:'Estándar', status:'ocupada', guest:'Sra. Londoño' },
+    { number:'215', floor:2, type:'Estándar', status:'ocupada', guest:null },
+    { number:'302', floor:3, type:'Deluxe', status:'ocupada', guest:null },
+    { number:'305', floor:3, type:'Deluxe', status:'ocupada', guest:null },
+    { number:'309', floor:3, type:'Deluxe', status:'libre', guest:null },
+    { number:'401', floor:4, type:'Deluxe', status:'ocupada', guest:null },
+    { number:'406', floor:4, type:'Deluxe', status:'ocupada', guest:null },
+    { number:'410', floor:4, type:'Deluxe', status:'mantenimiento', guest:null },
+    { number:'318', floor:3, type:'Suite', status:'ocupada', guest:'Sr. Gómez', subtype:'Suite Junior' },
+    { number:'405', floor:4, type:'Suite', status:'ocupada', guest:'Sr Snick', subtype:'Suite Deluxe' },
+    { number:'220', floor:2, type:'Suite', status:'libre', guest:null, subtype:'Suite Ejecutiva' },
+    { number:'512', floor:5, type:'Suite', status:'ocupada', guest:null, subtype:'Suite Ejecutiva' },
+    { number:'509', floor:5, type:'Presidencial', status:'ocupada', guest:'Sra. Pardo', subtype:'Suite Presidencial' },
+    { number:'601', floor:6, type:'Presidencial', status:'libre', guest:null, subtype:'Suite Presidencial' },
+  ];
+
+  const guests = [
+    { id:'g1', name:'Sr Snick', room:'405', type:'Suite Deluxe', checkin:'15 sep', checkout:'19 sep', status:'in-house', doc:'CC 1 020 345 678', phone:'+57 300 123 4567' },
+    { id:'g2', name:'Sra. Londoño', room:'212', type:'Habitación Estándar', checkin:'16 sep', checkout:'20 sep', status:'in-house', doc:'CC 43 567 890', phone:'+57 310 987 6543' },
+    { id:'g3', name:'Sr. Gómez', room:'318', type:'Suite Junior', checkin:'17 sep', checkout:'21 sep', status:'in-house', doc:'CC 79 234 561', phone:'+57 315 456 7890' },
+    { id:'g4', name:'Sra. Pardo', room:'509', type:'Suite Presidencial', checkin:'14 sep', checkout:'18 sep', status:'in-house', doc:'CC 52 876 123', phone:'+57 320 234 5678' },
+    { id:'g5', name:'Sr. Duarte', room:'104', type:'Habitación Estándar', checkin:'16 sep', checkout:'18 sep', status:'checkout-hoy', doc:'CC 11 345 987', phone:'+57 312 678 9012' },
+    { id:'g6', name:'Sra. Ibarra', room:'220', type:'Suite Ejecutiva', checkin:'12 sep', checkout:'17 sep', status:'salio', doc:'CC 63 112 456', phone:'+57 301 345 6789' },
+    { id:'g7', name:'Sr. Osorio', room:'406', type:'Deluxe', checkin:'18 sep', checkout:'22 sep', status:'reserva', doc:'CC 80 456 789', phone:'+57 318 567 1234' },
+    { id:'g8', name:'Sra. Vélez', room:'512', type:'Suite Ejecutiva', checkin:'17 sep', checkout:'23 sep', status:'in-house', doc:'CC 71 223 456', phone:'+57 304 890 1234' },
+  ];
+
+  // Estado y urgencia se muestran con el mismo vocabulario que usan room-service.html
+  // y servicio-solicitud.html al escribir en localStorage (ver hotelife_service_requests
+  // y hotelife_shared_orders), para que todo se pueda mezclar en una sola tabla.
+  const STATUS_MAP = {
+    pendiente: { cls:'status-pending', label:'Pendiente' },
+    nuevo: { cls:'status-pending', label:'Nuevo' },
+    proceso: { cls:'status-progress', label:'En proceso' },
+    preparando: { cls:'status-progress', label:'Preparando' },
+    camino: { cls:'status-progress', label:'En camino' },
+    coordinando: { cls:'status-progress', label:'Coordinando' },
+    confirmada: { cls:'status-done', label:'Confirmado' },
+    confirmado: { cls:'status-done', label:'Confirmado' },
+    completada: { cls:'status-done', label:'Completada' },
+    entregado: { cls:'status-done', label:'Entregado' },
+  };
+  function statusBucket(status){ return (STATUS_MAP[status] || STATUS_MAP.pendiente).cls; }
+  function statusLabel(status){ return (STATUS_MAP[status] || { label: status }).label; }
+
+  let requestSeq = 0;
+  // source:'local' = datos de ejemplo manejables aquí mismo. source:'shared' = viene de
+  // localStorage (lo escribió el huésped o un área) y solo se puede visualizar, no mutar,
+  // porque la app dueña de esa solicitud es la que controla su estado real.
+  const requests = [
+    { id:'r'+(++requestSeq), guest:'Sr Snick', room:'405', roomType:'Suite Deluxe', title:'Mantenimiento — A/C', dept:'🔧 Mantenimiento', status:'pendiente', urgent:true, note:'El aire acondicionado hace un ruido extraño y no enfría bien.', createdAt: new Date(Date.now() - 22*60000).toISOString(), source:'local' },
+    { id:'r'+(++requestSeq), guest:'Sra. Londoño', room:'212', roomType:'Habitación Estándar', title:'Room Service', dept:'🍽️ A&B', status:'camino', urgent:false, note:'1x Club Sandwich, 1x Jugo natural de naranja.', createdAt: new Date(Date.now() - 12*60000).toISOString(), source:'local' },
+    { id:'r'+(++requestSeq), guest:'Sr. Gómez', room:'318', roomType:'Suite Junior', title:'Traslado al aeropuerto', dept:'🧭 Conserjería', status:'pendiente', urgent:false, note:'Vuelo a las 6:40 PM, necesita salir del hotel a las 4:30 PM.', createdAt: new Date(Date.now() - 6*60000).toISOString(), source:'local' },
+    { id:'r'+(++requestSeq), guest:'Sra. Pardo', room:'509', roomType:'Suite Presidencial', title:'Spa & Wellness', dept:'🧖‍♀️ Spa', status:'confirmado', urgent:false, note:'Masaje relajante 50 min, reservado para las 5:00 PM.', createdAt: new Date(Date.now() - 40*60000).toISOString(), source:'local' },
+    { id:'r'+(++requestSeq), guest:'Sr. Duarte', room:'104', roomType:'Habitación Estándar', title:'Housekeeping — Toallas extra', dept:'🧺 Ama de llaves', status:'camino', urgent:false, note:'Solicita 2 toallas adicionales.', createdAt: new Date(Date.now() - 9*60000).toISOString(), source:'local' },
+    { id:'r'+(++requestSeq), guest:'Sra. Ibarra', room:'220', roomType:'Suite Ejecutiva', title:'Check-out — pago pendiente', dept:'🏨 Recepción', status:'pendiente', urgent:false, note:'Falta liquidar el consumo del minibar antes de confirmar el check-out.', createdAt: new Date(Date.now() - 11*60000).toISOString(), source:'local' },
+  ];
+
+  /* ============ UTILIDADES ============ */
+  function showToast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(window.__toastTimer);
+    window.__toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+  }
+  function minutesAgo(iso){ return Math.max(0, Math.round((Date.now() - new Date(iso)) / 60000)); }
+
+  /* ============ NAVEGACIÓN ENTRE VISTAS ============ */
+  const VIEW_TITLES = { dashboard:'Dashboard', solicitudes:'Solicitudes', huespedes:'Huéspedes', habitaciones:'Habitaciones', mantenimiento:'Mantenimiento', reportes:'Reportes', configuracion:'Configuración' };
+  function goToView(view){
+    document.querySelectorAll('.nav-link[data-view]').forEach(l => l.classList.toggle('active', l.dataset.view === view));
+    document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + view));
+    document.getElementById('topbarTitle').textContent = VIEW_TITLES[view] || view;
+    if (view === 'dashboard') renderDashboard();
+  }
+  document.querySelectorAll('.nav-link[data-view]').forEach(link => {
+    link.addEventListener('click', () => goToView(link.dataset.view));
+  });
+
+  /* ============ DASHBOARD / OCUPACIÓN ============ */
+  function DEPT_ROOM_TYPES(){ return ['Estándar','Deluxe','Suite','Presidencial']; }
+  function recomputeOccupancy(){
+    const byType = {};
+    DEPT_ROOM_TYPES().forEach(t => byType[t] = { total:0, occ:0 });
+    rooms.forEach(r => {
+      byType[r.type].total++;
+      if (r.status === 'ocupada') byType[r.type].occ++;
     });
-  });
-
-  document.querySelectorAll('.row-action').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const row = e.target.closest('tr');
-      const guest = row.querySelector('.guest-cell').textContent.trim();
-      console.log('Acción sobre solicitud de:', guest);
-    });
-  });
-
-  document.getElementById('viewAllRequests').addEventListener('click', () => {
-    document.querySelector('[data-view="solicitudes"]').click();
-  });
-
-  document.getElementById('notifBtn').addEventListener('click', () => {
-    console.log('Abrir panel de notificaciones');
-  });
-  document.getElementById('settingsBtn').addEventListener('click', () => {
-    console.log('Abrir configuración');
-  });
-
-  // Recepción ve TODAS las solicitudes de todas las áreas (respaldo 24/7)
-  function loadRealRequests() {
-    const serviceRequests = JSON.parse(localStorage.getItem('hotelife_service_requests') || '[]');
-    const roomServiceOrders = JSON.parse(localStorage.getItem('hotelife_shared_orders') || '[]');
-
-    // Normalizar ambas fuentes a una misma forma
-    const normalized = [
-      ...serviceRequests.map(r => ({
-        id: r.id, guestName: r.guestName, room: r.room, title: r.title, dept: r.dept,
-        status: r.status, urgent: !!r.urgent, createdAt: r.createdAt
-      })),
-      ...roomServiceOrders.map(r => ({
-        id: r.id, guestName: r.guest, room: r.room, title: r.source + ' — ' + (r.items || '').split('\n')[0],
-        dept: '🍽️ A&B', status: r.stage, urgent: false, createdAt: r.createdAt
-      }))
-    ];
-
-    normalized.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-    const statusMap = {
-      pendiente: { cls: 'status-pending', label: 'Pendiente' },
-      nuevo: { cls: 'status-pending', label: 'Nuevo' },
-      proceso: { cls: 'status-progress', label: 'En proceso' },
-      preparando: { cls: 'status-progress', label: 'Preparando' },
-      camino: { cls: 'status-progress', label: 'En camino' },
-      coordinando: { cls: 'status-progress', label: 'Coordinando' },
-      confirmada: { cls: 'status-done', label: 'Confirmado' },
-      confirmado: { cls: 'status-done', label: 'Confirmado' },
-      completada: { cls: 'status-done', label: 'Completada' },
-      entregado: { cls: 'status-done', label: 'Entregado' }
-    };
-
-    const tbody = document.getElementById('requestsTableBody');
-    normalized.forEach(req => {
-      if (document.getElementById(req.id)) return;
-
-      const minutesAgo = Math.max(0, Math.round((Date.now() - new Date(req.createdAt)) / 60000));
-      const statusInfo = statusMap[req.status] || { cls: 'status-pending', label: req.status };
-      const statusCellHtml = req.urgent
-        ? `<span class="status-pill status-urgent">Urgente</span>${minutesAgo > 15 ? `<div class="escalation-flag">⚠️ Sin respuesta ${minutesAgo} min</div>` : ''}`
-        : `<span class="status-pill ${statusInfo.cls}">${statusInfo.label}</span>`;
-
-      const row = document.createElement('tr');
-      row.id = req.id;
-      row.innerHTML = `
-        <td><div class="guest-cell">🧑 ${req.guestName}</div></td>
-        <td><span class="room-pill">${req.room}</span></td>
-        <td>${req.title}</td>
-        <td><span class="dept-pill">${req.dept}</span></td>
-        <td>${statusCellHtml}</td>
-        <td><button class="row-action">Atender</button></td>
-      `;
-      tbody.insertBefore(row, tbody.firstChild);
-
-      row.querySelector('.row-action').addEventListener('click', () => {
-        console.log('Acción sobre solicitud de:', req.guestName);
-      });
-    });
-
-    updatePendingKpi();
+    return byType;
   }
 
-  function updatePendingKpi() {
-    const rows = document.querySelectorAll('#requestsTableBody tr');
-    let pending = 0, urgent = 0;
-    rows.forEach(row => {
-      if (row.querySelector('.status-urgent')) { pending++; urgent++; }
-      else if (row.querySelector('.status-pending, .status-progress')) { pending++; }
-    });
+  function renderDashboard(){
+    const byType = recomputeOccupancy();
+    const totalRooms = rooms.length;
+    const occRooms = rooms.filter(r => r.status === 'ocupada').length;
+    document.getElementById('kpiOcupacion').textContent = Math.round(occRooms / totalRooms * 100) + '%';
+    document.getElementById('kpiHuespedes').textContent = guests.filter(g => g.status === 'in-house').length;
+    document.getElementById('kpiHuespedesSub').textContent = occRooms + ' habitaciones';
+
+    const pending = requests.filter(r => r.urgent || statusBucket(r.status) !== 'status-done').length;
+    const urgent = requests.filter(r => r.urgent).length;
     document.getElementById('kpiPendientes').textContent = pending;
     document.getElementById('kpiUrgentes').textContent = urgent + (urgent === 1 ? ' urgente' : ' urgentes');
+
+    const wrap = document.getElementById('occupancyByType');
+    wrap.innerHTML = DEPT_ROOM_TYPES().map(type => {
+      const d = byType[type];
+      const pct = d.total ? Math.round(d.occ / d.total * 100) : 0;
+      return `<div class="occupancy-row"><span class="occupancy-label">${type}</span><div class="occupancy-track"><div class="occupancy-fill" style="width:${pct}%"></div></div><span class="occupancy-value">${pct}%</span></div>`;
+    }).join('');
+
+    document.getElementById('dashRequestsBody').innerHTML = requests.slice(0, 5).map(r => requestRowHtml(r)).join('');
+    attachRequestRowHandlers(document.getElementById('dashRequestsBody'));
+    renderDnd();
   }
 
-  // Modo Privacidad: habitaciones que activaron "No Molestar" desde la app del huésped
-  function loadDoNotDisturb() {
+  function requestRowHtml(r){
+    const mins = r.createdAt ? minutesAgo(r.createdAt) : 0;
+    let statusHtml;
+    if (r.urgent){
+      statusHtml = `<span class="status-pill status-urgent">Urgente</span>${mins > 15 ? `<div class="escalation-flag">⚠️ Sin respuesta ${mins} min</div>` : ''}`;
+    } else {
+      statusHtml = `<span class="status-pill ${statusBucket(r.status)}">${statusLabel(r.status)}</span>`;
+    }
+    const actionLabel = statusBucket(r.status) === 'status-done' ? 'Ver' : 'Atender';
+    return `
+      <tr data-id="${r.id}" data-room="${r.room}">
+        <td><div class="guest-cell" data-open-guest="${r.guest}">🧑 ${r.guest}</div></td>
+        <td><span class="room-pill">${r.room}</span></td>
+        <td>${r.title}</td>
+        <td><span class="dept-pill">${r.dept}</span></td>
+        <td>${statusHtml}</td>
+        <td><button class="row-action" data-request-action="${r.id}">${actionLabel}</button></td>
+      </tr>`;
+  }
+
+  function attachRequestRowHandlers(container){
+    container.querySelectorAll('[data-request-action]').forEach(btn => {
+      btn.addEventListener('click', () => openRequestModal(btn.dataset.requestAction));
+    });
+    container.querySelectorAll('[data-open-guest]').forEach(el => {
+      el.addEventListener('click', () => openGuestModalByName(el.dataset.openGuest));
+    });
+  }
+
+  document.getElementById('viewAllRequests').addEventListener('click', () => goToView('solicitudes'));
+
+  /* ============ SOLICITUDES (vista completa) ============ */
+  let reqFilter = 'todas';
+  let reqSearchTerm = '';
+  function renderSolicitudes(){
+    let list = requests.slice();
+    if (reqFilter === 'urgente') list = list.filter(r => r.urgent);
+    else if (reqFilter !== 'todas') list = list.filter(r => !r.urgent && statusBucket(r.status) === ({ pendiente:'status-pending', 'en-camino':'status-progress', confirmado:'status-done' })[reqFilter]);
+    if (reqSearchTerm) list = list.filter(r => (r.guest + r.room).toLowerCase().includes(reqSearchTerm));
+    const body = document.getElementById('fullRequestsBody');
+    body.innerHTML = list.length ? list.map(r => requestRowHtml(r)).join('') : '<tr><td colspan="6" style="color:var(--text-muted); padding:20px 0;">No hay solicitudes con ese filtro.</td></tr>';
+    attachRequestRowHandlers(body);
+    renderDnd();
+  }
+  document.getElementById('reqFilters').addEventListener('click', (e) => {
+    const chip = e.target.closest('.filter-chip');
+    if (!chip) return;
+    document.querySelectorAll('#reqFilters .filter-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    reqFilter = chip.dataset.filter;
+    renderSolicitudes();
+  });
+  document.getElementById('reqSearch').addEventListener('input', (e) => {
+    reqSearchTerm = e.target.value.trim().toLowerCase();
+    renderSolicitudes();
+  });
+
+  function advanceRequestStatus(id){
+    const r = requests.find(x => x.id === id);
+    if (!r || r.source !== 'local') return;
+    const bucket = statusBucket(r.status);
+    if (r.urgent || bucket === 'status-pending') { r.status = 'proceso'; r.urgent = false; }
+    else if (bucket === 'status-progress') { r.status = 'confirmado'; }
+    renderDashboard();
+    renderSolicitudes();
+    showToast('Solicitud de ' + r.guest + ' actualizada a "' + statusLabel(r.status) + '"');
+  }
+
+  function openRequestModal(id){
+    const r = requests.find(x => x.id === id);
+    if (!r) return;
+    document.getElementById('modalTitle').textContent = r.title;
+    document.getElementById('modalBody').innerHTML = `
+      <div class="modal-field"><span>Huésped</span><b>${r.guest}</b></div>
+      <div class="modal-field"><span>Habitación</span><b>${r.room} · ${r.roomType}</b></div>
+      <div class="modal-field"><span>Área asignada</span><b>${r.dept}</b></div>
+      <div class="modal-field"><span>Estado</span>${r.urgent ? '<span class="status-pill status-urgent">Urgente</span>' : `<span class="status-pill ${statusBucket(r.status)}">${statusLabel(r.status)}</span>`}</div>
+      <div class="modal-section-title">Detalle</div>
+      <p style="font-size:13px; color:var(--text-muted); line-height:1.5;">${r.note || 'Sin detalle adicional.'}</p>
+      ${r.source === 'shared' ? '<p class="modal-note">Esta solicitud la gestiona el área correspondiente desde su propia app; aquí recepción solo la está viendo como respaldo.</p>' : ''}
+    `;
+    const footer = document.getElementById('modalFooter');
+    footer.innerHTML = '';
+    if (r.source === 'local' && statusBucket(r.status) !== 'status-done'){
+      const nextLabel = (r.urgent || statusBucket(r.status) === 'status-pending') ? 'Marcar en proceso' : 'Marcar confirmado';
+      const btn = document.createElement('button');
+      btn.className = 'btn btn-primary';
+      btn.style.flex = '1';
+      btn.textContent = nextLabel;
+      btn.addEventListener('click', () => { advanceRequestStatus(r.id); closeModal(); });
+      footer.appendChild(btn);
+    }
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'btn btn-outline';
+    closeBtn.style.flex = (r.source === 'shared' || statusBucket(r.status) === 'status-done') ? '1' : '0 0 auto';
+    closeBtn.textContent = 'Cerrar';
+    closeBtn.addEventListener('click', closeModal);
+    footer.appendChild(closeBtn);
+    openModal();
+  }
+
+  /* ============ HUÉSPEDES ============ */
+  const GUEST_STATUS_LABEL = { 'in-house':'En el hotel', 'checkout-hoy':'Check-out hoy', salio:'Ya salió', reserva:'Próxima llegada' };
+  const GUEST_STATUS_CLASS = { 'in-house':'status-done', 'checkout-hoy':'status-urgent', salio:'status-pending', reserva:'status-progress' };
+  let guestSearchTerm = '';
+  function renderGuests(){
+    let list = guests.slice();
+    if (guestSearchTerm) list = list.filter(g => (g.name + g.room).toLowerCase().includes(guestSearchTerm));
+    document.getElementById('guestsBody').innerHTML = list.map(g => `
+      <tr>
+        <td><div class="guest-cell" data-open-guest="${g.name}">🧑 ${g.name}</div></td>
+        <td><span class="room-pill">${g.room}</span></td>
+        <td>${g.type}</td>
+        <td>${g.checkin}</td>
+        <td>${g.checkout}</td>
+        <td><span class="status-pill ${GUEST_STATUS_CLASS[g.status]}">${GUEST_STATUS_LABEL[g.status]}</span></td>
+        <td><button class="row-action" data-open-guest="${g.name}">Ver perfil</button></td>
+      </tr>
+    `).join('');
+    document.querySelectorAll('#guestsBody [data-open-guest]').forEach(el => {
+      el.addEventListener('click', () => openGuestModalByName(el.dataset.openGuest));
+    });
+  }
+  document.getElementById('guestSearch').addEventListener('input', (e) => {
+    guestSearchTerm = e.target.value.trim().toLowerCase();
+    renderGuests();
+  });
+
+  function openGuestModalByName(name){
+    const g = guests.find(x => x.name === name);
+    if (!g) { showToast('No hay ficha para ' + name); return; }
+    const theirRequests = requests.filter(r => r.guest === g.name);
+    document.getElementById('modalTitle').textContent = g.name;
+    document.getElementById('modalBody').innerHTML = `
+      <div class="modal-field"><span>Habitación</span><b>${g.room} · ${g.type}</b></div>
+      <div class="modal-field"><span>Check-in</span><b>${g.checkin}</b></div>
+      <div class="modal-field"><span>Check-out</span><b>${g.checkout}</b></div>
+      <div class="modal-field"><span>Documento</span><b>${g.doc}</b></div>
+      <div class="modal-field"><span>Teléfono</span><b>${g.phone}</b></div>
+      <div class="modal-field"><span>Estado</span><span class="status-pill ${GUEST_STATUS_CLASS[g.status]}">${GUEST_STATUS_LABEL[g.status]}</span></div>
+      <div class="modal-section-title">Solicitudes de este huésped</div>
+      ${theirRequests.length ? theirRequests.map(r => `<div class="activity-item"><div class="activity-icon">${r.dept.split(' ')[0]}</div><div><p class="activity-text"><b>${r.title}</b></p><p class="activity-time">${r.urgent ? 'Urgente' : statusLabel(r.status)}</p></div></div>`).join('') : '<p style="font-size:12.5px; color:var(--text-muted);">Sin solicitudes registradas.</p>'}
+    `;
+    const footer = document.getElementById('modalFooter');
+    footer.innerHTML = '';
+    const msgBtn = document.createElement('button');
+    msgBtn.className = 'btn btn-primary';
+    msgBtn.style.flex = '1';
+    msgBtn.textContent = '✉️ Enviar mensaje';
+    msgBtn.addEventListener('click', () => { showToast('Mensaje enviado a ' + g.name); closeModal(); });
+    footer.appendChild(msgBtn);
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'btn btn-outline';
+    closeBtn.textContent = 'Cerrar';
+    closeBtn.addEventListener('click', closeModal);
+    footer.appendChild(closeBtn);
+    openModal();
+  }
+
+  /* ============ HABITACIONES ============ */
+  let roomFilter = 'todas';
+  const ROOM_STATUS_CYCLE = ['ocupada', 'libre', 'mantenimiento'];
+  function dndRoomSet(){
     let privacy = {};
     try { privacy = JSON.parse(localStorage.getItem('hotelife_privacy') || '{}'); } catch (e) {}
-    const rooms = Object.entries(privacy)
+    return new Set(Object.entries(privacy).filter(([, p]) => p && p.on).map(([room]) => room));
+  }
+  function renderRooms(){
+    let list = rooms.slice();
+    if (roomFilter !== 'todas') list = list.filter(r => r.status === roomFilter);
+    const dnd = dndRoomSet();
+    document.getElementById('roomGrid').innerHTML = list.map(r => `
+      <div class="room-card" data-status="${r.status}" data-room="${r.number}">
+        <div class="room-card-number-row">
+          <p class="room-card-number">${r.number}</p>
+          ${dnd.has(r.number) ? '<span class="room-dnd-flag" title="No Molestar activo">🔕</span>' : ''}
+        </div>
+        <p class="room-card-type">${r.subtype || r.type}</p>
+        ${r.guest ? `<p class="room-card-guest">🧑 ${r.guest}</p>` : ''}
+        <span class="room-status-chip ${r.status}">${r.status === 'ocupada' ? 'Ocupada' : r.status === 'libre' ? 'Libre' : 'Mantenimiento'}</span>
+      </div>
+    `).join('');
+    document.querySelectorAll('#roomGrid .room-card').forEach(card => {
+      card.addEventListener('click', () => cycleRoomStatus(card.dataset.room));
+    });
+  }
+  document.getElementById('roomFilters').addEventListener('click', (e) => {
+    const chip = e.target.closest('.filter-chip');
+    if (!chip) return;
+    document.querySelectorAll('#roomFilters .filter-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    roomFilter = chip.dataset.filter;
+    renderRooms();
+  });
+  function cycleRoomStatus(number){
+    const r = rooms.find(x => x.number === number);
+    if (!r) return;
+    const idx = ROOM_STATUS_CYCLE.indexOf(r.status);
+    r.status = ROOM_STATUS_CYCLE[(idx + 1) % ROOM_STATUS_CYCLE.length];
+    if (r.status !== 'ocupada') r.guest = null;
+    renderRooms();
+    showToast('Habitación ' + number + ' → ' + (r.status === 'ocupada' ? 'Ocupada' : r.status === 'libre' ? 'Libre' : 'Mantenimiento'));
+  }
+
+  /* ============ MANTENIMIENTO (vista admin) ============ */
+  let maintSeq = 0;
+  const maintTickets = [
+    { id:'m'+(++maintSeq), room:'405', guest:'Sr Snick', roomType:'Suite Deluxe', category:'🌡️ Aire acondicionado', desc:'El aire acondicionado hace un ruido extraño y no enfría bien.', urgency:'urgente', status:'pendiente', access:'Prefiere que entren cuando no esté', source:'local' },
+    { id:'m'+(++maintSeq), room:'212', guest:'Sra. Londoño', roomType:'Habitación Estándar', category:'💡 Eléctrico', desc:'Un enchufe del baño no funciona.', urgency:'normal', status:'pendiente', access:'Ahora mismo, está en la habitación', source:'local' },
+    { id:'m'+(++maintSeq), room:'318', guest:'Sr. Gómez', roomType:'Suite Junior', category:'🚿 Plomería', desc:'Fuga leve debajo del lavamanos.', urgency:'normal', status:'proceso', access:'Hora específica: 3:00 PM', source:'local' },
+    { id:'m'+(++maintSeq), room:'509', guest:'Sra. Pardo', roomType:'Suite Presidencial', category:'🚪 Puerta / Cerradura', desc:'La cerradura electrónica no responde.', urgency:'urgente', status:'proceso', access:'Ahora mismo, está en la habitación', source:'local' },
+    { id:'m'+(++maintSeq), room:'104', guest:'Sr. Duarte', roomType:'Habitación Estándar', category:'🪑 Muebles / Otro', desc:'Una silla del escritorio está floja.', urgency:'normal', status:'completada', source:'local' },
+  ];
+  let maintFilter = 'todas';
+  function renderMaint(){
+    let list = maintTickets.slice();
+    if (maintFilter !== 'todas') list = list.filter(t => t.status === maintFilter);
+    const STATUS_LABEL = { pendiente:'Pendiente', proceso:'En proceso', completada:'Completada' };
+    document.getElementById('maintList').innerHTML = list.map(t => `
+      <div class="ticket-card ${t.urgency === 'urgente' && t.status !== 'completada' ? 'urgent' : ''}">
+        <div class="ticket-top-row">
+          <div><span class="room-pill">${t.room}</span> <b style="font-size:13px;">${t.guest}</b></div>
+          <span class="status-pill ${t.status === 'pendiente' ? 'status-pending' : t.status === 'proceso' ? 'status-progress' : 'status-done'}">${STATUS_LABEL[t.status]}</span>
+        </div>
+        <p style="font-weight:700; font-size:13px;">${t.category}</p>
+        <p class="ticket-desc">"${t.desc}"</p>
+        ${t.access ? `<span class="dept-pill" style="width:fit-content;">🔑 ${t.access}</span>` : ''}
+        <div class="ticket-actions">
+          ${t.source === 'local' && t.status === 'pendiente' ? `<button class="btn btn-primary" data-maint-accept="${t.id}">Aceptar</button>` : ''}
+          ${t.source === 'local' && t.status === 'proceso' ? `<button class="btn btn-success" data-maint-complete="${t.id}">Marcar completada</button>` : ''}
+          <button class="btn btn-outline" data-maint-view="${t.id}">Ver detalle</button>
+        </div>
+      </div>
+    `).join('') || '<p style="color:var(--text-muted); font-size:13px;">No hay tickets con ese filtro.</p>';
+
+    document.querySelectorAll('[data-maint-accept]').forEach(b => b.addEventListener('click', () => { setMaintStatus(b.dataset.maintAccept, 'proceso'); }));
+    document.querySelectorAll('[data-maint-complete]').forEach(b => b.addEventListener('click', () => { setMaintStatus(b.dataset.maintComplete, 'completada'); }));
+    document.querySelectorAll('[data-maint-view]').forEach(b => b.addEventListener('click', () => openMaintModal(b.dataset.maintView)));
+  }
+  document.getElementById('maintFilters').addEventListener('click', (e) => {
+    const chip = e.target.closest('.filter-chip');
+    if (!chip) return;
+    document.querySelectorAll('#maintFilters .filter-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    maintFilter = chip.dataset.filter;
+    renderMaint();
+  });
+  function setMaintStatus(id, status){
+    const t = maintTickets.find(x => x.id === id);
+    if (!t) return;
+    t.status = status;
+    renderMaint();
+    showToast('Ticket de ' + t.room + ' → ' + (status === 'proceso' ? 'En proceso' : 'Completada'));
+  }
+  function openMaintModal(id){
+    const t = maintTickets.find(x => x.id === id);
+    if (!t) return;
+    document.getElementById('modalTitle').textContent = t.category;
+    document.getElementById('modalBody').innerHTML = `
+      <div class="modal-field"><span>Huésped</span><b>${t.guest}</b></div>
+      <div class="modal-field"><span>Habitación</span><b>${t.room} · ${t.roomType || ''}</b></div>
+      <div class="modal-field"><span>Urgencia</span><b>${t.urgency === 'urgente' ? 'Urgente' : 'Normal'}</b></div>
+      ${t.access ? `<div class="modal-field"><span>Acceso</span><b>${t.access}</b></div>` : ''}
+      <div class="modal-section-title">Descripción</div>
+      <p style="font-size:13px; color:var(--text-muted); line-height:1.5;">"${t.desc}"</p>
+      ${t.source === 'shared' ? '<p class="modal-note">Este ticket lo gestiona el jefe de Mantenimiento desde su propia app; aquí recepción solo lo está viendo como respaldo.</p>' : ''}
+    `;
+    const footer = document.getElementById('modalFooter');
+    footer.innerHTML = '';
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'btn btn-outline';
+    closeBtn.style.flex = '1';
+    closeBtn.textContent = 'Cerrar';
+    closeBtn.addEventListener('click', closeModal);
+    footer.appendChild(closeBtn);
+    openModal();
+  }
+
+  /* ============ REPORTES ============ */
+  function renderReportes(){
+    const deptCounts = {};
+    requests.forEach(r => { deptCounts[r.dept] = (deptCounts[r.dept] || 0) + 1; });
+    const maxCount = Math.max(1, ...Object.values(deptCounts));
+    document.getElementById('reportByDept').innerHTML = Object.keys(deptCounts).map(dept => {
+      const pct = Math.round(deptCounts[dept] / maxCount * 100);
+      return `<div class="occupancy-row"><span class="occupancy-label">${dept}</span><div class="occupancy-track"><div class="occupancy-fill" style="width:${pct}%"></div></div><span class="occupancy-value">${deptCounts[dept]}</span></div>`;
+    }).join('');
+
+    const revenue = [ ['Lun', 60], ['Mar', 72], ['Mié', 55], ['Jue', 80], ['Vie', 94], ['Sáb', 100], ['Dom', 68] ];
+    document.getElementById('reportRevenue').innerHTML = revenue.map(([d, pct]) => `<div class="occupancy-row"><span class="occupancy-label">${d}</span><div class="occupancy-track"><div class="occupancy-fill" style="width:${pct}%"></div></div><span class="occupancy-value">${pct}%</span></div>`).join('');
+  }
+  document.getElementById('exportReportBtn').addEventListener('click', () => showToast('La exportación a PDF estará disponible próximamente'));
+
+  /* ============ CONFIGURACIÓN ============ */
+  const SETTINGS_KEY = 'hotelife_admin_settings';
+  function renderConfig(){
+    const saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
+    document.getElementById('cfgHotelName').value = saved.hotelName || 'HOTELIFE';
+    if (saved.timezone) document.getElementById('cfgTimezone').value = saved.timezone;
+
+    document.getElementById('cfgDepartments').innerHTML = DEPARTMENTS.filter(d => d.id !== 'recepcion').map(d => {
+      const checked = saved.departments ? saved.departments.includes(d.id) : true;
+      return `
+        <div class="toggle-row">
+          <div><p class="toggle-row-label">${d.icon} ${d.label}</p></div>
+          <label class="switch"><input type="checkbox" data-dept="${d.id}" ${checked ? 'checked' : ''}><span class="switch-track"></span></label>
+        </div>`;
+    }).join('');
+
+    const notifDefs = [
+      { id:'nuevas', label:'Nuevas solicitudes', sub:'Avisar cuando llegue una solicitud nueva' },
+      { id:'urgentes', label:'Solicitudes urgentes', sub:'Avisar de inmediato si algo queda sin atender' },
+      { id:'resumen', label:'Resumen diario', sub:'Enviar un resumen del día cada noche' },
+    ];
+    document.getElementById('cfgNotifications').innerHTML = notifDefs.map(n => {
+      const checked = saved.notifications ? saved.notifications.includes(n.id) : true;
+      return `
+        <div class="toggle-row">
+          <div><p class="toggle-row-label">${n.label}</p><p class="toggle-row-sub">${n.sub}</p></div>
+          <label class="switch"><input type="checkbox" data-notif="${n.id}" ${checked ? 'checked' : ''}><span class="switch-track"></span></label>
+        </div>`;
+    }).join('');
+  }
+  document.getElementById('cfgSaveBtn').addEventListener('click', () => {
+    const departments = Array.from(document.querySelectorAll('[data-dept]:checked')).map(el => el.dataset.dept);
+    const notifications = Array.from(document.querySelectorAll('[data-notif]:checked')).map(el => el.dataset.notif);
+    const settings = {
+      hotelName: document.getElementById('cfgHotelName').value.trim() || 'HOTELIFE',
+      timezone: document.getElementById('cfgTimezone').value,
+      departments, notifications
+    };
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+    showToast('Cambios guardados');
+  });
+
+  /* ============ MODAL GENÉRICO ============ */
+  function openModal(){ document.getElementById('modalOverlay').classList.add('open'); }
+  function closeModal(){ document.getElementById('modalOverlay').classList.remove('open'); }
+  document.getElementById('modalClose').addEventListener('click', closeModal);
+  document.getElementById('modalOverlay').addEventListener('click', (e) => { if (e.target.id === 'modalOverlay') closeModal(); });
+
+  /* ============ NOTIFICACIONES (topbar) ============ */
+  document.getElementById('notifBtn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    document.getElementById('notifPop').classList.toggle('open');
+  });
+  document.addEventListener('click', () => document.getElementById('notifPop').classList.remove('open'));
+  document.getElementById('settingsBtn').addEventListener('click', () => goToView('configuracion'));
+
+  /* ============ NO MOLESTAR (lo activa el huésped desde Inicio o Perfil) ============ */
+  function renderDnd(){
+    let privacy = {};
+    try { privacy = JSON.parse(localStorage.getItem('hotelife_privacy') || '{}'); } catch (e) {}
+    const dndRooms = Object.entries(privacy)
       .filter(([, p]) => p && p.on)
       .sort((a, b) => new Date(b[1].updatedAt) - new Date(a[1].updatedAt));
 
     const count = document.getElementById('dndCount');
-    count.textContent = rooms.length + (rooms.length === 1 ? ' habitación' : ' habitaciones');
-    count.classList.toggle('zero', rooms.length === 0);
-    document.getElementById('dndPanel').classList.toggle('dnd-alert', rooms.length > 0);
+    count.textContent = dndRooms.length + (dndRooms.length === 1 ? ' habitación' : ' habitaciones');
+    count.classList.toggle('zero', dndRooms.length === 0);
+    document.getElementById('dndPanel').classList.toggle('dnd-alert', dndRooms.length > 0);
 
-    document.getElementById('dndList').innerHTML = rooms.length === 0
+    document.getElementById('dndList').innerHTML = dndRooms.length === 0
       ? '<p class="dnd-empty">Ninguna habitación tiene activo el modo No Molestar.</p>'
-      : rooms.map(([room, p]) => {
+      : dndRooms.map(([room, p]) => {
           const since = new Date(p.updatedAt).toLocaleTimeString('es-CO', { hour: 'numeric', minute: '2-digit' });
           return `
             <div class="dnd-item">
@@ -492,13 +1108,13 @@
             </div>`;
         }).join('');
 
-    // Marca la habitación en la tabla de solicitudes para que el staff no entre
-    const dndRooms = new Set(rooms.map(([room]) => room));
-    document.querySelectorAll('#requestsTableBody tr').forEach(row => {
+    // Marca la habitación en cualquier tabla de solicitudes visible para que el staff no entre
+    const dndSet = new Set(dndRooms.map(([room]) => room));
+    document.querySelectorAll('[data-room]').forEach(row => {
       const pill = row.querySelector('.room-pill');
       if (!pill) return;
       let flag = row.querySelector('.dnd-flag');
-      if (dndRooms.has(pill.textContent.trim())) {
+      if (dndSet.has(row.dataset.room)) {
         if (!flag) {
           flag = document.createElement('span');
           flag.className = 'dnd-flag';
@@ -511,12 +1127,54 @@
     });
   }
 
-  function refresh() {
-    loadRealRequests();
-    loadDoNotDisturb();
+  /* ============ CONECTAR SOLICITUDES REALES (huésped → recepción, respaldo 24/7) ============ */
+  function pullLiveRequests(){
+    const serviceRequests = JSON.parse(localStorage.getItem('hotelife_service_requests') || '[]');
+    const roomServiceOrders = JSON.parse(localStorage.getItem('hotelife_shared_orders') || '[]');
+    let added = false;
+
+    serviceRequests.forEach(r => {
+      if (requests.some(x => x.id === r.id)) return;
+      requests.unshift({ id:r.id, guest:r.guestName, room:r.room, roomType:r.roomType, title:r.title, dept:r.dept, status:r.status, urgent:!!r.urgent, note: r.details ? Object.entries(r.details).map(([k,v]) => `${k}: ${v}`).join(' · ') : '', createdAt:r.createdAt, source:'shared' });
+      added = true;
+    });
+    roomServiceOrders.forEach(o => {
+      if (requests.some(x => x.id === o.id)) return;
+      const plain = (o.items || '').replace(/<[^>]+>/g, '').replace(/\n/g, ', ');
+      requests.unshift({ id:o.id, guest:o.guest, room:o.room, roomType:o.roomType, title:o.source + ' — ' + plain.split(',')[0], dept:'🍽️ A&B', status:o.stage || 'nuevo', urgent:false, note:plain, createdAt:o.createdAt, source:'shared' });
+      added = true;
+    });
+
+    // Mantenimiento también se agrega a la lista dedicada de la vista Mantenimiento
+    serviceRequests.filter(r => r.dept && r.dept.includes('Mantenimiento')).forEach(r => {
+      if (maintTickets.some(x => x.id === r.id)) return;
+      maintTickets.unshift({
+        id:r.id, room:r.room, guest:r.guestName, roomType:r.roomType, category:r.title,
+        desc: r.details ? Object.entries(r.details).map(([k,v]) => `${k}: ${v}`).join(' · ') : r.title,
+        urgency: r.urgent ? 'urgente' : 'normal', status: r.status === 'completada' ? 'completada' : (r.status === 'proceso' ? 'proceso' : 'pendiente'),
+        source:'shared'
+      });
+      added = true;
+    });
+
+    requests.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    return added;
   }
 
+  function refresh(){
+    const added = pullLiveRequests();
+    renderDashboard();
+    renderSolicitudes();
+    renderMaint();
+    renderReportes();
+    if (added) renderDnd();
+  }
+
+  /* ============ INIT ============ */
   refresh();
+  renderGuests();
+  renderRooms();
+  renderConfig();
 
   // Refrescar cada pocos segundos para simular llegada de solicitudes en vivo;
   // el evento "storage" lo actualiza al instante si el huésped está en otra pestaña
