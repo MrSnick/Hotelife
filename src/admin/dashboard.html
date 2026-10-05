@@ -253,6 +253,14 @@
   .stat-tile .big{ font-family:"Cormorant Garamond", serif; font-size:30px; font-weight:700; }
   .stat-tile .lbl{ font-size:11px; color: var(--text-muted); text-transform:uppercase; font-weight:700; }
 
+  /* Perfil de huésped */
+  .guest-profile-header{ display:flex; align-items:center; gap:18px; background: var(--navy); border-radius:16px; padding:24px; margin-bottom:20px; color:#fff; }
+  .guest-profile-avatar{ width:64px; height:64px; border-radius:18px; background: var(--gold); color: var(--navy); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:22px; flex-shrink:0; }
+  .guest-profile-name{ font-family:"Cormorant Garamond", serif; font-weight:700; font-size:24px; }
+  .guest-profile-sub{ font-size:12.5px; color: rgba(255,255,255,0.7); margin-top:2px; }
+  .guest-profile-tier{ display:inline-block; margin-top:8px; background: rgba(212,178,133,0.15); border:1px solid var(--gold); border-radius:10px; padding:5px 12px; font-size:11px; font-weight:700; color: var(--gold); }
+  .empty-note{ font-size:12.5px; color: var(--text-muted); }
+
   /* Modal */
   .modal-overlay{
     position:fixed; inset:0; background: rgba(26,34,45,0.45);
@@ -631,6 +639,12 @@
       </div>
     </section>
 
+    <!-- ========== PERFIL DE HUÉSPED (pantalla de detalle, no es un ítem del menú) ========== -->
+    <section class="view" id="view-guest-profile">
+      <button class="panel-link" id="guestProfileBack" style="margin-bottom:16px;">← Volver</button>
+      <div id="guestProfileBody"></div>
+    </section>
+
   </div>
 </div>
 
@@ -680,15 +694,34 @@
     { number:'601', floor:6, type:'Presidencial', status:'libre', guest:null, subtype:'Suite Presidencial' },
   ];
 
+  // Campos extra (email, idioma, notificaciones, métodos de pago, tier) reflejan lo que el
+  // huésped ve y edita en su propio perfil (src/perfil.html, igual al diseño de Figma);
+  // aquí recepción solo los puede consultar, no editar.
   const guests = [
-    { id:'g1', name:'Sr Snick', room:'405', type:'Suite Deluxe', checkin:'15 sep', checkout:'19 sep', status:'in-house', doc:'CC 1 020 345 678', phone:'+57 300 123 4567' },
-    { id:'g2', name:'Sra. Londoño', room:'212', type:'Habitación Estándar', checkin:'16 sep', checkout:'20 sep', status:'in-house', doc:'CC 43 567 890', phone:'+57 310 987 6543' },
-    { id:'g3', name:'Sr. Gómez', room:'318', type:'Suite Junior', checkin:'17 sep', checkout:'21 sep', status:'in-house', doc:'CC 79 234 561', phone:'+57 315 456 7890' },
-    { id:'g4', name:'Sra. Pardo', room:'509', type:'Suite Presidencial', checkin:'14 sep', checkout:'18 sep', status:'in-house', doc:'CC 52 876 123', phone:'+57 320 234 5678' },
-    { id:'g5', name:'Sr. Duarte', room:'104', type:'Habitación Estándar', checkin:'16 sep', checkout:'18 sep', status:'checkout-hoy', doc:'CC 11 345 987', phone:'+57 312 678 9012' },
-    { id:'g6', name:'Sra. Ibarra', room:'220', type:'Suite Ejecutiva', checkin:'12 sep', checkout:'17 sep', status:'salio', doc:'CC 63 112 456', phone:'+57 301 345 6789' },
-    { id:'g7', name:'Sr. Osorio', room:'406', type:'Deluxe', checkin:'18 sep', checkout:'22 sep', status:'reserva', doc:'CC 80 456 789', phone:'+57 318 567 1234' },
-    { id:'g8', name:'Sra. Vélez', room:'512', type:'Suite Ejecutiva', checkin:'17 sep', checkout:'23 sep', status:'in-house', doc:'CC 71 223 456', phone:'+57 304 890 1234' },
+    { id:'g1', name:'Sr Snick', room:'405', type:'Suite Deluxe', checkin:'15 sep', checkout:'19 sep', status:'in-house', doc:'CC 1 020 345 678', phone:'+57 300 123 4567',
+      docType:'Cédula de extranjería', email:'snick@correo.com', tier:'✦ Huésped Gold', language:'Español', notifPush:true, notifPromos:false,
+      paymentMethods:[ { name:'Wompi', sub:'Bancolombia •• 4417', color:'#3852ff', logo:'W' }, { name:'Mercado Pago', sub:'Cuenta vinculada', color:'#009ee3', logo:'MP' } ] },
+    { id:'g2', name:'Sra. Londoño', room:'212', type:'Habitación Estándar', checkin:'16 sep', checkout:'20 sep', status:'in-house', doc:'CC 43 567 890', phone:'+57 310 987 6543',
+      docType:'Cédula de ciudadanía', email:'londono@correo.com', tier:'Huésped Silver', language:'Español', notifPush:true, notifPromos:true,
+      paymentMethods:[ { name:'Mercado Pago', sub:'Cuenta vinculada', color:'#009ee3', logo:'MP' } ] },
+    { id:'g3', name:'Sr. Gómez', room:'318', type:'Suite Junior', checkin:'17 sep', checkout:'21 sep', status:'in-house', doc:'CC 79 234 561', phone:'+57 315 456 7890',
+      docType:'Cédula de ciudadanía', email:'gomez@correo.com', tier:'Huésped Silver', language:'Español', notifPush:false, notifPromos:false,
+      paymentMethods:[ { name:'Wompi', sub:'Visa •• 2290', color:'#3852ff', logo:'W' } ] },
+    { id:'g4', name:'Sra. Pardo', room:'509', type:'Suite Presidencial', checkin:'14 sep', checkout:'18 sep', status:'in-house', doc:'CC 52 876 123', phone:'+57 320 234 5678',
+      docType:'Cédula de ciudadanía', email:'pardo@correo.com', tier:'✦ Huésped Gold', language:'Español', notifPush:true, notifPromos:true,
+      paymentMethods:[ { name:'Wompi', sub:'Bancolombia •• 7781', color:'#3852ff', logo:'W' }, { name:'Mercado Pago', sub:'Cuenta vinculada', color:'#009ee3', logo:'MP' } ] },
+    { id:'g5', name:'Sr. Duarte', room:'104', type:'Habitación Estándar', checkin:'16 sep', checkout:'18 sep', status:'checkout-hoy', doc:'CC 11 345 987', phone:'+57 312 678 9012',
+      docType:'Cédula de ciudadanía', email:'duarte@correo.com', tier:'Huésped', language:'Español', notifPush:true, notifPromos:false,
+      paymentMethods:[] },
+    { id:'g6', name:'Sra. Ibarra', room:'220', type:'Suite Ejecutiva', checkin:'12 sep', checkout:'17 sep', status:'salio', doc:'CC 63 112 456', phone:'+57 301 345 6789',
+      docType:'Cédula de ciudadanía', email:'ibarra@correo.com', tier:'Huésped Silver', language:'Español', notifPush:false, notifPromos:false,
+      paymentMethods:[ { name:'Wompi', sub:'Bancolombia •• 3301', color:'#3852ff', logo:'W' } ] },
+    { id:'g7', name:'Sr. Osorio', room:'406', type:'Deluxe', checkin:'18 sep', checkout:'22 sep', status:'reserva', doc:'CC 80 456 789', phone:'+57 318 567 1234',
+      docType:'Cédula de ciudadanía', email:'osorio@correo.com', tier:'Huésped', language:'Español', notifPush:true, notifPromos:true,
+      paymentMethods:[] },
+    { id:'g8', name:'Sra. Vélez', room:'512', type:'Suite Ejecutiva', checkin:'17 sep', checkout:'23 sep', status:'in-house', doc:'CC 71 223 456', phone:'+57 304 890 1234',
+      docType:'Cédula de ciudadanía', email:'velez@correo.com', tier:'Huésped Silver', language:'Español', notifPush:true, notifPromos:false,
+      paymentMethods:[ { name:'Mercado Pago', sub:'Cuenta vinculada', color:'#009ee3', logo:'MP' } ] },
   ];
 
   // Estado y urgencia se muestran con el mismo vocabulario que usan room-service.html
@@ -734,7 +767,9 @@
 
   /* ============ NAVEGACIÓN ENTRE VISTAS ============ */
   const VIEW_TITLES = { dashboard:'Dashboard', solicitudes:'Solicitudes', huespedes:'Huéspedes', habitaciones:'Habitaciones', mantenimiento:'Mantenimiento', amadellaves:'Ama de Llaves', ayb:'Alimentos y Bebidas', spa:'Spa & Wellness', conserjeria:'Conserjería', reportes:'Reportes', configuracion:'Configuración' };
+  let currentView = 'dashboard';
   function goToView(view){
+    currentView = view;
     document.querySelectorAll('.nav-link[data-view]').forEach(l => l.classList.toggle('active', l.dataset.view === view));
     document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + view));
     document.getElementById('topbarTitle').textContent = VIEW_TITLES[view] || view;
@@ -806,7 +841,7 @@
       btn.addEventListener('click', () => openRequestModal(btn.dataset.requestAction));
     });
     container.querySelectorAll('[data-open-guest]').forEach(el => {
-      el.addEventListener('click', () => openGuestModalByName(el.dataset.openGuest));
+      el.addEventListener('click', () => openGuestProfile(el.dataset.openGuest));
     });
   }
 
@@ -901,7 +936,7 @@
       </tr>
     `).join('');
     document.querySelectorAll('#guestsBody [data-open-guest]').forEach(el => {
-      el.addEventListener('click', () => openGuestModalByName(el.dataset.openGuest));
+      el.addEventListener('click', () => openGuestProfile(el.dataset.openGuest));
     });
   }
   document.getElementById('guestSearch').addEventListener('input', (e) => {
@@ -909,36 +944,80 @@
     renderGuests();
   });
 
-  function openGuestModalByName(name){
+  // Pantalla completa de perfil (no modal): toda la info del huésped, igual a lo que él
+  // mismo ve/edita en src/perfil.html — aquí recepción solo la consulta.
+  let profileReturnView = 'dashboard';
+  function openGuestProfile(name){
     const g = guests.find(x => x.name === name);
     if (!g) { showToast('No hay ficha para ' + name); return; }
+    profileReturnView = currentView;
+
     const theirRequests = requests.filter(r => r.guest === g.name);
-    document.getElementById('modalTitle').textContent = g.name;
-    document.getElementById('modalBody').innerHTML = `
-      <div class="modal-field"><span>Habitación</span><b>${g.room} · ${g.type}</b></div>
-      <div class="modal-field"><span>Check-in</span><b>${g.checkin}</b></div>
-      <div class="modal-field"><span>Check-out</span><b>${g.checkout}</b></div>
-      <div class="modal-field"><span>Documento</span><b>${g.doc}</b></div>
-      <div class="modal-field"><span>Teléfono</span><b>${g.phone}</b></div>
-      <div class="modal-field"><span>Estado</span><span class="status-pill ${GUEST_STATUS_CLASS[g.status]}">${GUEST_STATUS_LABEL[g.status]}</span></div>
-      <div class="modal-section-title">Solicitudes de este huésped</div>
-      ${theirRequests.length ? theirRequests.map(r => `<div class="activity-item"><div class="activity-icon">${r.dept.split(' ')[0]}</div><div><p class="activity-text"><b>${r.title}</b></p><p class="activity-time">${r.urgent ? 'Urgente' : statusLabel(r.status)}</p></div></div>`).join('') : '<p style="font-size:12.5px; color:var(--text-muted);">Sin solicitudes registradas.</p>'}
+    const enProceso = theirRequests.filter(r => r.urgent || statusBucket(r.status) !== 'status-done');
+    const completadas = theirRequests.filter(r => !r.urgent && statusBucket(r.status) === 'status-done');
+    function reqLine(r){
+      const statusHtml = r.urgent ? '<span class="status-pill status-urgent">Urgente</span>' : `<span class="status-pill ${statusBucket(r.status)}">${statusLabel(r.status)}</span>`;
+      return `<div class="activity-item"><div class="activity-icon">${r.dept.split(' ')[0]}</div><div><p class="activity-text"><b>${r.title}</b></p><p class="activity-time">${r.dept.replace(/^\S+\s/, '')}</p></div>${statusHtml}</div>`;
+    }
+
+    let companions = [];
+    try {
+      companions = JSON.parse(localStorage.getItem('hotelife_access_passes') || '[]').filter(p => p.room === g.room);
+    } catch (e) {}
+    const COMPANION_STATUS = { activo:{ cls:'status-done', label:'Activo' }, pendiente:{ cls:'status-pending', label:'Pendiente' } };
+
+    const initials = g.name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+
+    document.getElementById('guestProfileBody').innerHTML = `
+      <div class="guest-profile-header">
+        <div class="guest-profile-avatar">${initials}</div>
+        <div>
+          <p class="guest-profile-name">${g.name}</p>
+          <p class="guest-profile-sub">Habitación ${g.room} · ${g.type}</p>
+          <span class="guest-profile-tier">${g.tier}</span>
+        </div>
+      </div>
+      <div class="report-grid">
+        <div class="panel">
+          <div class="panel-header"><p class="panel-title">Datos personales</p></div>
+          <div class="modal-field"><span>Nombre completo</span><b>${g.name}</b></div>
+          <div class="modal-field"><span>Documento</span><b>${g.docType} · ${g.doc}</b></div>
+          <div class="modal-field"><span>Correo electrónico</span><b>${g.email}</b></div>
+          <div class="modal-field"><span>Teléfono</span><b>${g.phone}</b></div>
+          <div class="modal-field"><span>Check-in</span><b>${g.checkin}</b></div>
+          <div class="modal-field"><span>Check-out</span><b>${g.checkout}</b></div>
+          <div class="modal-field"><span>Estado</span><span class="status-pill ${GUEST_STATUS_CLASS[g.status]}">${GUEST_STATUS_LABEL[g.status]}</span></div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><p class="panel-title">Preferencias</p></div>
+          <div class="modal-field"><span>Idioma</span><b>${g.language}</b></div>
+          <div class="modal-field"><span>Notificaciones push</span><span class="status-pill ${g.notifPush ? 'status-done' : 'status-pending'}">${g.notifPush ? 'Activadas' : 'Desactivadas'}</span></div>
+          <div class="modal-field"><span>Ofertas y promociones</span><span class="status-pill ${g.notifPromos ? 'status-done' : 'status-pending'}">${g.notifPromos ? 'Activadas' : 'Desactivadas'}</span></div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><p class="panel-title">Acompañantes registrados</p></div>
+          ${companions.length ? companions.map(c => `<div class="activity-item"><div class="activity-icon">🧳</div><div><p class="activity-text"><b>${c.guestName}</b></p><p class="activity-time">${c.docType} •••• ${c.docNumber.slice(-4)} · ${c.passType}</p></div><span class="status-pill ${(COMPANION_STATUS[c.status] || COMPANION_STATUS.pendiente).cls}">${(COMPANION_STATUS[c.status] || COMPANION_STATUS.pendiente).label}</span></div>`).join('') : '<p class="empty-note">Sin acompañantes registrados.</p>'}
+        </div>
+        <div class="panel">
+          <div class="panel-header"><p class="panel-title">Métodos de pago</p></div>
+          ${g.paymentMethods.length ? g.paymentMethods.map(p => `<div class="activity-item"><div class="activity-icon" style="background:${p.color}; color:#fff;">${p.logo}</div><div><p class="activity-text"><b>${p.name}</b></p><p class="activity-time">${p.sub}</p></div></div>`).join('') : '<p class="empty-note">No ha agregado métodos de pago.</p>'}
+        </div>
+        <div class="panel" style="grid-column: 1 / -1;">
+          <div class="panel-header"><p class="panel-title">Solicitudes en proceso (${enProceso.length})</p></div>
+          ${enProceso.length ? enProceso.map(reqLine).join('') : '<p class="empty-note">Ninguna en este momento.</p>'}
+        </div>
+        <div class="panel" style="grid-column: 1 / -1;">
+          <div class="panel-header"><p class="panel-title">Solicitudes completadas (${completadas.length})</p></div>
+          ${completadas.length ? completadas.map(reqLine).join('') : '<p class="empty-note">Aún no hay historial para este huésped.</p>'}
+        </div>
+      </div>
     `;
-    const footer = document.getElementById('modalFooter');
-    footer.innerHTML = '';
-    const msgBtn = document.createElement('button');
-    msgBtn.className = 'btn btn-primary';
-    msgBtn.style.flex = '1';
-    msgBtn.textContent = '✉️ Enviar mensaje';
-    msgBtn.addEventListener('click', () => { showToast('Mensaje enviado a ' + g.name); closeModal(); });
-    footer.appendChild(msgBtn);
-    const closeBtn = document.createElement('button');
-    closeBtn.className = 'btn btn-outline';
-    closeBtn.textContent = 'Cerrar';
-    closeBtn.addEventListener('click', closeModal);
-    footer.appendChild(closeBtn);
-    openModal();
+
+    document.querySelectorAll('.nav-link[data-view]').forEach(l => l.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-guest-profile'));
+    document.getElementById('topbarTitle').textContent = g.name;
   }
+  document.getElementById('guestProfileBack').addEventListener('click', () => goToView(profileReturnView));
 
   /* ============ HABITACIONES ============ */
   let roomFilter = 'todas';
@@ -1031,8 +1110,8 @@
       const msgBtn = document.createElement('button');
       msgBtn.className = 'btn btn-primary';
       msgBtn.style.flex = '1';
-      msgBtn.textContent = '🧑 Ver ficha completa';
-      msgBtn.addEventListener('click', () => { closeModal(); openGuestModalByName(guestRecord.name); });
+      msgBtn.textContent = '🧑 Ver perfil';
+      msgBtn.addEventListener('click', () => { closeModal(); openGuestProfile(guestRecord.name); });
       footer.appendChild(msgBtn);
     }
     const closeBtn = document.createElement('button');
