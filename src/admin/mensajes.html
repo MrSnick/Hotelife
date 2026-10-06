@@ -113,20 +113,31 @@
     localStorage.setItem(THREADS_KEY, JSON.stringify(threads));
   }
 
+  // Las conversaciones con los jefes de área (hotelife_staff_threads, ver staff-mensajes.html)
+  // aparecen en la misma bandeja que las de huéspedes, prefijadas "staff:<área>"
+  function loadStaffThreads() {
+    return JSON.parse(localStorage.getItem('hotelife_staff_threads') || '{}');
+  }
+  function saveStaffThreads(t) {
+    localStorage.setItem('hotelife_staff_threads', JSON.stringify(t));
+  }
+
   function renderThreadList() {
     const threads = loadThreads();
-    const rooms = Object.keys(threads);
+    const staff = loadStaffThreads();
+    const rooms = Object.keys(threads).concat(Object.keys(staff).map(a => 'staff:' + a));
     const list = document.getElementById('threadList');
 
     if (rooms.length === 0) {
-      list.innerHTML = '<div style="padding:20px; font-size:12px; color:var(--text-muted);">Aún no hay conversaciones. Aparecerán aquí cuando un huésped escriba desde la app.</div>';
+      list.innerHTML = '<div style="padding:20px; font-size:12px; color:var(--text-muted);">Aún no hay conversaciones. Aparecerán aquí cuando un huésped o un jefe de área escriba desde su app.</div>';
       return;
     }
 
     list.innerHTML = rooms.map(room => {
-      const t = threads[room];
+      const isStaff = room.startsWith('staff:');
+      const t = isStaff ? Object.assign({ guestName: staff[room.slice(6)].areaLabel || room.slice(6) }, staff[room.slice(6)]) : threads[room];
       const lastMsg = t.messages[t.messages.length - 1];
-      const initials = t.guestName.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+      const initials = isStaff ? '👥' : t.guestName.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
       const unread = t.unreadForReception || 0;
       return `
         <div class="thread-item ${room === activeRoom ? 'active' : ''}" data-room="${room}">
@@ -134,7 +145,7 @@
           <div class="thread-info">
             <div class="thread-top">
               <span class="thread-name">${t.guestName}</span>
-              <span class="thread-room">${room}</span>
+              <span class="thread-room">${isStaff ? 'Staff' : room}</span>
             </div>
             <p class="thread-preview">${lastMsg ? (lastMsg.sender === 'reception' ? 'Tú: ' : '') + lastMsg.text : ''}</p>
           </div>
@@ -150,26 +161,26 @@
 
   function openThread(room) {
     activeRoom = room;
-    const threads = loadThreads();
-    const t = threads[room];
+    const isStaff = room.startsWith('staff:');
+    const threads = isStaff ? loadStaffThreads() : loadThreads();
+    const t = isStaff ? threads[room.slice(6)] : threads[room];
     if (!t) return;
 
     // Marcar como leído
     t.unreadForReception = 0;
-    saveThreads(threads);
+    if (isStaff) saveStaffThreads(threads); else saveThreads(threads);
 
     const view = document.getElementById('threadView');
     view.innerHTML = `
       <div class="thread-header">
         <div class="thread-header-info">
           <div>
-            <p class="thread-header-name">${t.guestName}</p>
-            <p class="thread-header-sub">Habitación ${room} · ${t.roomType}</p>
+            <p class="thread-header-name">${isStaff ? (t.areaLabel || room.slice(6)) : t.guestName}</p>
+            <p class="thread-header-sub">${isStaff ? 'Chat interno con el jefe de área' : 'Habitación ' + room + ' · ' + t.roomType}</p>
           </div>
         </div>
         <div class="thread-header-actions">
-          <button class="header-action-btn">📞 Llamar</button>
-          <button class="header-action-btn">Ver perfil →</button>
+          ${isStaff ? '' : '<button class="header-action-btn">📞 Llamar</button><button class="header-action-btn">Ver perfil →</button>'}
         </div>
       </div>
       <div class="messages-scroll" id="messagesScroll"></div>
@@ -187,11 +198,12 @@
   }
 
   function renderMessages() {
-    const threads = loadThreads();
-    const t = threads[activeRoom];
+    const isStaff = activeRoom.startsWith('staff:');
+    const threads = isStaff ? loadStaffThreads() : loadThreads();
+    const t = isStaff ? threads[activeRoom.slice(6)] : threads[activeRoom];
     const scroll = document.getElementById('messagesScroll');
     scroll.innerHTML = t.messages.map(m => `
-      <div class="bubble ${m.sender}">
+      <div class="bubble ${m.sender === 'staff' ? 'guest' : m.sender}">
         <p>${m.text}</p>
         <span class="bubble-time">${m.time}</span>
       </div>
@@ -203,14 +215,15 @@
     const input = document.getElementById('replyInput');
     const text = input.value.trim();
     if (!text || !activeRoom) return;
-    const threads = loadThreads();
-    const now = new Date();
-    const time = now.toLocaleTimeString('es-CO', { hour: 'numeric', minute: '2-digit' });
-    threads[activeRoom].messages.push({ sender: 'reception', text, time });
-    saveThreads(threads);
+    const isStaff = activeRoom.startsWith('staff:');
+    const threads = isStaff ? loadStaffThreads() : loadThreads();
+    const t = isStaff ? threads[activeRoom.slice(6)] : threads[activeRoom];
+    const time = new Date().toLocaleTimeString('es-CO', { hour: 'numeric', minute: '2-digit' });
+    t.messages.push({ sender: 'reception', text, time });
+    if (isStaff) { t.unreadForStaff = (t.unreadForStaff || 0) + 1; saveStaffThreads(threads); } else saveThreads(threads);
     input.value = '';
     renderMessages();
-    console.log('Respuesta enviada al huésped de la habitación', activeRoom);
+    console.log('Respuesta enviada a', isStaff ? 'staff' : 'huésped', activeRoom);
   }
 
   renderThreadList();

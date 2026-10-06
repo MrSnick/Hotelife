@@ -143,11 +143,8 @@
 
   </div>
 
-  <nav class="bottom-nav">
-    <button class="nav-item active" data-tab="solicitudes"><span class="nav-icon">📋</span><span>Solicitudes</span></button>
-    <button class="nav-item" data-tab="contactos"><span class="nav-icon">📇</span><span>Contactos</span></button>
-    <button class="nav-item" data-tab="perfil"><span class="nav-icon">👤</span><span>Perfil</span></button>
-  </nav>
+  <nav class="bottom-nav" id="staffNav" data-area="conserjeria" data-active="solicitudes"></nav>
+  <script src="staff-nav.js"></script>
 </div>
 
 <script>
@@ -179,13 +176,6 @@
     });
   }
   document.querySelectorAll('.ticket').forEach(attachHandlers);
-
-  document.querySelectorAll('.nav-item').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-    });
-  });
 
   // Cargar solicitudes reales (Traslados, Alquiler de vehículos, Tours, Entradas, Niñera)
   function loadRealRequests() {

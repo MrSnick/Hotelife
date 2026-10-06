@@ -161,11 +161,8 @@
 
   </div>
 
-  <nav class="bottom-nav">
-    <button class="nav-item active" data-tab="solicitudes"><span class="nav-icon">📋</span><span>Solicitudes</span></button>
-    <button class="nav-item" data-tab="historial"><span class="nav-icon">🗂️</span><span>Historial</span></button>
-    <button class="nav-item" data-tab="perfil"><span class="nav-icon">👤</span><span>Perfil</span></button>
-  </nav>
+  <nav class="bottom-nav" id="staffNav" data-area="amadellaves" data-active="solicitudes"></nav>
+  <script src="staff-nav.js"></script>
 </div>
 
 <script>
@@ -197,13 +194,6 @@
     });
   }
   document.querySelectorAll('[data-action="completar"]').forEach(btn => attachCompleteHandler(btn.closest('.ticket')));
-  document.querySelectorAll('.nav-item').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-    });
-  });
-
   // Cargar solicitudes reales para Ama de Llaves (Housekeeping, Lavandería, Minibar, Amenities)
   function loadRealRequests() {
     const all = JSON.parse(localStorage.getItem('hotelife_service_requests') || '[]');

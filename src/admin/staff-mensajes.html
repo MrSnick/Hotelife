@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HOTELIFE Staff — Mensajes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{ --navy:#1a222d; --bg-outer:#f9f6f0; --gold:#d4b285; --bronze:#8b6534; --border-light:#e5e1d8; --text-muted:rgba(26,34,45,0.6); --green:#4c8c4a; --red:#b5573a; }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{ font-family:"Manrope",-apple-system,sans-serif; background:#e5e2db; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; color:var(--navy); }
+  .phone{ background:var(--bg-outer); border:0.8px solid var(--gold); border-radius:44px; box-shadow:0 25px 50px -12px rgba(26,34,45,0.25); width:100%; max-width:390px; overflow:hidden; display:flex; flex-direction:column; height:844px; position:relative; }
+  .status-bar{ flex-shrink:0; display:flex; align-items:center; justify-content:space-between; height:44px; padding:0 24px; font-weight:600; font-size:14px; }
+  .header{ flex-shrink:0; background:var(--navy); padding:14px 20px 18px; color:#fff; display:flex; align-items:center; gap:12px; }
+  .back-btn{ width:36px; height:36px; border-radius:10px; background:rgba(255,255,255,0.08); color:#fff; display:flex; align-items:center; justify-content:center; font-size:16px; text-decoration:none; flex-shrink:0; }
+  .header-title{ font-family:"Cormorant Garamond",serif; font-weight:700; font-size:22px; }
+  .header-sub{ font-size:10px; color:var(--gold); }
+  .scroll-content{ flex:1; overflow-y:auto; scrollbar-width:none; padding:16px 20px 24px; display:flex; flex-direction:column; gap:12px; }
+  .scroll-content::-webkit-scrollbar{ display:none; }
+  .section-title{ font-weight:700; font-size:11px; text-transform:uppercase; color:var(--text-muted); }
+  .bottom-nav{ flex-shrink:0; background:var(--navy); border-top:1px solid var(--gold); height:70px; display:flex; align-items:center; justify-content:space-around; }
+  .nav-item{ display:flex; flex-direction:column; align-items:center; gap:4px; color:#fff; opacity:0.6; font-size:9px; cursor:pointer; background:none; border:none; }
+  .nav-item.active{ color:var(--gold); opacity:1; }
+  .nav-icon{ font-size:16px; }
+  .msgs{ flex:1; overflow-y:auto; scrollbar-width:none; padding:16px 20px; display:flex; flex-direction:column; gap:8px; }
+  .msgs::-webkit-scrollbar{ display:none; }
+  .bubble{ max-width:78%; padding:10px 13px; border-radius:16px; font-size:12.5px; line-height:1.4; }
+  .bubble.staff{ align-self:flex-end; background:var(--navy); color:#fff; border-bottom-right-radius:4px; }
+  .bubble.reception{ align-self:flex-start; background:#fff; border:1px solid var(--border-light); border-bottom-left-radius:4px; }
+  .bubble-time{ display:block; font-size:9px; opacity:0.55; margin-top:4px; }
+  .empty{ margin:auto; text-align:center; font-size:12px; color:var(--text-muted); padding:0 30px; }
+  .reply-row{ flex-shrink:0; display:flex; gap:8px; padding:10px 16px; background:#fff; border-top:1px solid var(--border-light); }
+  .reply-input{ flex:1; height:40px; border:1px solid var(--gold); border-radius:20px; padding:0 14px; font-family:inherit; font-size:12px; outline:none; }
+  .reply-btn{ width:40px; height:40px; border-radius:20px; border:none; background:var(--gold); color:var(--navy); font-size:15px; cursor:pointer; }
+</style>
+<link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+<script>
+  if (!JSON.parse(localStorage.getItem('hotelife_staff_session') || 'null')) window.location.href = 'login.html';
+</script>
+<div class="phone">
+  <div class="status-bar"><span>12:40</span><span>📶 📡 🔋</span></div>
+  <div class="header">
+    <a class="back-btn" id="backBtn" href="login.html" aria-label="Volver">←</a>
+    <div><p class="header-title">Mensajes</p><p class="header-sub" id="areaSub"></p></div>
+  </div>
+  <div class="msgs" id="msgs"></div>
+  <div class="reply-row"><input class="reply-input" id="inp" placeholder="Escribe a Recepción..."><button class="reply-btn" id="send" aria-label="Enviar">➤</button></div>
+  <nav class="bottom-nav" id="staffNav" data-active="mensajes"></nav>
+</div>
+<script src="staff-nav.js"></script>
+<script>
+  const AREA = staffAreaFromUrl();
+  const A = STAFF_AREAS[AREA];
+  document.getElementById('areaSub').textContent = A.label;
+  document.getElementById('backBtn').href = A.home;
+  function renderMsgs() {
+    const all = staffThreads(); const t = all[AREA] || { messages: [] };
+    if (t.unreadForStaff) { t.unreadForStaff = 0; all[AREA] = t; saveStaffThreads(all); }
+    const box = document.getElementById('msgs');
+    const atEnd = box.scrollTop + box.clientHeight >= box.scrollHeight - 30;
+    box.innerHTML = t.messages.length ? t.messages.map(m => `<div class="bubble ${m.sender}">${m.text}<span class="bubble-time">${m.sender === 'staff' ? 'Tú' : 'Recepción'} · ${m.time}</span></div>`).join('')
+      : '<p class="empty">Chat directo con Recepción (24/7). Escribe aquí para coordinar traslados, apoyo o novedades del turno.</p>';
+    if (atEnd) box.scrollTop = box.scrollHeight;
+  }
+  function send() {
+    const inp = document.getElementById('inp'); const text = inp.value.trim(); if (!text) return;
+    const all = staffThreads(); const t = all[AREA] || { messages: [], unreadForStaff: 0, unreadForReception: 0 };
+    t.messages.push({ sender: 'staff', text, time: new Date().toLocaleTimeString('es-CO', { hour: 'numeric', minute: '2-digit' }) });
+    t.unreadForReception = (t.unreadForReception || 0) + 1; t.areaLabel = A.label;
+    all[AREA] = t; saveStaffThreads(all); inp.value = ''; renderMsgs();
+    document.getElementById('msgs').scrollTop = 1e9;
+  }
+  document.getElementById('send').addEventListener('click', send);
+  document.getElementById('inp').addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
+  renderMsgs(); document.getElementById('msgs').scrollTop = 1e9;
+  setInterval(renderMsgs, 3000);
+</script>
+</body>
+</html>

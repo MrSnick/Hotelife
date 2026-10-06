@@ -7,6 +7,10 @@ Esta carpeta contiene el lado del proyecto dirigido al **staff del hotel**, comp
 1. **Recepción (`dashboard.html`)** — panel de escritorio/tablet. Ve **absolutamente todas** las solicitudes de todas las áreas del hotel, siempre (lee todo, sin filtrar por departamento). Es el respaldo 24/7 cuando el jefe de área correspondiente no está disponible. También incluye `mensajes.html` (chat con huéspedes) y `control-accesos.html` (validar pases de invitados).
 2. **Apps móviles por jefe de área (`staff-*.html`)** — cada jefe de área tiene un celular corporativo con su propia vista, filtrada solo a las solicitudes de su categoría (vía el campo `dept` de cada solicitud).
 
+## Acceso (login) y sesión simulada
+
+`login.html` es el punto de entrada del staff (mismo estilo visual que el login del huésped). Pide correo, contraseña y área; **no valida credenciales contra nada real** (cualquier combinación con los 3 campos llenos entra). Al enviar, guarda `hotelife_staff_session` en `localStorage` y redirige al panel de esa área (Recepción → `dashboard.html`, o la app `staff-*.html` correspondiente). Los 6 paneles revisan esa clave al cargar y, si no existe, regresan a `login.html`. Cada app de staff tiene un botón "←" en el encabezado que regresa al login, y su pestaña "Perfil" abre `staff-perfil.html?area=<área>` (una sola página que se adapta al área); ahí "Cerrar sesión" borra `hotelife_staff_session` y vuelve al login. El Dashboard tiene su propio botón "Cerrar sesión" en la barra superior.
+
 ## Mapeo de categorías del catálogo de servicios → jefe de área
 
 | Archivo | Jefe de área | Categorías que atiende |
@@ -55,3 +59,10 @@ Todas las apps de staff (y el Dashboard) leen en vivo de `localStorage`, no solo
 ## Diseño
 
 El diseño visual de estas pantallas también existe en Figma (mismo archivo del proyecto general). La interactividad real (filtros, cambios de estado, carga de datos) vive solo en este código — en Figma solo algunas piezas puntuales son interactivas de verdad (ver README raíz, sección "Figma: qué es real y qué es solo visual").
+
+## Barra inferior de 4 pestañas (staff)
+Las 5 apps usan la misma barra: **Solicitudes** (A&B "Pedidos", Spa "Agenda") · **Mensajes** · **Equipo** · **Perfil**.
+- `staff-nav.js`: renderiza la barra (`<nav id="staffNav" data-area=".." data-active="..">`), define `STAFF_AREAS` (equipos por área) y el badge de no leídos.
+- `staff-mensajes.html?area=`: chat del jefe de área con Recepción. Clave `hotelife_staff_threads` (`{area:{messages,unreadForStaff,unreadForReception,areaLabel}}`). Recepción lo ve en `mensajes.html` (conversaciones "Staff").
+- `staff-equipo.html?area=`: disponibilidad del equipo (clave `hotelife_staff_team`) y asignación de solicitudes (`assignedTo` en `hotelife_service_requests`).
+- "Completadas" queda como filtro dentro de Solicitudes (sustituye a Historial).

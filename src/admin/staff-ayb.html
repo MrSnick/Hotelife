@@ -151,11 +151,8 @@
 
   </div>
 
-  <nav class="bottom-nav">
-    <button class="nav-item active" data-tab="pedidos"><span class="nav-icon">📋</span><span>Pedidos</span></button>
-    <button class="nav-item" data-tab="menu"><span class="nav-icon">📖</span><span>Menú</span></button>
-    <button class="nav-item" data-tab="perfil"><span class="nav-icon">👤</span><span>Perfil</span></button>
-  </nav>
+  <nav class="bottom-nav" id="staffNav" data-area="ayb" data-active="solicitudes"></nav>
+  <script src="staff-nav.js"></script>
 </div>
 
 <script>
@@ -241,13 +238,6 @@
     });
   }
   document.querySelectorAll('.ticket').forEach(attachHandlers);
-
-  document.querySelectorAll('.nav-item').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-    });
-  });
 
   // Leer también Bar, Desayuno y Restaurante desde el almacén genérico de solicitudes
   function loadRealServiceRequests() {
