@@ -1766,6 +1766,11 @@
   renderRooms();
   renderConfig();
 
+  // Permite enlazar directo a una sección (ej. "dashboard.html#solicitudes") desde
+  // otras páginas del panel, como mensajes.html, que no son parte de este SPA.
+  const initialView = (location.hash || '').replace('#', '');
+  if (initialView && VIEW_TITLES[initialView]) goToView(initialView);
+
   // Refrescar cada pocos segundos para simular llegada de solicitudes en vivo;
   // el evento "storage" lo actualiza al instante si el huésped está en otra pestaña
   setInterval(refresh, 4000);
