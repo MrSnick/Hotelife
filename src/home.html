@@ -280,6 +280,16 @@
     background:none; border:none; font-size:16px;
     color: var(--text-muted); cursor:pointer;
   }
+  .call-toast{
+    position:absolute; left:50%; bottom:110px; transform:translate(-50%, 12px);
+    background: var(--navy); color:#fff; padding:14px 20px; border-radius:14px;
+    display:flex; align-items:center; gap:8px; font-size:12.5px; font-weight:600;
+    white-space:nowrap; box-shadow:0 14px 30px rgba(26,34,45,0.35);
+    opacity:0; pointer-events:none; transition: opacity .25s ease, transform .25s ease;
+    z-index:90;
+  }
+  .call-toast.show{ opacity:1; transform:translate(-50%, 0); }
+  .call-toast .num{ color: var(--gold); font-weight:800; }
   .chat-messages{
     flex:1;
     overflow-y:auto;
@@ -532,12 +542,14 @@
     <span class="chat-badge" id="chatBadge">2</span>
   </button>
 
+  <div class="call-toast" id="callToast">📞 Llamando a recepción · <span class="num">+57 304 456 0497</span></div>
+
   <div class="chat-overlay" id="chatOverlay">
     <div class="chat-panel">
       <div class="chat-panel-header">
         <p class="chat-panel-title">Chat con Recepción</p>
         <div class="chat-header-actions">
-          <a class="chat-call-btn" href="tel:+10000000000" aria-label="Llamar a recepción">📞</a>
+          <a class="chat-call-btn" id="callBtn" href="tel:+573044560497" aria-label="Llamar a recepción">📞</a>
           <button class="chat-close" id="chatClose" aria-label="Cerrar chat">✕</button>
         </div>
       </div>
@@ -584,6 +596,16 @@
       e.preventDefault();
       console.log('Servicio seleccionado:', card.dataset.service);
     });
+  });
+
+  // Botón de llamar a recepción: abre el marcador en celular y muestra el número en pantalla
+  const callBtn = document.getElementById('callBtn');
+  const callToast = document.getElementById('callToast');
+  let callToastTimer;
+  callBtn.addEventListener('click', () => {
+    callToast.classList.add('show');
+    clearTimeout(callToastTimer);
+    callToastTimer = setTimeout(() => callToast.classList.remove('show'), 2500);
   });
 
   // Chat flotante: abrir/cerrar overlay, conectado al hilo compartido con Recepción
