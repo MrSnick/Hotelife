@@ -159,6 +159,7 @@
       const btn = document.getElementById('submitBtn');
       btn.textContent = '✓ Reserva confirmada';
       btn.disabled = true;
+      HotelifeConfirm.show();
 
       const request = {
         id: 'REQ-' + Date.now(),
@@ -186,6 +187,7 @@
   document.getElementById('backBtn').addEventListener('click', () => { window.location.href = 'servicios.html'; });
 </script>
 
+<script src="js/confirmacion.js"></script>
 <script src="js/nav.js"></script>
 </body>
 </html>
