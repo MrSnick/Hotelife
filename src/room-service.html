@@ -82,6 +82,18 @@
   .confirm-btn{ width:100%; height:50px; border-radius:16px; background:var(--gold); border:none; font-weight:700; font-size:13px; text-transform:uppercase; color:var(--navy); cursor:pointer; }
   .confirm-btn:disabled{ opacity:0.5; cursor:not-allowed; }
 
+  /* Overlay: elegir dónde recibir el pedido (paso final antes de confirmar) */
+  .location-option{
+    display:flex; align-items:center; gap:12px;
+    border:1px solid var(--border-light); border-radius:14px;
+    padding:14px; cursor:pointer;
+  }
+  .location-option.selected{ border-color:var(--gold); border-width:1.5px; background:rgba(212,178,133,0.08); }
+  .location-emoji{ width:40px; height:40px; border-radius:12px; background:var(--bg-outer); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+  .location-name{ font-weight:700; font-size:13px; }
+  .location-check{ margin-left:auto; width:20px; height:20px; border-radius:50%; border:1.5px solid var(--border-light); display:flex; align-items:center; justify-content:center; font-size:11px; color:#fff; flex-shrink:0; }
+  .location-option.selected .location-check{ background:var(--gold); border-color:var(--gold); }
+
   .success-screen{
     position:absolute; inset:0; background:var(--bg-outer);
     display:none; flex-direction:column; align-items:center; justify-content:center; gap:14px;
@@ -233,6 +245,19 @@
     </div>
   </div>
 
+  <div class="modal-overlay" id="locationModal">
+    <div class="modal-panel">
+      <div class="modal-header">
+        <p class="modal-title">¿Dónde lo recibes?</p>
+        <button class="modal-close" id="closeLocationModalBtn">✕</button>
+      </div>
+      <div class="modal-body" id="locationOptions"></div>
+      <div class="modal-footer">
+        <button class="confirm-btn" id="confirmLocationBtn">Confirmar pedido</button>
+      </div>
+    </div>
+  </div>
+
   <div class="success-screen" id="successScreen">
     <div class="success-icon">✓</div>
     <p class="success-title">¡Pedido enviado!</p>
@@ -337,12 +362,52 @@
   document.getElementById('closeModalBtn').addEventListener('click', () => cartModal.classList.remove('open'));
   cartModal.addEventListener('click', (e) => { if (e.target === cartModal) cartModal.classList.remove('open'); });
 
-  // Confirmar pedido -> guardar en localStorage (base de datos compartida simulada) y mostrar éxito
+  // Paso final: elegir dónde recibir el pedido, antes de confirmar
+  const LOCATIONS = [
+    { id: 'habitacion', icon: '🛏️', name: 'Habitación' },
+    { id: 'terraza', icon: '🌴', name: 'Terraza' },
+    { id: 'lobby', icon: '🛋️', name: 'Lobby' },
+    { id: 'piscina', icon: '🏊', name: 'Piscina' }
+  ];
+  let selectedLocation = LOCATIONS[0].id;
+  let pendingNotes = '';
+  const locationModal = document.getElementById('locationModal');
+
+  function renderLocationOptions() {
+    const box = document.getElementById('locationOptions');
+    box.innerHTML = LOCATIONS.map(loc => `
+      <div class="location-option ${loc.id === selectedLocation ? 'selected' : ''}" data-location="${loc.id}">
+        <div class="location-emoji">${loc.icon}</div>
+        <p class="location-name">${loc.name}</p>
+        <span class="location-check">${loc.id === selectedLocation ? '✓' : ''}</span>
+      </div>
+    `).join('');
+    box.querySelectorAll('.location-option').forEach(opt => {
+      opt.addEventListener('click', () => {
+        selectedLocation = opt.dataset.location;
+        renderLocationOptions();
+      });
+    });
+  }
+
+  // "Confirmar pedido" en el resumen del carrito -> pasa al paso de ubicación de entrega
   document.getElementById('confirmOrderBtn').addEventListener('click', () => {
     const lines = Object.values(cart);
     if (lines.length === 0) return;
-    const notes = document.getElementById('notesInput').value.trim();
+    pendingNotes = document.getElementById('notesInput').value.trim();
+    cartModal.classList.remove('open');
+    renderLocationOptions();
+    locationModal.classList.add('open');
+  });
+  document.getElementById('closeLocationModalBtn').addEventListener('click', () => locationModal.classList.remove('open'));
+  locationModal.addEventListener('click', (e) => { if (e.target === locationModal) locationModal.classList.remove('open'); });
+
+  // Confirmar pedido (ya con ubicación de entrega) -> guardar en localStorage (base de datos compartida simulada) y mostrar éxito
+  document.getElementById('confirmLocationBtn').addEventListener('click', () => {
+    const lines = Object.values(cart);
+    if (lines.length === 0) return;
     const total = lines.reduce((s, i) => s + i.qty * i.price, 0);
+    const locationName = LOCATIONS.find(l => l.id === selectedLocation).name;
 
     const order = {
       id: 'ORD-' + Date.now(),
@@ -350,7 +415,8 @@
       guest: 'Sr Snick',
       roomType: 'Suite Deluxe',
       source: '🍽️ Room Service',
-      items: lines.map(l => `${l.qty}x ${l.name}`).join('\n') + (notes ? `\nNota: ${notes}` : ''),
+      deliverTo: locationName,
+      items: lines.map(l => `${l.qty}x ${l.name}`).join('\n') + `\nEntregar en: ${locationName}` + (pendingNotes ? `\nNota: ${pendingNotes}` : ''),
       total: '$' + total.toLocaleString('es-CO'),
       stage: 'nuevo',
       createdAt: new Date().toISOString()
@@ -360,7 +426,7 @@
     existing.unshift(order);
     localStorage.setItem('hotelife_shared_orders', JSON.stringify(existing));
 
-    cartModal.classList.remove('open');
+    locationModal.classList.remove('open');
     document.getElementById('successScreen').classList.add('visible');
     console.log('Pedido guardado y disponible para el panel de A&B:', order);
   });
