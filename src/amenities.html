@@ -32,7 +32,8 @@
   .item-card:active{ filter:brightness(0.97); }
   .item-emoji{
     width:100%; aspect-ratio:1/1; border-radius:12px;
-    background: var(--bg-outer);
+    background-color: var(--bg-outer);
+    background-size:cover; background-position:center;
     display:flex; align-items:center; justify-content:center;
     font-size:76px;
   }
@@ -136,8 +137,8 @@
       cartCta: 'Confirmar solicitud',
       categories: {
         'Baño': [
-          ['🧴','Kit de Aseo Premium'], ['🧺','Juego de Toallas'], ['🥋','Batas de baño'],
-          ['🥿','Pantuflas'], ['🪒','Kit de afeitar'], ['🦷','Kit dental'], ['💨','Secador de pelo']
+          ['🧴','Kit de Aseo Premium','assets/amenities/kit-aseo.png'], ['🧺','Juego de Toallas','assets/amenities/toallas.png'], ['🥋','Batas de baño','assets/amenities/batas.png'],
+          ['🥿','Pantuflas','assets/amenities/pantuflas.png'], ['🪒','Kit de afeitar','assets/amenities/kit-afeitar.png'], ['🦷','Kit dental'], ['💨','Secador de pelo']
         ],
         'Habitación': [
           ['🛏️','Almohadas Extra'], ['☕','Set de Café & Té'], ['🧣','Cobijas extra'],
@@ -186,14 +187,14 @@
 
     const grid = document.createElement('div');
     grid.className = 'item-grid';
-    items.forEach(([icon, name]) => {
+    items.forEach(([icon, name, img]) => {
       const card = document.createElement('div');
       card.className = 'item-card';
       card.dataset.name = name;
       card.dataset.icon = icon;
       card.innerHTML = `
         <span class="item-added-badge"></span>
-        <div class="item-emoji">${icon}</div>
+        <div class="item-emoji"${img ? ` style="background-image:url('${img}')"` : ''}>${img ? '' : icon}</div>
         <p class="item-name">${name}</p>
       `;
       grid.appendChild(card);
