@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HOTELIFE — Restaurante</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy: #1a222d; --bg-outer: #f9f6f0; --gold: #d4b285; --border-light: #e5e1d8;
+    --text-muted: rgba(26,34,45,0.6);
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{ font-family:"Manrope",-apple-system,sans-serif; background:#e5e2db; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; color:var(--navy); }
+  .phone{ background:var(--bg-outer); border:0.8px solid var(--gold); border-radius:44px; box-shadow:0 25px 50px -12px rgba(26,34,45,0.25); width:100%; max-width:390px; overflow:hidden; display:flex; flex-direction:column; height:844px; position:relative; }
+  .status-bar{ flex-shrink:0; display:flex; align-items:center; justify-content:space-between; height:44px; padding:0 24px; font-weight:600; font-size:14px; }
+  .status-icons{ display:flex; gap:6px; align-items:center; font-size:12px; }
+  .header{ flex-shrink:0; display:flex; align-items:center; justify-content:space-between; gap:12px; height:64px; padding:0 20px; border-bottom:1px solid var(--gold); }
+  .header-left{ display:flex; align-items:center; gap:10px; }
+  .back-btn{ width:40px; height:40px; border-radius:20px; background:#fff; border:1px solid var(--border-light); display:flex; align-items:center; justify-content:center; font-size:16px; cursor:pointer; flex-shrink:0; }
+  .back-btn svg{ width:14px; height:14px; color:var(--navy); }
+  .header-title{ font-family:"Cormorant Garamond", serif; font-weight:700; font-size:18px; }
+  .room-badge{ background: var(--navy); border-radius:12px; padding:4px 10px; font-weight:700; font-size:10px; color: var(--gold); white-space:nowrap; }
+
+  .scroll-content{ flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; padding: 16px 20px 110px; display:flex; flex-direction:column; gap:18px; }
+  .scroll-content::-webkit-scrollbar{ display:none; }
+
+  /* Hero */
+  .hero{ border-radius:20px; padding:20px; color:#fff; display:flex; flex-direction:column; gap:8px; background: linear-gradient(135deg, #2a2016, #1a222d); }
+  .hero-label{ color:var(--gold); font-weight:800; font-size:10px; text-transform:uppercase; letter-spacing:0.5px; }
+  .hero-title{ font-family:"Cormorant Garamond", serif; font-weight:700; font-size:24px; }
+  .hero-desc{ font-size:12px; color:rgba(255,255,255,0.75); line-height:1.4; }
+  .hero-cta{ margin-top:6px; align-self:flex-start; background:var(--gold); color:var(--navy); border:none; border-radius:12px; padding:10px 16px; font-weight:800; font-size:11.5px; text-transform:uppercase; cursor:pointer; }
+
+  /* Delivery selector */
+  .delivery-selector{ display:flex; gap:8px; background:#fff; border:1px solid var(--border-light); border-radius:14px; padding:4px; }
+  .delivery-opt{ flex:1; text-align:center; padding:9px 6px; border-radius:11px; font-size:11.5px; font-weight:700; color:var(--text-muted); cursor:pointer; }
+  .delivery-opt.active{ background:var(--navy); color:#fff; }
+
+  /* Category chips */
+  .category-chips{ display:flex; flex-shrink:0; align-items:flex-start; gap:8px; overflow-x:auto; overflow-y:hidden; scrollbar-width:none; padding-bottom:2px; }
+  .category-chips::-webkit-scrollbar{ display:none; }
+  .chip{ flex-shrink:0; padding:9px 16px; border-radius:16px; border:1px solid var(--border-light); background:#fff; font-size:12px; font-weight:700; color:var(--text-muted); cursor:pointer; white-space:nowrap; }
+  .chip.active{ background:var(--navy); border-color:var(--navy); color:#fff; }
+
+  /* Section title */
+  .section-title{ font-weight:800; font-size:11px; text-transform:uppercase; color:var(--text-muted); letter-spacing:0.3px; }
+
+  /* Chef carousel (hub) */
+  .chef-carousel{ display:flex; flex-shrink:0; align-items:flex-start; gap:12px; overflow-x:auto; overflow-y:hidden; scrollbar-width:none; margin:0 -20px; padding:0 20px 4px; }
+  .chef-carousel::-webkit-scrollbar{ display:none; }
+  .chef-card{ flex:0 0 150px; background:#fff; border:1px solid var(--border-light); border-radius:16px; overflow:hidden; cursor:pointer; }
+  .chef-card-photo{ width:100%; height:100px; background-size:cover; background-position:center; display:flex; align-items:center; justify-content:center; font-size:34px; }
+  .chef-card-body{ padding:10px 12px 12px; display:flex; flex-direction:column; gap:6px; }
+  .chef-card-name{ font-weight:700; font-size:12px; line-height:1.25; }
+  .chef-card-price{ font-size:11px; color:var(--text-muted); font-weight:600; }
+  .chef-card-add{ margin-top:2px; height:28px; border-radius:9px; background:var(--gold); border:none; font-weight:700; font-size:10.5px; color:var(--navy); cursor:pointer; }
+
+  /* Explore rows (hub) */
+  .explore-row{ display:flex; align-items:center; gap:12px; background:#fff; border:1px solid var(--border-light); border-radius:16px; padding:10px; cursor:pointer; }
+  .explore-photo{ width:52px; height:52px; border-radius:12px; flex-shrink:0; background-size:cover; background-position:center; display:flex; align-items:center; justify-content:center; font-size:22px; }
+  .explore-info{ flex:1; min-width:0; }
+  .explore-title{ font-weight:700; font-size:13px; }
+  .explore-desc{ font-size:11px; color:var(--text-muted); margin-top:2px; }
+  .explore-chevron{ color:var(--gold); flex-shrink:0; }
+  .explore-chevron svg{ width:12px; height:16px; }
+
+  /* Dish list (category views) */
+  .dish-item{ display:flex; gap:12px; background:#fff; border:1px solid var(--border-light); border-radius:16px; padding:14px; }
+  .dish-photo{ width:52px; height:52px; border-radius:12px; background-size:cover; background-position:center; display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; }
+  .dish-info{ flex:1; min-width:0; display:flex; flex-direction:column; gap:3px; }
+  .dish-name{ font-weight:700; font-size:13.5px; }
+  .dish-desc{ font-size:11.5px; color:var(--text-muted); line-height:1.4; }
+  .dish-bottom{ display:flex; align-items:center; justify-content:space-between; margin-top:2px; }
+  .dish-price{ font-weight:700; font-size:13px; }
+  .qty-control{ display:flex; align-items:center; gap:10px; }
+  .qty-btn{ width:26px; height:26px; border-radius:8px; border:1px solid var(--border-light); background:#fff; font-weight:700; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .qty-value{ font-weight:700; font-size:13px; min-width:14px; text-align:center; }
+  .add-btn{ height:30px; padding:0 14px; border-radius:9px; background:var(--gold); border:none; font-weight:700; font-size:11px; color:var(--navy); cursor:pointer; }
+
+  .cart-bar{
+    position:absolute; left:20px; right:20px; bottom:24px;
+    background:var(--navy); border-radius:18px; padding:14px 18px;
+    display:none; align-items:center; justify-content:space-between;
+    box-shadow:0 12px 24px rgba(26,34,45,0.3); cursor:pointer;
+  }
+  .cart-bar.visible{ display:flex; }
+  .cart-info{ color:#fff; }
+  .cart-count{ font-size:11px; opacity:0.7; }
+  .cart-total{ font-family:"Cormorant Garamond", serif; font-weight:700; font-size:18px; }
+  .cart-cta{ background:var(--gold); color:var(--navy); font-weight:800; font-size:12px; text-transform:uppercase; padding:10px 16px; border-radius:12px; border:none; cursor:pointer; }
+
+  /* Modal de confirmación */
+  .modal-overlay{ position:absolute; inset:0; background:rgba(26,34,45,0.5); display:none; align-items:flex-end; z-index:30; }
+  .modal-overlay.open{ display:flex; }
+  .modal-panel{ width:100%; max-height:80%; background:#fff; border-radius:24px 24px 0 0; display:flex; flex-direction:column; overflow:hidden; }
+  .modal-header{ padding:18px 20px; border-bottom:1px solid var(--border-light); display:flex; align-items:center; justify-content:space-between; }
+  .modal-title{ font-weight:700; font-size:15px; }
+  .modal-close{ background:none; border:none; font-size:16px; color:var(--text-muted); cursor:pointer; }
+  .modal-body{ flex:1; overflow-y:auto; padding:16px 20px; display:flex; flex-direction:column; gap:10px; }
+  .cart-line{ display:flex; justify-content:space-between; font-size:13px; }
+  .cart-line b{ font-weight:700; }
+  .notes-box{ width:100%; height:60px; border:1px solid var(--border-light); border-radius:12px; padding:10px; font-family:inherit; font-size:12px; resize:none; outline:none; margin-top:4px; }
+  .notes-box:focus{ border-color:var(--gold); }
+  .modal-total-row{ display:flex; justify-content:space-between; font-weight:700; font-size:15px; padding-top:10px; border-top:1px solid var(--border-light); margin-top:6px; }
+  .modal-footer{ padding:16px 20px 20px; border-top:1px solid var(--border-light); }
+  .confirm-btn{ width:100%; height:50px; border-radius:16px; background:var(--gold); border:none; font-weight:700; font-size:13px; text-transform:uppercase; color:var(--navy); cursor:pointer; }
+  .confirm-btn:disabled{ opacity:0.5; cursor:not-allowed; }
+
+  /* Overlay: elegir dónde recibir el pedido */
+  .location-option{ display:flex; align-items:center; gap:12px; border:1px solid var(--border-light); border-radius:14px; padding:14px; cursor:pointer; }
+  .location-option.selected{ border-color:var(--gold); border-width:1.5px; background:rgba(212,178,133,0.08); }
+  .location-emoji{ width:40px; height:40px; border-radius:12px; background:var(--bg-outer); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+  .location-name{ font-weight:700; font-size:13px; }
+  .location-check{ margin-left:auto; width:20px; height:20px; border-radius:50%; border:1.5px solid var(--border-light); display:flex; align-items:center; justify-content:center; font-size:11px; color:#fff; flex-shrink:0; }
+  .location-option.selected .location-check{ background:var(--gold); border-color:var(--gold); }
+
+  .success-screen{
+    position:absolute; inset:0; background:var(--bg-outer);
+    display:none; flex-direction:column; align-items:center; justify-content:center; gap:14px;
+    padding:40px; text-align:center; z-index:40;
+  }
+  .success-screen.visible{ display:flex; }
+  .success-icon{ width:64px; height:64px; border-radius:32px; background:var(--navy); border:1.6px solid var(--gold); display:flex; align-items:center; justify-content:center; font-size:28px; color:var(--gold); }
+  .success-title{ font-family:"Cormorant Garamond", serif; font-weight:700; font-size:20px; }
+  .success-desc{ font-size:12.5px; color:var(--text-muted); line-height:1.5; }
+  .success-btn{ margin-top:10px; height:46px; padding:0 24px; border-radius:16px; background:var(--navy); border:none; font-weight:700; font-size:12px; color:var(--gold); cursor:pointer; }
+
+  .bottom-nav{ flex-shrink:0; background: var(--bg-outer); border-top: 1px solid var(--gold); height:70px; display:flex; align-items:center; justify-content:space-around; }
+  .nav-item{ display:flex; flex-direction:column; align-items:center; gap:4px; color: var(--navy); font-size:9px; text-decoration:none; cursor:pointer; background:none; border:none; }
+  .nav-item.active{ color: var(--gold); }
+  .nav-icon{ display:flex; }
+  .nav-icon svg{ width:16px; height:16px; }
+
+  .chat-fab{ position:absolute; right:20px; bottom:98px; width:52px; height:52px; border-radius:26px; background:var(--gold); border:none; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 16px rgba(26,34,45,0.2); cursor:pointer; }
+  .chat-fab svg{ width:22px; height:22px; color:var(--navy); }
+</style>
+<link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+<div class="phone">
+  <div class="status-bar"><span>12:40</span><span class="status-icons">📶 📡 🔋</span></div>
+
+  <div class="header">
+    <div class="header-left">
+      <button class="back-btn" id="backBtn"><svg viewBox="0 0 16 19" fill="none"><path d="M9.99967 4.83325L5.33301 9.49992L9.99967 14.1666" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <p class="header-title">Restaurante</p>
+    </div>
+    <span class="room-badge">Suite 405</span>
+  </div>
+
+  <div class="scroll-content" id="scrollContent"></div>
+
+  <div class="cart-bar" id="cartBar">
+    <div class="cart-info">
+      <p class="cart-count" id="cartCount">0 items</p>
+      <p class="cart-total" id="cartTotalMini">$0</p>
+    </div>
+    <button class="cart-cta" id="viewCartBtn">Ver pedido</button>
+  </div>
+
+  <button class="chat-fab" id="chatFab"><svg viewBox="0 0 22 22" fill="none"><path d="M6.41666 9.16647H15.5833M6.41666 12.8331H12.8333M19.25 10.0831C19.25 12.0281 18.3808 13.8933 16.8336 15.2686C15.2864 16.6439 13.188 17.4165 11 17.4165H6.41666L2.74999 20.1665V13.7498C2.20299 11.8049 2.54757 9.74647 3.70796 8.02738C4.86834 6.3083 6.74946 5.06937 8.93749 4.58314C11.1255 4.09691 13.4412 4.40321 15.3752 5.43466C17.3092 6.46611 18.703 8.13822 19.25 10.0831Z" stroke="currentColor" stroke-width="1.5125" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+
+  <div class="modal-overlay" id="cartModal">
+    <div class="modal-panel">
+      <div class="modal-header">
+        <p class="modal-title">Tu pedido</p>
+        <button class="modal-close" id="closeModalBtn">✕</button>
+      </div>
+      <div class="modal-body" id="cartLines">
+        <textarea class="notes-box" id="notesInput" placeholder="Notas especiales (alergias, sin cebolla, etc.)"></textarea>
+        <div class="modal-total-row"><span>Total</span><span id="modalTotal">$0</span></div>
+      </div>
+      <div class="modal-footer">
+        <button class="confirm-btn" id="confirmOrderBtn">Confirmar pedido</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="locationModal">
+    <div class="modal-panel">
+      <div class="modal-header">
+        <p class="modal-title">¿Dónde lo recibes?</p>
+        <button class="modal-close" id="closeLocationModalBtn">✕</button>
+      </div>
+      <div class="modal-body" id="locationOptions"></div>
+      <div class="modal-footer">
+        <button class="confirm-btn" id="confirmLocationBtn">Confirmar pedido</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="success-screen" id="successScreen">
+    <div class="success-icon">✓</div>
+    <p class="success-title">¡Pedido enviado!</p>
+    <p class="success-desc">Tu pedido llegó al equipo de Alimentos y Bebidas. Te avisaremos cuando esté en camino.</p>
+    <button class="success-btn" id="successBackBtn">Volver a Servicios</button>
+  </div>
+
+  <nav class="bottom-nav">
+    <a class="nav-item active" href="home.html"><span class="nav-icon"><svg viewBox="0 0 14 14" fill="none"><path d="M1.75 5.83333L7 1.75L12.25 5.83333V12.25H8.75V8.16667H5.25V12.25H1.75V5.83333Z" stroke="currentColor" stroke-width="0.9625" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Inicio</span></a>
+    <a class="nav-item" href="servicios.html"><span class="nav-icon"><svg viewBox="0 0 14 14" fill="none"><path d="M1.75 1.75H5.25V5.25H1.75V1.75ZM8.75 1.75H12.25V5.25H8.75V1.75ZM1.75 8.75H5.25V12.25H1.75V8.75ZM8.75 8.75H12.25V12.25H8.75V8.75Z" stroke="currentColor" stroke-width="0.9625" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Servicios</span></a>
+    <a class="nav-item" href="solicitudes.html"><span class="nav-icon"><svg viewBox="0 0 14 14" fill="none"><path d="M5.25001 2.33333H2.91667V12.25H11.0833V2.33333H8.75001M4.66667 7H9.33334M4.66667 9.33333H8.16667M5.25001 1.75H8.75001V4.08333H5.25001V1.75Z" stroke="currentColor" stroke-width="0.9625" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Mis solicitudes</span></a>
+    <a class="nav-item" href="cuenta.html"><span class="nav-icon"><svg viewBox="0 0 14 14" fill="none"><path d="M4.66667 5.25H9.33334M4.66667 7.58333H9.33334M4.66667 9.91667H7.58334M2.91667 1.75L4.66667 2.91667L7.00001 1.75L9.33334 2.91667L11.0833 1.75V12.25L9.33334 11.0833L7.00001 12.25L4.66667 11.0833L2.91667 12.25V1.75Z" stroke="currentColor" stroke-width="0.9625" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Mi cuenta</span></a>
+  </nav>
+</div>
+
+<script>
+  // ---------- Datos de catálogo (igual al hub unificado de Figma: Restaurante + Desayuno + Bar) ----------
+  const CATEGORIES = {
+    desayuno: {
+      label: 'Desayuno', heroLabel: 'DESAYUNO', heroTitle: 'Empieza tu día', heroDesc: 'Servido de 6:00 a 11:00 AM, directo a tu suite',
+      groups: [
+        { title: 'PLATOS', items: [
+          { id:'d-continental', name:'Desayuno continental', desc:'Pan, mermelada, fruta y café.', price:22000, img:'assets/food/desayuno-continental.png' },
+          { id:'d-americano', name:'Desayuno americano', desc:'Huevos, tocineta y tostadas.', price:28000, img:'assets/food/desayuno-americano.png' },
+          { id:'d-bowl', name:'Bowl saludable', desc:'Yogurt, granola y frutos rojos.', price:19000, img:'assets/food/desayuno-bowl.png' },
+          { id:'d-panqueques', name:'Panqueques con frutos', desc:'Miel de maple y frutos del bosque.', price:24000, img:'assets/food/desayuno-panqueques.png' }
+        ]},
+        { title: 'BEBIDAS', items: [
+          { id:'d-jugo', name:'Jugo natural', desc:'Naranja recién exprimida.', price:8000, emoji:'🍊' },
+          { id:'d-cafe', name:'Café de origen', desc:'Prensa francesa, 2 tazas.', price:9000, emoji:'☕' }
+        ]}
+      ]
+    },
+    restaurante: {
+      label: 'Restaurante', heroLabel: 'RESTAURANTE PRINCIPAL', heroTitle: 'Sabores de autor', heroDesc: 'Almuerzo y cena · 12:00 PM a 11:00 PM',
+      groups: [
+        { title: 'ENTRADAS', items: [
+          { id:'p-ceviche', name:'Ceviche de camarón', desc:'Camarón, limón, cilantro y ají dulce.', price:32000, img:'assets/food/platos-ceviche.png' },
+          { id:'p-cesar', name:'Ensalada César VIP', desc:'Lechuga romana, crutones y parmesano.', price:24000, img:'assets/food/platos-cesar.png' },
+          { id:'p-crema', name:'Crema de tomate asado', desc:'Con albahaca fresca y pan artesanal.', price:22000, img:'assets/food/platos-crema-tomate.png' }
+        ]},
+        { title: 'PLATOS FUERTES', items: [
+          { id:'p-lomo', name:'Lomo de res al vino', desc:'Puré rústico y vegetales salteados.', price:68000, emoji:'🥩' },
+          { id:'p-salmon', name:'Salmón a la parrilla', desc:'Salsa de maracuyá y arroz de coco.', price:62000, emoji:'🐟' },
+          { id:'p-risotto', name:'Risotto de hongos', desc:'Hongos silvestres y queso grana.', price:48000, emoji:'🍚' }
+        ]},
+        { title: 'POSTRES', items: [
+          { id:'p-fondant', name:'Fondant de chocolate', desc:'Corazón fundido y helado de vainilla.', price:26000, emoji:'🍫' },
+          { id:'p-cheesecake', name:'Cheesecake de maracuyá', desc:'Base de galleta y coulis de frutos rojos.', price:22000, emoji:'🍰' }
+        ]}
+      ]
+    },
+    bar: {
+      label: 'Bar', heroLabel: 'BAR / LOUNGE', heroTitle: 'Coctelería de autor', heroDesc: 'Abierto de 5:00 PM a 1:00 AM · Pide a tu suite',
+      groups: [
+        { title: 'COCTELES', items: [
+          { id:'b-mojito', name:'Mojito clásico', desc:'Ron, menta y lima.', price:17000, img:'assets/food/bar-mojito.png' },
+          { id:'b-margarita', name:'Margarita de la casa', desc:'Tequila, triple sec y limón.', price:24000, img:'assets/food/bar-margarita.png' },
+          { id:'b-gintonic', name:'Gin tonic premium', desc:'Ginebra, tónica y pepino.', price:26000, img:'assets/food/bar-gintonic.png' }
+        ]},
+        { title: 'VINOS Y CERVEZAS', items: [
+          { id:'b-vino', name:'Copa de vino tinto', desc:'Reserva de la casa.', price:22000, img:'assets/food/bar-vino.png' },
+          { id:'b-cerveza', name:'Cerveza artesanal', desc:'Botella de 330 ml.', price:12000, emoji:'🍺' }
+        ]},
+        { title: 'DESTILADOS', items: [
+          { id:'b-whisky', name:'Whisky en las rocas', desc:'Etiqueta premium.', price:28000, emoji:'🥃' }
+        ]}
+      ]
+    }
+  };
+
+  const CHEF_RECOMMENDATIONS = [
+    { id:'d-americano', name:'Desayuno americano', price:28000, img:'assets/food/hub-desayuno-americano.png', goto:'desayuno' },
+    { id:'p-ceviche', name:'Ceviche de camarón', price:32000, img:'assets/food/hub-ceviche.png', goto:'restaurante' },
+    { id:'p-lomo', name:'Lomo de res al vino', price:68000, emoji:'🥩', goto:'restaurante' },
+    { id:'b-mojito', name:'Mojito clásico', price:17000, emoji:'🍸', goto:'bar' },
+    { id:'p-fondant', name:'Fondant de chocolate', price:26000, emoji:'🍫', goto:'restaurante' }
+  ];
+
+  const EXPLORE_ROWS = [
+    { key:'desayuno', title:'Desayuno', desc:'Empieza tu día con energía', img:'assets/food/explore-desayuno.png' },
+    { key:'restaurante', title:'Restaurante', desc:'Almuerzo y cena de autor', emoji:'🍷' },
+    { key:'bar', title:'Bar / Lounge', desc:'Coctelería y bebidas', emoji:'🍸' },
+    { key:'roomservice', title:'Room service', desc:'Directo a tu suite, 24/7', emoji:'🛎️', external:'room-service.html' }
+  ];
+
+  const HUB_HERO = { heroLabel:'RESTAURANTE PRINCIPAL', heroTitle:'Sabores de autor', heroDesc:'Desayuno, almuerzo, cena y bar · Pide a tu suite o reserva mesa' };
+
+  function money(n) { return '$' + n.toLocaleString('es-CO') + ' COP'; }
+  function mediaStyle(item) {
+    return item.img ? `background-image:url('${item.img}')` : '';
+  }
+
+  // ---------- Estado ----------
+  let activeChip = 'todo';
+  let deliveryMode = 'suite';
+  const cart = {}; // { itemId: { name, price, qty } }
+  const ALL_ITEMS = {};
+  Object.values(CATEGORIES).forEach(cat => cat.groups.forEach(g => g.items.forEach(it => { ALL_ITEMS[it.id] = it; })));
+
+  function render() {
+    const root = document.getElementById('scrollContent');
+    if (activeChip === 'todo') {
+      root.innerHTML = heroHtml(HUB_HERO, true) + deliverySelectorHtml() + chipsHtml() + `
+        <p class="section-title">Recomendados del chef</p>
+        <div class="chef-carousel">${CHEF_RECOMMENDATIONS.map(chefCardHtml).join('')}</div>
+        <p class="section-title">Explora por momento</p>
+        <div style="display:flex; flex-direction:column; gap:10px;">${EXPLORE_ROWS.map(exploreRowHtml).join('')}</div>
+      `;
+    } else {
+      const cat = CATEGORIES[activeChip];
+      root.innerHTML = heroHtml(cat, false) + deliverySelectorHtml() + chipsHtml() +
+        cat.groups.map(g => `<p class="section-title">${g.title}</p>` + g.items.map(dishItemHtml).join('')).join('');
+    }
+    wireInteractions();
+  }
+
+  function heroHtml(h, withCta) {
+    return `<div class="hero">
+      <p class="hero-label">${h.heroLabel}</p>
+      <p class="hero-title">${h.heroTitle}</p>
+      <p class="hero-desc">${h.heroDesc}</p>
+      ${withCta ? `<button class="hero-cta" id="reservarMesaBtn">Reservar mesa →</button>` : ''}
+    </div>`;
+  }
+  function deliverySelectorHtml() {
+    return `<div class="delivery-selector">
+      <div class="delivery-opt ${deliveryMode === 'suite' ? 'active' : ''}" data-mode="suite">🛎️ A mi suite 405</div>
+      <div class="delivery-opt ${deliveryMode === 'restaurante' ? 'active' : ''}" data-mode="restaurante">🍽️ En el restaurante</div>
+    </div>`;
+  }
+  function chipsHtml() {
+    const chips = [['todo','Todo'],['desayuno','Desayuno'],['restaurante','Restaurante'],['bar','Bar'],['roomservice','Room service']];
+    return `<div class="category-chips">${chips.map(([key,label]) =>
+      `<button class="chip ${activeChip === key ? 'active' : ''}" data-chip="${key}">${label}</button>`
+    ).join('')}</div>`;
+  }
+  function chefCardHtml(item) {
+    return `<div class="chef-card" data-goto="${item.goto}">
+      <div class="chef-card-photo" style="${mediaStyle(item)}">${item.img ? '' : item.emoji}</div>
+      <div class="chef-card-body">
+        <p class="chef-card-name">${item.name}</p>
+        <p class="chef-card-price">${money(item.price)}</p>
+        <button class="chef-card-add" data-add="${item.id}">+ Añadir</button>
+      </div>
+    </div>`;
+  }
+  function exploreRowHtml(row) {
+    return `<div class="explore-row" data-explore="${row.key}" ${row.external ? `data-external="${row.external}"` : ''}>
+      <div class="explore-photo" style="${row.img ? `background-image:url('${row.img}')` : ''}">${row.img ? '' : row.emoji}</div>
+      <div class="explore-info"><p class="explore-title">${row.title}</p><p class="explore-desc">${row.desc}</p></div>
+      <span class="explore-chevron"><svg viewBox="0 0 17 22" fill="none"><path d="M6.375 6.0415L11.3333 10.9998L6.375 15.9582" stroke="currentColor" stroke-width="1.16875" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    </div>`;
+  }
+  function dishItemHtml(item) {
+    return `<div class="dish-item" data-id="${item.id}">
+      <div class="dish-photo" style="${mediaStyle(item)}">${item.img ? '' : item.emoji}</div>
+      <div class="dish-info">
+        <p class="dish-name">${item.name}</p>
+        <p class="dish-desc">${item.desc}</p>
+        <div class="dish-bottom">
+          <p class="dish-price">${money(item.price)}</p>
+          <div class="qty-control-wrap" data-qty-for="${item.id}"></div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  function qtyControlHtml(id) {
+    const qty = cart[id]?.qty || 0;
+    if (qty === 0) return `<button class="add-btn" data-action="add" data-id="${id}">+ Agregar</button>`;
+    return `<div class="qty-control"><button class="qty-btn" data-action="minus" data-id="${id}">−</button><span class="qty-value">${qty}</span><button class="qty-btn" data-action="plus" data-id="${id}">+</button></div>`;
+  }
+  function renderQtyControls() {
+    document.querySelectorAll('[data-qty-for]').forEach(el => { el.innerHTML = qtyControlHtml(el.dataset.qtyFor); });
+  }
+
+  function updateCartBar() {
+    const items = Object.values(cart);
+    const count = items.reduce((s, i) => s + i.qty, 0);
+    const total = items.reduce((s, i) => s + i.qty * i.price, 0);
+    document.getElementById('cartCount').textContent = count + (count === 1 ? ' item' : ' items');
+    document.getElementById('cartTotalMini').textContent = '$' + total.toLocaleString('es-CO');
+    document.getElementById('cartBar').classList.toggle('visible', count > 0);
+  }
+
+  function addItem(id) {
+    const item = ALL_ITEMS[id];
+    if (!item) return;
+    cart[id] = { name: item.name, price: item.price, qty: (cart[id]?.qty || 0) + 1 };
+    renderQtyControls();
+    updateCartBar();
+  }
+  function changeQty(id, delta) {
+    if (!cart[id]) return;
+    cart[id].qty += delta;
+    if (cart[id].qty <= 0) delete cart[id];
+    renderQtyControls();
+    updateCartBar();
+  }
+
+  function wireInteractions() {
+    renderQtyControls();
+
+    document.getElementById('reservarMesaBtn')?.addEventListener('click', () => { activeChip = 'restaurante'; render(); });
+
+    document.querySelectorAll('.delivery-opt').forEach(opt => {
+      opt.addEventListener('click', () => { deliveryMode = opt.dataset.mode; render(); });
+    });
+
+    document.querySelectorAll('.chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const key = chip.dataset.chip;
+        if (key === 'roomservice') { window.location.href = 'room-service.html'; return; }
+        activeChip = key;
+        render();
+      });
+    });
+
+    document.querySelectorAll('.chef-card').forEach(card => {
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('[data-add]')) return;
+        activeChip = card.dataset.goto;
+        render();
+      });
+    });
+    document.querySelectorAll('[data-add]').forEach(btn => {
+      btn.addEventListener('click', (e) => { e.stopPropagation(); addItem(btn.dataset.add); });
+    });
+
+    document.querySelectorAll('.explore-row').forEach(row => {
+      row.addEventListener('click', () => {
+        if (row.dataset.external) { window.location.href = row.dataset.external; return; }
+        activeChip = row.dataset.explore;
+        render();
+      });
+    });
+
+    document.querySelectorAll('[data-action="add"]').forEach(btn => btn.addEventListener('click', () => addItem(btn.dataset.id)));
+    document.querySelectorAll('[data-action="minus"]').forEach(btn => btn.addEventListener('click', () => changeQty(btn.dataset.id, -1)));
+    document.querySelectorAll('[data-action="plus"]').forEach(btn => btn.addEventListener('click', () => changeQty(btn.dataset.id, 1)));
+  }
+
+  render();
+
+  // ---------- Carrito / confirmación / ubicación de entrega ----------
+  const cartModal = document.getElementById('cartModal');
+  document.getElementById('viewCartBtn').addEventListener('click', () => {
+    const lines = Object.values(cart);
+    const container = document.getElementById('cartLines');
+    const notesBox = document.getElementById('notesInput');
+    container.innerHTML = '';
+    lines.forEach(l => {
+      const row = document.createElement('div');
+      row.className = 'cart-line';
+      row.innerHTML = `<span>${l.qty}x ${l.name}</span><b>$${(l.qty * l.price).toLocaleString('es-CO')}</b>`;
+      container.appendChild(row);
+    });
+    container.appendChild(notesBox);
+    const totalRow = document.createElement('div');
+    totalRow.className = 'modal-total-row';
+    const total = lines.reduce((s, i) => s + i.qty * i.price, 0);
+    totalRow.innerHTML = `<span>Total</span><span id="modalTotal">$${total.toLocaleString('es-CO')}</span>`;
+    container.appendChild(totalRow);
+    cartModal.classList.add('open');
+  });
+  document.getElementById('closeModalBtn').addEventListener('click', () => cartModal.classList.remove('open'));
+  cartModal.addEventListener('click', (e) => { if (e.target === cartModal) cartModal.classList.remove('open'); });
+
+  const LOCATIONS = [
+    { id: 'habitacion', icon: '🛏️', name: 'Habitación' },
+    { id: 'terraza', icon: '🌴', name: 'Terraza' },
+    { id: 'lobby', icon: '🛋️', name: 'Lobby' },
+    { id: 'piscina', icon: '🏊', name: 'Piscina' }
+  ];
+  let selectedLocation = LOCATIONS[0].id;
+  let pendingNotes = '';
+  const locationModal = document.getElementById('locationModal');
+
+  function renderLocationOptions() {
+    const box = document.getElementById('locationOptions');
+    box.innerHTML = LOCATIONS.map(loc => `
+      <div class="location-option ${loc.id === selectedLocation ? 'selected' : ''}" data-location="${loc.id}">
+        <div class="location-emoji">${loc.icon}</div>
+        <p class="location-name">${loc.name}</p>
+        <span class="location-check">${loc.id === selectedLocation ? '✓' : ''}</span>
+      </div>
+    `).join('');
+    box.querySelectorAll('.location-option').forEach(opt => {
+      opt.addEventListener('click', () => { selectedLocation = opt.dataset.location; renderLocationOptions(); });
+    });
+  }
+
+  document.getElementById('confirmOrderBtn').addEventListener('click', () => {
+    const lines = Object.values(cart);
+    if (lines.length === 0) return;
+    pendingNotes = document.getElementById('notesInput').value.trim();
+    cartModal.classList.remove('open');
+    // Si el huésped eligió "En el restaurante", nos saltamos la elección de ubicación (ya está en el restaurante)
+    if (deliveryMode === 'restaurante') {
+      finalizeOrder('En el restaurante');
+      return;
+    }
+    renderLocationOptions();
+    locationModal.classList.add('open');
+  });
+  document.getElementById('closeLocationModalBtn').addEventListener('click', () => locationModal.classList.remove('open'));
+  locationModal.addEventListener('click', (e) => { if (e.target === locationModal) locationModal.classList.remove('open'); });
+  document.getElementById('confirmLocationBtn').addEventListener('click', () => {
+    const locationName = LOCATIONS.find(l => l.id === selectedLocation).name;
+    locationModal.classList.remove('open');
+    finalizeOrder(locationName);
+  });
+
+  function finalizeOrder(deliverTo) {
+    const lines = Object.values(cart);
+    if (lines.length === 0) return;
+    const total = lines.reduce((s, i) => s + i.qty * i.price, 0);
+
+    const order = {
+      id: 'ORD-' + Date.now(),
+      room: '405',
+      guest: 'Sr Snick',
+      roomType: 'Suite Deluxe',
+      source: '🍽️ Restaurante',
+      deliverTo,
+      items: lines.map(l => `${l.qty}x ${l.name}`).join('\n') + `\nEntregar en: ${deliverTo}` + (pendingNotes ? `\nNota: ${pendingNotes}` : ''),
+      total: '$' + total.toLocaleString('es-CO'),
+      stage: 'nuevo',
+      createdAt: new Date().toISOString()
+    };
+    const existing = JSON.parse(localStorage.getItem('hotelife_shared_orders') || '[]');
+    existing.unshift(order);
+    localStorage.setItem('hotelife_shared_orders', JSON.stringify(existing));
+
+    document.getElementById('successScreen').classList.add('visible');
+  }
+
+  document.getElementById('successBackBtn').addEventListener('click', () => { window.location.href = 'servicios.html'; });
+  document.getElementById('backBtn').addEventListener('click', () => { window.location.href = 'servicios.html'; });
+  document.getElementById('chatFab').addEventListener('click', () => { window.location.href = 'solicitudes.html'; });
+</script>
+
+<script src="js/nav.js"></script>
+</body>
+</html>
