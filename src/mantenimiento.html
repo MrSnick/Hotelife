@@ -176,7 +176,8 @@
     background:none; border:none;
   }
   .nav-item.active{ color: var(--gold); }
-  .nav-icon{ font-size:16px; }
+  .nav-icon{ font-size:16px; display:flex; }
+  .nav-icon svg{ width:16px; height:16px; }
 
   .chat-fab{
     position:absolute;
@@ -267,19 +268,19 @@
 
   <nav class="bottom-nav">
     <button class="nav-item" data-tab="inicio">
-      <span class="nav-icon">🏠</span>
+      <span class="nav-icon"><svg class="icon-svg" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.75 5.83333L7 1.75L12.25 5.83333V12.25H8.75V8.16667H5.25V12.25H1.75V5.83333Z" stroke="currentColor" stroke-width="0.9625" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       <span>Inicio</span>
     </button>
     <button class="nav-item active" data-tab="servicios">
-      <span class="nav-icon">🗂️</span>
+      <span class="nav-icon"><svg class="icon-svg" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.75 1.75H5.25V5.25H1.75V1.75ZM8.75 1.75H12.25V5.25H8.75V1.75ZM1.75 8.75H5.25V12.25H1.75V8.75ZM8.75 8.75H12.25V12.25H8.75V8.75Z" stroke="currentColor" stroke-width="0.9625" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       <span>Servicios</span>
     </button>
     <button class="nav-item" data-tab="solicitudes">
-      <span class="nav-icon">📋</span>
+      <span class="nav-icon"><svg class="icon-svg" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5.25001 2.33333H2.91667V12.25H11.0833V2.33333H8.75001M4.66667 7H9.33334M4.66667 9.33333H8.16667M5.25001 1.75H8.75001V4.08333H5.25001V1.75Z" stroke="currentColor" stroke-width="0.9625" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       <span>Mis solicitudes</span>
     </button>
     <button class="nav-item" data-tab="cuenta">
-      <span class="nav-icon">🧾</span>
+      <span class="nav-icon"><svg class="icon-svg" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4.66667 5.25H9.33334M4.66667 7.58333H9.33334M4.66667 9.91667H7.58334M2.91667 1.75L4.66667 2.91667L7.00001 1.75L9.33334 2.91667L11.0833 1.75V12.25L9.33334 11.0833L7.00001 12.25L4.66667 11.0833L2.91667 12.25V1.75Z" stroke="currentColor" stroke-width="0.9625" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       <span>Mi cuenta</span>
     </button>
   </nav>
