@@ -434,7 +434,7 @@
           <p class="card-cta">Ver menú →</p>
         </div>
       </a>
-      <a class="service-card" href="#" data-service="housekeeping">
+      <a class="service-card" href="servicio-solicitud.html?service=housekeeping" data-service="housekeeping">
         <div class="card-header">
           <span class="card-emoji">🧺</span>
         </div>
@@ -443,7 +443,7 @@
           <p class="card-cta">Solicitar →</p>
         </div>
       </a>
-      <a class="service-card" href="#" data-service="spa">
+      <a class="service-card" href="spa.html" data-service="spa">
         <div class="card-header">
           <span class="card-emoji">🧖‍♀️</span>
         </div>
@@ -452,7 +452,7 @@
           <p class="card-cta">Reservar →</p>
         </div>
       </a>
-      <a class="service-card" href="#" data-service="traslados">
+      <a class="service-card" href="servicio-coordinacion.html?service=traslados" data-service="traslados">
         <div class="card-header">
           <span class="card-emoji">🚗</span>
         </div>
@@ -461,7 +461,7 @@
           <p class="card-cta">Solicitar →</p>
         </div>
       </a>
-      <a class="service-card" href="#" data-service="restaurante">
+      <a class="service-card" href="restaurante.html" data-service="restaurante">
         <div class="card-header">
           <span class="card-emoji">🍷</span>
         </div>
@@ -470,7 +470,7 @@
           <p class="card-cta">Reservar →</p>
         </div>
       </a>
-      <a class="service-card" href="#" data-service="lavanderia">
+      <a class="service-card" href="servicio-solicitud.html?service=lavanderia" data-service="lavanderia">
         <div class="card-header">
           <span class="card-emoji">👔</span>
         </div>
@@ -479,7 +479,7 @@
           <p class="card-cta">Solicitar →</p>
         </div>
       </a>
-      <a class="service-card service-card-more" href="#" data-service="mas-servicios" id="masServiciosCard">
+      <a class="service-card service-card-more" href="servicios.html" data-service="mas-servicios" id="masServiciosCard">
         <div class="card-header">
           <span class="card-emoji">➕</span>
         </div>
@@ -583,22 +583,7 @@
     });
   });
 
-  document.querySelectorAll('.service-card').forEach(card => {
-    card.addEventListener('click', (e) => {
-      if (card.dataset.service === 'mas-servicios') {
-        e.preventDefault();
-        document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-        document.querySelector('[data-tab="servicios"]').classList.add('active');
-        console.log('Navegando al catálogo completo de servicios');
-        return;
-      }
-      if (card.dataset.service === 'room-service') {
-        return; // navegación real vía href, no se bloquea
-      }
-      e.preventDefault();
-      console.log('Servicio seleccionado:', card.dataset.service);
-    });
-  });
+  // Todas las tarjetas de Servicios rápidos navegan de verdad vía su href
 
   // Botón de llamar a recepción: abre el marcador en celular y muestra el número en pantalla
   const callBtn = document.getElementById('callBtn');

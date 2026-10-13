@@ -105,7 +105,7 @@
   });
   const times = ['9:00 AM','11:00 AM','1:00 PM','3:00 PM','5:00 PM','7:00 PM'];
 
-  let selectedOption = 0, selectedDate = 0, selectedTime = 2;
+  let selectedOption = Number(new URLSearchParams(location.search).get('option')) || 0, selectedDate = 0, selectedTime = 2;
 
   function render() {
     document.getElementById('content').innerHTML = `
