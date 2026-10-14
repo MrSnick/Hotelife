@@ -112,7 +112,8 @@
   }
   .request-icon{
     width:40px; height:40px; border-radius:14px;
-    background: var(--bg-outer);
+    background-color: var(--bg-outer);
+    background-size:cover; background-position:center;
     display:flex; align-items:center; justify-content:center;
     font-size:19px; flex-shrink:0;
   }
@@ -202,7 +203,7 @@
   <div class="scroll-content" id="scrollContent">
 
     <div class="request-card" data-status="progreso">
-      <div class="request-icon">🔧</div>
+      <div class="request-icon" style="background-image:url('assets/services/mantenimiento.png')"></div>
       <div class="request-info">
         <p class="request-name">Mantenimiento — Aire acondicionado</p>
         <p class="request-time">Hoy · 1:10 PM</p>
@@ -214,7 +215,7 @@
     </div>
 
     <div class="request-card" data-status="pendiente">
-      <div class="request-icon">🚗</div>
+      <div class="request-icon" style="background-image:url('assets/servicios-hero/traslados.png')"></div>
       <div class="request-info">
         <p class="request-name">Traslado al aeropuerto</p>
         <p class="request-time">Mañana · 7:00 AM</p>
@@ -226,7 +227,7 @@
     </div>
 
     <div class="request-card" data-status="progreso">
-      <div class="request-icon">🍽️</div>
+      <div class="request-icon" style="background-image:url('assets/quickcards/room-service.png')"></div>
       <div class="request-info">
         <p class="request-name">Room Service</p>
         <p class="request-time">Hoy · 12:35 PM</p>
@@ -238,7 +239,7 @@
     </div>
 
     <div class="request-card" data-status="confirmado">
-      <div class="request-icon">🧖‍♀️</div>
+      <div class="request-icon" style="background-image:url('assets/spa/hero.png')"></div>
       <div class="request-info">
         <p class="request-name">Spa & Wellness</p>
         <p class="request-time">Hoy · 5:00 PM</p>
@@ -249,7 +250,7 @@
     </div>
 
     <div class="request-card" data-status="completada">
-      <div class="request-icon">🧺</div>
+      <div class="request-icon" style="background-image:url('assets/services/housekeeping.png')"></div>
       <div class="request-info">
         <p class="request-name">Limpieza matutina</p>
         <p class="request-time">Hoy · 9:15 AM</p>
@@ -260,7 +261,7 @@
     </div>
 
     <div class="request-card" data-status="completada">
-      <div class="request-icon">🧴</div>
+      <div class="request-icon" style="background-image:url('assets/amenities/toallas.png')"></div>
       <div class="request-info">
         <p class="request-name">Toallas extra</p>
         <p class="request-time">Ayer · 6:40 PM</p>
