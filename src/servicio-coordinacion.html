@@ -25,7 +25,7 @@
   .scroll-content::-webkit-scrollbar{ display:none; }
 
   .icon-hero{ display:flex; flex-direction:column; align-items:center; gap:8px; padding: 4px 0; }
-  .icon-circle{ width:64px; height:64px; border-radius:20px; background: var(--navy); display:flex; align-items:center; justify-content:center; font-size:28px; }
+  .icon-circle{ width:64px; height:64px; border-radius:20px; background-color: var(--navy); background-size:cover; background-position:center; display:flex; align-items:center; justify-content:center; font-size:28px; }
   .icon-desc{ font-size:12px; color: var(--text-muted); text-align:center; }
 
   .coord-note{ background: rgba(212,178,133,0.12); border:1px solid var(--gold); border-radius:14px; padding:12px 14px; font-size:11.5px; line-height:1.5; }
@@ -57,15 +57,15 @@
 
 <script>
   const SERVICES = {
-    traslados: { icon:'🚗', title:'Traslados', desc:'Coordina tu transporte desde o hacia el hotel.',
+    traslados: { icon:'🚗', img:'assets/servicios-hero/traslados.png', title:'Traslados', desc:'Coordina tu transporte desde o hacia el hotel.',
       fields:[ {label:'Tipo de traslado', type:'select', options:['Al aeropuerto','Desde el aeropuerto','A un destino local']}, {label:'Fecha', type:'date'}, {label:'Hora', type:'select', options:['6:00 AM','7:00 AM','8:00 AM','12:00 PM','3:00 PM','6:00 PM']}, {label:'N° de pasajeros', type:'select', options:['1','2','3','4+']} ] },
-    vehiculos: { icon:'🚙', title:'Alquiler de vehículos', desc:'Coordina el alquiler de un vehículo durante tu estadía.',
+    vehiculos: { icon:'🚙', img:'assets/servicios-hero/vehiculos.png', title:'Alquiler de vehículos', desc:'Coordina el alquiler de un vehículo durante tu estadía.',
       fields:[ {label:'Tipo de vehículo', type:'select', options:['Sedán','SUV','Camioneta']}, {label:'Fecha de inicio', type:'date'}, {label:'Días de alquiler', type:'select', options:['1 día','2 días','3 días','Más de 3 días']} ] },
-    tours: { icon:'🗺️', title:'Tours y actividades', desc:'Descubre y reserva experiencias locales.',
+    tours: { icon:'🗺️', img:'assets/servicios-hero/tours.png', title:'Tours y actividades', desc:'Descubre y reserva experiencias locales.',
       fields:[ {label:'Tour de interés', type:'select', options:['Ciudad histórica','Naturaleza y senderismo','Gastronómico','Otro (especificar en notas)']}, {label:'Fecha preferida', type:'date'}, {label:'N° de personas', type:'select', options:['1','2','3','4+']} ] },
-    entradas: { icon:'🎟️', title:'Reserva de entradas', desc:'Te ayudamos a conseguir entradas para shows o eventos locales.',
+    entradas: { icon:'🎟️', img:'assets/servicios-hero/entradas.png', title:'Reserva de entradas', desc:'Te ayudamos a conseguir entradas para shows o eventos locales.',
       fields:[ {label:'Evento o lugar', type:'text', placeholder:'Ej: Show nocturno, museo...'}, {label:'Fecha', type:'date'}, {label:'N° de entradas', type:'select', options:['1','2','3','4+']} ] },
-    ninera: { icon:'🧸', title:'Niñera / Kids club', desc:'Cuidado infantil profesional para que disfrutes tu estadía.',
+    ninera: { icon:'🧸', img:'assets/servicios-hero/ninera.png', title:'Niñera / Kids club', desc:'Cuidado infantil profesional para que disfrutes tu estadía.',
       fields:[ {label:'Servicio', type:'select', options:['Niñera en habitación','Kids club (grupal)']}, {label:'Fecha', type:'date'}, {label:'Horario', type:'select', options:['Mañana (9am-1pm)','Tarde (2pm-6pm)','Noche (7pm-11pm)']}, {label:'Edad del niño/a', type:'text', placeholder:'Ej: 5 años'} ] }
   };
 
@@ -82,7 +82,7 @@
 
   document.getElementById('content').innerHTML = `
     <div class="icon-hero">
-      <div class="icon-circle">${svc.icon}</div>
+      <div class="icon-circle"${svc.img ? ` style="background-image:url('${svc.img}')"` : ''}>${svc.img ? '' : svc.icon}</div>
       <p class="icon-desc">${svc.desc}</p>
     </div>
     <div class="coord-note">🧭 Un miembro de nuestro equipo de Conserjería coordinará los detalles finales contigo por chat una vez recibamos tu solicitud.</div>

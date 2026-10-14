@@ -24,7 +24,7 @@
   .scroll-content::-webkit-scrollbar{ display:none; }
 
   .menu-item{ display:flex; gap:12px; background:#fff; border:1px solid var(--border-light); border-radius:16px; padding:14px; }
-  .item-emoji{ width:52px; height:52px; border-radius:12px; background:var(--bg-outer); display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0; }
+  .item-emoji{ width:52px; height:52px; border-radius:12px; background-color:var(--bg-outer); background-size:cover; background-position:center; display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0; }
   .item-info{ flex:1; min-width:0; display:flex; flex-direction:column; gap:3px; }
   .item-name{ font-weight:700; font-size:13.5px; }
   .item-desc{ font-size:11.5px; color:var(--text-muted); line-height:1.4; }
@@ -88,10 +88,10 @@
       { id:'jugo', icon:'🍊', name:'Jugo natural', desc:'Naranja recién exprimida', price:8000 }
     ]},
     tienda: { title: 'Tienda del hotel', dept:'🏨 Recepción', items: [
-      { id:'agua', icon:'💧', name:'Agua embotellada', desc:'500ml', price:6000 },
-      { id:'snack', icon:'🍫', name:'Snack / chocolatina', desc:'Variedad disponible', price:9000 },
-      { id:'protector', icon:'🧴', name:'Protector solar', desc:'FPS 50', price:35000 },
-      { id:'camiseta', icon:'👕', name:'Camiseta HOTELIFE', desc:'Souvenir oficial', price:45000 }
+      { id:'agua', icon:'💧', img:'assets/tienda/agua.png', name:'Agua embotellada', desc:'500ml', price:6000 },
+      { id:'snack', icon:'🍫', img:'assets/tienda/snack.png', name:'Snack / chocolatina', desc:'Variedad disponible', price:9000 },
+      { id:'protector', icon:'🧴', img:'assets/tienda/protector.png', name:'Protector solar', desc:'FPS 50', price:35000 },
+      { id:'camiseta', icon:'👕', img:'assets/tienda/camiseta.png', name:'Camiseta HOTELIFE', desc:'Souvenir oficial', price:45000 }
     ]}
   };
 
@@ -106,7 +106,7 @@
   const list = document.getElementById('menuList');
   list.innerHTML = menu.items.map(item => `
     <div class="menu-item" data-id="${item.id}">
-      <div class="item-emoji">${item.icon}</div>
+      <div class="item-emoji"${item.img ? ` style="background-image:url('${item.img}')"` : ''}>${item.img ? '' : item.icon}</div>
       <div class="item-info">
         <p class="item-name">${item.name}</p>
         <p class="item-desc">${item.desc}</p>

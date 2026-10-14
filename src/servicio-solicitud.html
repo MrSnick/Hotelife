@@ -27,7 +27,7 @@
   .scroll-content::-webkit-scrollbar{ display:none; }
 
   .icon-hero{ display:flex; flex-direction:column; align-items:center; gap:8px; padding: 10px 0 4px; }
-  .icon-circle{ width:64px; height:64px; border-radius:20px; background: var(--navy); display:flex; align-items:center; justify-content:center; font-size:28px; }
+  .icon-circle{ width:64px; height:64px; border-radius:20px; background-color: var(--navy); background-size:cover; background-position:center; display:flex; align-items:center; justify-content:center; font-size:28px; }
   .icon-desc{ font-size:12px; color: var(--text-muted); text-align:center; }
 
   .section-title{ font-weight:700; font-size:11px; text-transform:uppercase; color: var(--text-muted); }
@@ -89,28 +89,28 @@
 <script>
   // Cada entrada define cómo se ve y qué campos pide el formulario para ese servicio
   const SERVICES = {
-    housekeeping: { icon:'🧹', title:'Housekeeping', subtitle:'Limpieza de habitación', desc:'Solicita limpieza de tu habitación en el momento que prefieras.', dept:'🧺 Ama de Llaves',
+    housekeeping: { icon:'🧹', img:'assets/services/housekeeping.png', title:'Housekeeping', subtitle:'Limpieza de habitación', desc:'Solicita limpieza de tu habitación en el momento que prefieras.', dept:'🧺 Ama de Llaves',
       schedule:{ title:'🧹 Programar Limpieza de Suite', times:['Ahora','9:00 AM','10:00 AM','11:00 AM','12:00 PM','1:00 PM','2:00 PM','3:00 PM','4:00 PM','5:00 PM'] },
       fields:[ {label:'Tipo de limpieza', type:'select', options:['Rápida (10 min)','Completa (30 min)'], value:'Completa (30 min)'}, {label:'Horario preferido', type:'select', options:['Ahora mismo','En 1 hora','Esta tarde','Mañana temprano'], value:'Esta tarde'} ] },
-    'amenities-adicionales': { icon:'🧴', title:'Amenities adicionales', subtitle:'Reposición de artículos de aseo', desc:'Pide toallas, almohadas o kit de aseo extra para tu habitación.', dept:'🧺 Ama de Llaves',
+    'amenities-adicionales': { icon:'🧴', img:'assets/services/amenities.png', title:'Amenities adicionales', subtitle:'Reposición de artículos de aseo', desc:'Pide toallas, almohadas o kit de aseo extra para tu habitación.', dept:'🧺 Ama de Llaves',
       fields:[ {label:'Artículo', type:'select', options:['Juego de toallas','Almohadas extra','Kit de aseo premium','Set de café & té']} ], quantity:true },
-    lavanderia: { icon:'👔', title:'Lavandería y planchado', subtitle:'Servicio de lavandería', desc:'Recogemos tus prendas y las devolvemos limpias el mismo día.', dept:'🧺 Ama de Llaves',
+    lavanderia: { icon:'👔', img:'assets/services/lavanderia.png', title:'Lavandería y planchado', subtitle:'Servicio de lavandería', desc:'Recogemos tus prendas y las devolvemos limpias el mismo día.', dept:'🧺 Ama de Llaves',
       fields:[ {label:'Tipo de servicio', type:'select', options:['Lavado estándar','Lavado urgente (+50%)','Solo planchado']} ], quantity:true, quantityLabel:'Número de prendas' },
-    minibar: { icon:'🥤', title:'Minibar', subtitle:'Reposición del minibar', desc:'Indícanos qué se te acabó y lo reponemos.', dept:'🧺 Ama de Llaves',
+    minibar: { icon:'🥤', img:'assets/services/minibar.png', title:'Minibar', subtitle:'Reposición del minibar', desc:'Indícanos qué se te acabó y lo reponemos.', dept:'🧺 Ama de Llaves',
       fields:[ {label:'¿Qué necesitas reponer?', type:'textarea', placeholder:'Ej: agua, snacks, cerveza...'} ] },
-    'late-checkout': { icon:'🕒', title:'Late check-out / Early check-in', subtitle:'Ajustar horario de entrada o salida', desc:'Sujeto a disponibilidad del hotel.', dept:'🏨 Recepción',
+    'late-checkout': { icon:'🕒', img:'assets/services/late-checkout.png', title:'Late check-out / Early check-in', subtitle:'Ajustar horario de entrada o salida', desc:'Sujeto a disponibilidad del hotel.', dept:'🏨 Recepción',
       fields:[ {label:'Tipo de solicitud', type:'select', options:['Late check-out','Early check-in']}, {label:'Hora deseada', type:'select', options:['12:00 PM','1:00 PM','2:00 PM','3:00 PM']} ] },
-    'caja-fuerte': { icon:'🔐', title:'Caja fuerte', subtitle:'Asistencia con la caja fuerte', desc:'¿Olvidaste tu código o tienes un problema con la caja fuerte de tu habitación?', dept:'🏨 Recepción',
+    'caja-fuerte': { icon:'🔐', img:'assets/servicios-hero/caja-fuerte.png', title:'Caja fuerte', subtitle:'Asistencia con la caja fuerte', desc:'¿Olvidaste tu código o tienes un problema con la caja fuerte de tu habitación?', dept:'🏨 Recepción',
       fields:[ {label:'Motivo', type:'select', options:['Olvidé mi código','La caja no abre','Otro problema']} ] },
-    valet: { icon:'🅿️', title:'Estacionamiento / Valet', subtitle:'Servicio de valet parking', desc:'Nuestro equipo recogerá tu vehículo en la entrada principal.', dept:'🏨 Recepción',
+    valet: { icon:'🅿️', img:'assets/servicios-hero/valet.png', title:'Estacionamiento / Valet', subtitle:'Servicio de valet parking', desc:'Nuestro equipo recogerá tu vehículo en la entrada principal.', dept:'🏨 Recepción',
       fields:[ {label:'Placa del vehículo', type:'text', placeholder:'ABC123'}, {label:'Hora de llegada', type:'select', options:['Ahora mismo','En 15 min','En 30 min']} ] },
-    equipaje: { icon:'🧳', title:'Custodia de equipaje', subtitle:'Guardar maletas', desc:'Ideal si tu vuelo es más tarde y ya hiciste check-out.', dept:'🏨 Recepción',
+    equipaje: { icon:'🧳', img:'assets/servicios-hero/equipaje.png', title:'Custodia de equipaje', subtitle:'Guardar maletas', desc:'Ideal si tu vuelo es más tarde y ya hiciste check-out.', dept:'🏨 Recepción',
       fields:[ {label:'Hora de recogida', type:'select', options:['En 2 horas','En 4 horas','Esta noche','Mañana']} ], quantity:true, quantityLabel:'Número de maletas' },
-    mascotas: { icon:'🐾', title:'Servicio de mascotas', subtitle:'Cuidado y paseo', desc:'Servicios para que tu mascota también disfrute la estadía.', dept:'🏨 Recepción',
+    mascotas: { icon:'🐾', img:'assets/servicios-hero/mascotas.png', title:'Servicio de mascotas', subtitle:'Cuidado y paseo', desc:'Servicios para que tu mascota también disfrute la estadía.', dept:'🏨 Recepción',
       fields:[ {label:'Servicio', type:'select', options:['Paseo (30 min)','Cuidado en habitación','Kit de bienvenida para mascotas']} ] },
-    medico: { icon:'🩺', title:'Servicio médico', subtitle:'Asistencia médica', desc:'Un profesional de la salud se comunicará contigo lo antes posible.', dept:'🏨 Recepción', urgent:true,
+    medico: { icon:'🩺', img:'assets/servicios-hero/medico.png', title:'Servicio médico', subtitle:'Asistencia médica', desc:'Un profesional de la salud se comunicará contigo lo antes posible.', dept:'🏨 Recepción', urgent:true,
       fields:[ {label:'Motivo de la consulta', type:'textarea', placeholder:'Describe brevemente cómo te sientes...'} ] },
-    wifi: { icon:'📶', title:'WiFi de alta velocidad', subtitle:'Datos de conexión', desc:'', dept:null, info:true,
+    wifi: { icon:'📶', img:'assets/servicios-hero/wifi.png', title:'WiFi de alta velocidad', subtitle:'Datos de conexión', desc:'', dept:null, info:true,
       infoRows:[ {label:'Red', value:'HOTELIFE_Suite405'}, {label:'Contraseña', value:'HTL-405-Snick'} ] }
   };
 
@@ -126,7 +126,7 @@
   if (svc.info) {
     content.innerHTML = `
       <div class="icon-hero">
-        <div class="icon-circle">${svc.icon}</div>
+        <div class="icon-circle"${svc.img ? ` style="background-image:url('${svc.img}')"` : ''}>${svc.img ? '' : svc.icon}</div>
       </div>
       <div class="info-card">
         ${svc.infoRows.map(r => `
@@ -176,7 +176,7 @@
 
     content.innerHTML = `
       <div class="icon-hero">
-        <div class="icon-circle">${svc.icon}</div>
+        <div class="icon-circle"${svc.img ? ` style="background-image:url('${svc.img}')"` : ''}>${svc.img ? '' : svc.icon}</div>
         <p class="icon-desc">${svc.desc}</p>
       </div>
       ${scheduleHtml}

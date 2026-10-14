@@ -175,7 +175,11 @@
   }
   .service-card-more .card-cta{ color: var(--navy); }
   .card-header{ display:flex; align-items:center; justify-content:flex-start; }
-  .card-emoji{ font-size:24px; }
+  .card-emoji{
+    width:44px; height:44px; border-radius:14px;
+    background-color: var(--bg-outer); background-size:cover; background-position:center;
+    display:flex; align-items:center; justify-content:center; font-size:22px;
+  }
   .card-name{ font-weight:600; font-size:13px; line-height:1.25; }
   .card-cta{ font-weight:700; font-size:11px; color: var(--gold); margin-top:4px; }
 
@@ -427,7 +431,7 @@
     <div class="services-scroll">
       <a class="service-card" href="room-service.html" data-service="room-service">
         <div class="card-header">
-          <span class="card-emoji">🍽️</span>
+          <div class="card-emoji" style="background-image:url('assets/quickcards/room-service.png')"></div>
         </div>
         <div>
           <p class="card-name">Room Service</p>
@@ -436,7 +440,7 @@
       </a>
       <a class="service-card" href="servicio-solicitud.html?service=housekeeping" data-service="housekeeping">
         <div class="card-header">
-          <span class="card-emoji">🧺</span>
+          <div class="card-emoji" style="background-image:url('assets/services/housekeeping.png')"></div>
         </div>
         <div>
           <p class="card-name">Housekeeping</p>
@@ -445,7 +449,7 @@
       </a>
       <a class="service-card" href="spa.html" data-service="spa">
         <div class="card-header">
-          <span class="card-emoji">🧖‍♀️</span>
+          <div class="card-emoji" style="background-image:url('assets/spa/hero.png')"></div>
         </div>
         <div>
           <p class="card-name">Spa & Wellness</p>
@@ -454,7 +458,7 @@
       </a>
       <a class="service-card" href="servicio-coordinacion.html?service=traslados" data-service="traslados">
         <div class="card-header">
-          <span class="card-emoji">🚗</span>
+          <div class="card-emoji" style="background-image:url('assets/servicios-hero/traslados.png')"></div>
         </div>
         <div>
           <p class="card-name">Traslados</p>
@@ -463,7 +467,7 @@
       </a>
       <a class="service-card" href="restaurante.html" data-service="restaurante">
         <div class="card-header">
-          <span class="card-emoji">🍷</span>
+          <div class="card-emoji" style="background-image:url('assets/services/restaurante.png')"></div>
         </div>
         <div>
           <p class="card-name">Restaurante</p>
@@ -472,7 +476,7 @@
       </a>
       <a class="service-card" href="servicio-solicitud.html?service=lavanderia" data-service="lavanderia">
         <div class="card-header">
-          <span class="card-emoji">👔</span>
+          <div class="card-emoji" style="background-image:url('assets/services/lavanderia.png')"></div>
         </div>
         <div>
           <p class="card-name">Lavandería</p>

@@ -25,7 +25,7 @@
   .scroll-content::-webkit-scrollbar{ display:none; }
 
   .icon-hero{ display:flex; flex-direction:column; align-items:center; gap:8px; padding: 4px 0; }
-  .icon-circle{ width:64px; height:64px; border-radius:20px; background: var(--navy); display:flex; align-items:center; justify-content:center; font-size:28px; }
+  .icon-circle{ width:64px; height:64px; border-radius:20px; background-color: var(--navy); background-size:cover; background-position:center; display:flex; align-items:center; justify-content:center; font-size:28px; }
   .icon-desc{ font-size:12px; color: var(--text-muted); text-align:center; }
 
   .section-title{ font-weight:700; font-size:11px; text-transform:uppercase; color: var(--text-muted); }
@@ -72,23 +72,23 @@
 
 <script>
   const SERVICES = {
-    spa: { icon:'🧖‍♀️', title:'Spa & Wellness', desc:'Elige tu tratamiento y horario preferido.', dept:'🧖‍♀️ Spa',
+    spa: { icon:'🧖‍♀️', img:'assets/spa/hero.png', title:'Spa & Wellness', desc:'Elige tu tratamiento y horario preferido.', dept:'🧖‍♀️ Spa',
       options: [ {name:'Masaje relajante', detail:'60 min · $85.000'}, {name:'Masaje deportivo', detail:'45 min · $70.000'}, {name:'Facial hidratante', detail:'50 min · $65.000'}, {name:'Manicure & pedicure', detail:'75 min · $60.000'} ] },
-    gimnasio: { icon:'🏋️', title:'Gimnasio', desc:'Reserva tu sesión de entrenamiento libre o con instructor.', dept:'🧖‍♀️ Spa',
+    gimnasio: { icon:'🏋️', img:'assets/servicios-hero/gimnasio.png', title:'Gimnasio', desc:'Reserva tu sesión de entrenamiento libre o con instructor.', dept:'🧖‍♀️ Spa',
       options: [ {name:'Sesión libre', detail:'Sin costo'}, {name:'Con entrenador personal', detail:'60 min · $50.000'} ] },
-    piscina: { icon:'🏊', title:'Piscina', desc:'Reserva una camastra o un horario en la piscina climatizada.', dept:'🧖‍♀️ Spa',
+    piscina: { icon:'🏊', img:'assets/servicios-hero/piscina.png', title:'Piscina', desc:'Reserva una camastra o un horario en la piscina climatizada.', dept:'🧖‍♀️ Spa',
       options: [ {name:'Camastro estándar', detail:'Sin costo'}, {name:'Cabana privada', detail:'$40.000 / día'} ] },
-    sauna: { icon:'♨️', title:'Sauna / Jacuzzi', desc:'Relájate en nuestras instalaciones térmicas.', dept:'🧖‍♀️ Spa',
+    sauna: { icon:'♨️', img:'assets/servicios-hero/sauna.png', title:'Sauna / Jacuzzi', desc:'Relájate en nuestras instalaciones térmicas.', dept:'🧖‍♀️ Spa',
       options: [ {name:'Sauna (40 min)', detail:'$45.000'}, {name:'Jacuzzi (40 min)', detail:'$45.000'}, {name:'Ambos (70 min)', detail:'$75.000'} ] },
-    clases: { icon:'🧘', title:'Clases (Yoga, Pilates)', desc:'Clases grupales guiadas por instructores certificados.', dept:'🧖‍♀️ Spa',
+    clases: { icon:'🧘', img:'assets/servicios-hero/clases.png', title:'Clases (Yoga, Pilates)', desc:'Clases grupales guiadas por instructores certificados.', dept:'🧖‍♀️ Spa',
       options: [ {name:'Yoga matutino', detail:'45 min · Grupal'}, {name:'Pilates', detail:'45 min · Grupal'}, {name:'Yoga privado', detail:'45 min · $60.000'} ] },
     restaurante: { icon:'🍷', title:'Restaurante', desc:'Reserva tu mesa en el restaurante principal.', dept:'🍽️ A&B',
       options: [ {name:'Mesa para 2', detail:'Interior'}, {name:'Mesa para 2', detail:'Terraza'}, {name:'Mesa para 4+', detail:'Interior'} ] },
-    salones: { icon:'🏛️', title:'Salones de eventos', desc:'Cotiza y reserva un salón para tu evento.', dept:'🏨 Recepción',
+    salones: { icon:'🏛️', img:'assets/servicios-hero/salones.png', title:'Salones de eventos', desc:'Cotiza y reserva un salón para tu evento.', dept:'🏨 Recepción',
       options: [ {name:'Salón pequeño', detail:'Hasta 20 personas'}, {name:'Salón grande', detail:'Hasta 80 personas'}, {name:'Jardín exterior', detail:'Hasta 150 personas'} ] },
-    negocios: { icon:'🖨️', title:'Centro de negocios', desc:'Reserva una sala de juntas o estación de trabajo.', dept:'🏨 Recepción',
+    negocios: { icon:'🖨️', img:'assets/servicios-hero/negocios.png', title:'Centro de negocios', desc:'Reserva una sala de juntas o estación de trabajo.', dept:'🏨 Recepción',
       options: [ {name:'Estación individual', detail:'Por hora'}, {name:'Sala de juntas', detail:'Hasta 8 personas'} ] },
-    despertador: { icon:'⏰', title:'Servicio de despertador', desc:'Elige cómo y a qué hora quieres que te despertemos.', dept:'🏨 Recepción',
+    despertador: { icon:'⏰', img:'assets/servicios-hero/despertador.png', title:'Servicio de despertador', desc:'Elige cómo y a qué hora quieres que te despertemos.', dept:'🏨 Recepción',
       options: [ {name:'Llamada telefónica', detail:'A la habitación'}, {name:'Golpe en la puerta', detail:'Tocamos a tu puerta'} ] }
   };
 
@@ -110,7 +110,7 @@
   function render() {
     document.getElementById('content').innerHTML = `
       <div class="icon-hero">
-        <div class="icon-circle">${svc.icon}</div>
+        <div class="icon-circle"${svc.img ? ` style="background-image:url('${svc.img}')"` : ''}>${svc.img ? '' : svc.icon}</div>
         <p class="icon-desc">${svc.desc}</p>
       </div>
 
